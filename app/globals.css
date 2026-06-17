@@ -16,40 +16,21 @@
   --font-grotesk: var(--font-hanken);
 }
 
+/*
+ * One palette: white canvas, near-black ink, deep-blue accent used sparingly.
+ * No dark mode — the site is intentionally light everywhere, and color-scheme:
+ * light keeps native UI (scrollbars, overscroll, form controls) white too.
+ * These match lib/premium-theme.ts, which re-asserts them inline on <main>.
+ */
 :root {
+  color-scheme: light;
   --bg: #ffffff;
-  --fg: #0a0a0a;
-  --muted: #f4f4f5;
-  --muted-fg: #595959;
-  --border: #e4e4e7;
-
-  --orange: #ea580c;
-  --blue: #2563eb;
-
-  /* Default accent is orange; a wrapper may set data-accent to switch. */
-  --accent: var(--orange);
+  --fg: #0a0a0b;
+  --muted: #f3f3ef;
+  --muted-fg: #73737a;
+  --border: #e7e7e1;
+  --accent: #1b34ff;
   --accent-fg: #ffffff;
-}
-
-[data-accent="orange"] {
-  --accent: var(--orange);
-}
-
-[data-accent="blue"] {
-  --accent: var(--blue);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0a0a0a;
-    --fg: #fafafa;
-    --muted: #161618;
-    --muted-fg: #a1a1aa;
-    --border: rgba(255, 255, 255, 0.12);
-
-    --orange: #f97316;
-    --blue: #3b82f6;
-  }
 }
 
 @layer base {

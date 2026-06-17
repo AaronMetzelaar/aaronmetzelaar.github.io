@@ -4,7 +4,6 @@ import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { Hero } from "@/components/site/hero";
 import { MiniCard } from "@/components/site/mini-card";
-import { ProgressRail } from "@/components/site/progress-rail";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
 import { WorkEntry } from "@/components/site/work-entry";
@@ -27,8 +26,7 @@ export default function Home() {
       style={premiumTheme}
     >
       <SiteNav />
-      <ProgressRail />
-      {/* site-wide cursor-reactive dot field — the hero's motif, everywhere */}
+      {/* static ambient dot grid — the page's fine-dot texture, behind everything */}
       <PageDots />
 
       <div className="relative z-10">
@@ -122,8 +120,8 @@ export default function Home() {
               Most of my work now is one layer up — designing the system the
               team builds with: the context that grounds every agent, the skills
               that run the work, the reviewers, and the hooks that fire on their
-              own. Read it across the development lifecycle; hover anything for
-              detail.
+              own. Read it across the development lifecycle; hover or tap any
+              node for detail.
             </p>
           </Reveal>
           <Reveal className="mt-14">
@@ -241,14 +239,14 @@ export default function Home() {
             <div className="mt-12 flex flex-col gap-5">
               <PullLink
                 arrow="↗"
-                className="text-2xl tracking-[-0.01em] sm:text-3xl"
+                className="text-[clamp(1rem,5vw,1.875rem)] tracking-[-0.01em]"
                 href={`mailto:${site.email}`}
               >
                 {site.email}
               </PullLink>
               <PullLink
                 arrow="↗"
-                className="text-2xl tracking-[-0.01em] sm:text-3xl"
+                className="text-[clamp(1rem,5vw,1.875rem)] tracking-[-0.01em]"
                 href={site.socials.github}
                 rel="noreferrer"
                 target="_blank"

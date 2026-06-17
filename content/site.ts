@@ -20,10 +20,13 @@ export const site = {
     school: "University of Amsterdam",
     year: "2024",
   },
+  // Single source of truth for both the desktop links and the mobile menu.
+  // Order matches the page sections so scroll-spy reads correctly.
   nav: [
     { label: "About", href: "#about" },
     { label: "Work", href: "#work" },
     { label: "AI & Agentic", href: "#ai" },
+    { label: "Thesis", href: "#thesis" },
     { label: "Creative", href: "#creative" },
     { label: "Contact", href: "#contact" },
   ],

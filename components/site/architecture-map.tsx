@@ -17,6 +17,8 @@ const firstStage = (n: ArchNode) =>
   Math.min(...n.stages.map((s) => stages.indexOf(s)));
 const stageRange = (n: ArchNode) =>
   n.stages.length === 1 ? n.stages[0] : `${n.stages[0]} → ${n.stages.at(-1)}`;
+// fixed layer order for the mobile spine: context → skill → reviewer → hook
+const layerRank = (n: ArchNode) => layers.findIndex((l) => l.id === n.layer);
 
 const edges = archNodes.flatMap((n) =>
   (n.deps ?? []).map((to) => ({ from: n.id, to }))
@@ -81,104 +83,251 @@ export function ArchitectureMap() {
   const connected = connectionsOf(activeId);
   const onSelect = (id: string) => setSelected((c) => (c === id ? null : id));
 
+  // Mobile: select a node and scroll its row into view — keeps the inline
+  // "Connects to" jumps oriented when they cross stage groups.
+  const selectMobile = (id: string) => {
+    onSelect(id);
+    if (typeof window === "undefined") {
+      return;
+    }
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    requestAnimationFrame(() => {
+      document.getElementById(`am-${id}`)?.scrollIntoView({
+        behavior: reduced ? "auto" : "smooth",
+        block: "center",
+      });
+    });
+  };
+
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_minmax(260px,300px)] lg:gap-12">
-      <div className="min-w-0 overflow-x-auto">
-        <div
-          className="relative min-w-[640px] font-terminal"
-          style={{ height: "clamp(380px, 44vw, 540px)" }}
-        >
-          {/* stage guides + curves */}
-          <svg
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full overflow-visible"
-            preserveAspectRatio="none"
-            viewBox="0 0 100 100"
+    <>
+      {/* Desktop: the spatial pipeline flow map (lifecycle × layer). */}
+      <div className="hidden gap-10 lg:grid lg:grid-cols-[1fr_minmax(260px,300px)] lg:gap-12">
+        <div className="min-w-0 overflow-x-auto">
+          <div
+            className="relative min-w-[640px] font-terminal"
+            style={{ height: "clamp(380px, 44vw, 540px)" }}
           >
-            <title>lifecycle</title>
-            {stages.map((s, i) => (
-              <line
-                key={s}
-                stroke="var(--border)"
-                strokeWidth={1}
-                vectorEffect="non-scaling-stroke"
-                x1={stageX(i)}
-                x2={stageX(i)}
-                y1={8}
-                y2={90}
-              />
-            ))}
-            {edges.map((e) => {
-              const a = pos[e.from];
-              const b = pos[e.to];
-              if (!(a && b)) {
-                return null;
-              }
-              const lit = activeId === e.from || activeId === e.to;
-              return (
-                <path
-                  d={curve(a, b)}
-                  fill="none"
-                  key={`${e.from}-${e.to}`}
-                  stroke="var(--accent)"
-                  strokeOpacity={lit ? 0.85 : activeId ? 0.04 : 0.13}
-                  strokeWidth={lit ? 1.5 : 1}
+            {/* stage guides + curves */}
+            <svg
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full overflow-visible"
+              preserveAspectRatio="none"
+              viewBox="0 0 100 100"
+            >
+              <title>lifecycle</title>
+              {stages.map((s, i) => (
+                <line
+                  key={s}
+                  stroke="var(--border)"
+                  strokeWidth={1}
                   vectorEffect="non-scaling-stroke"
+                  x1={stageX(i)}
+                  x2={stageX(i)}
+                  y1={8}
+                  y2={90}
+                />
+              ))}
+              {edges.map((e) => {
+                const a = pos[e.from];
+                const b = pos[e.to];
+                if (!(a && b)) {
+                  return null;
+                }
+                const lit = activeId === e.from || activeId === e.to;
+                return (
+                  <path
+                    d={curve(a, b)}
+                    fill="none"
+                    key={`${e.from}-${e.to}`}
+                    stroke="var(--accent)"
+                    strokeOpacity={lit ? 0.85 : activeId ? 0.04 : 0.13}
+                    strokeWidth={lit ? 1.5 : 1}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                );
+              })}
+            </svg>
+
+            {/* stage labels (top) */}
+            {stages.map((s, i) => (
+              <span
+                className="-translate-x-1/2 absolute text-[0.56rem] text-muted-fg uppercase tracking-[0.16em]"
+                key={s}
+                style={{ left: `${stageX(i)}%`, top: "1%" }}
+              >
+                {s}
+              </span>
+            ))}
+
+            {/* lane labels (left) */}
+            {layers.map((l) => (
+              <span
+                className="absolute left-0 text-[0.56rem] text-muted-fg/70 uppercase tracking-[0.18em]"
+                key={l.id}
+                style={{
+                  top: `${LANE_Y[l.id]}%`,
+                  transform: "translateY(-50%)",
+                }}
+              >
+                {l.label}
+              </span>
+            ))}
+
+            {/* nodes */}
+            {archNodes.map((n) => {
+              const p = pos[n.id];
+              const state = activeId
+                ? activeId === n.id
+                  ? "active"
+                  : connected.has(n.id)
+                    ? "conn"
+                    : "dim"
+                : "idle";
+              return (
+                <Node
+                  key={n.id}
+                  node={n}
+                  onHover={setHovered}
+                  onSelect={onSelect}
+                  pt={p}
+                  state={state}
                 />
               );
             })}
-          </svg>
-
-          {/* stage labels (top) */}
-          {stages.map((s, i) => (
-            <span
-              className="-translate-x-1/2 absolute text-[0.56rem] text-muted-fg uppercase tracking-[0.16em]"
-              key={s}
-              style={{ left: `${stageX(i)}%`, top: "1%" }}
-            >
-              {s}
-            </span>
-          ))}
-
-          {/* lane labels (left) */}
-          {layers.map((l) => (
-            <span
-              className="absolute left-0 text-[0.56rem] text-muted-fg/70 uppercase tracking-[0.18em]"
-              key={l.id}
-              style={{ top: `${LANE_Y[l.id]}%`, transform: "translateY(-50%)" }}
-            >
-              {l.label}
-            </span>
-          ))}
-
-          {/* nodes */}
-          {archNodes.map((n) => {
-            const p = pos[n.id];
-            const state = activeId
-              ? activeId === n.id
-                ? "active"
-                : connected.has(n.id)
-                  ? "conn"
-                  : "dim"
-              : "idle";
-            return (
-              <Node
-                key={n.id}
-                node={n}
-                onHover={setHovered}
-                onSelect={onSelect}
-                pt={p}
-                state={state}
-              />
-            );
-          })}
+          </div>
         </div>
+
+        <aside className="lg:sticky lg:top-24 lg:h-max">
+          <DetailPanel node={active} onSelect={onSelect} />
+        </aside>
       </div>
 
-      <aside className="lg:sticky lg:top-24 lg:h-max">
-        <DetailPanel node={active} onSelect={onSelect} />
-      </aside>
-    </div>
+      {/* Mobile: same nodes + connections as a vertical lifecycle spine. */}
+      <MobileMap
+        activeId={activeId}
+        connected={connected}
+        onSelect={onSelect}
+        selectMobile={selectMobile}
+        selected={selected}
+      />
+    </>
+  );
+}
+
+function MobileMap({
+  activeId,
+  connected,
+  selected,
+  onSelect,
+  selectMobile,
+}: {
+  activeId: string | null;
+  connected: Set<string>;
+  selected: string | null;
+  onSelect: (id: string) => void;
+  selectMobile: (id: string) => void;
+}) {
+  return (
+    <ol className="relative font-terminal lg:hidden">
+      <span
+        aria-hidden="true"
+        className="absolute top-2 bottom-2 left-[3px] w-px bg-border"
+      />
+      {stages.map((s, i) => {
+        const nodes = archNodes
+          .filter((n) => firstStage(n) === i)
+          .sort((a, b) => layerRank(a) - layerRank(b));
+        if (nodes.length === 0) {
+          return null;
+        }
+        return (
+          <li className="mb-9 last:mb-0" key={s}>
+            <div className="flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+              />
+              <span className="text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]">
+                {s}
+              </span>
+            </div>
+            <ul className="mt-1 ml-5 divide-y divide-border/60">
+              {nodes.map((n) => {
+                const state: NState = activeId
+                  ? activeId === n.id
+                    ? "active"
+                    : connected.has(n.id)
+                      ? "conn"
+                      : "dim"
+                  : "idle";
+                const lit = state === "active" || state === "conn";
+                const isHook = n.layer === "hook";
+                const isOpen = selected === n.id;
+                return (
+                  <li id={`am-${n.id}`} key={n.id}>
+                    <button
+                      aria-expanded={isOpen}
+                      className={cn(
+                        "flex w-full items-start gap-3 py-3 text-left transition-opacity",
+                        state === "dim" && "opacity-60"
+                      )}
+                      onClick={() => onSelect(n.id)}
+                      type="button"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "mt-1 h-2 w-2 shrink-0 rounded-full border",
+                          isHook ? "bg-bg" : lit ? "bg-accent" : "bg-accent/55",
+                          lit ? "border-accent" : "border-accent/55"
+                        )}
+                      />
+                      <span className="min-w-0 flex-1">
+                        {n.role ? (
+                          <span className="block text-[0.6rem] text-muted-fg uppercase tracking-[0.16em]">
+                            {n.role}
+                          </span>
+                        ) : null}
+                        <span
+                          className={cn(
+                            "block text-sm tracking-tight",
+                            lit ? "text-accent" : "text-fg/85"
+                          )}
+                        >
+                          {n.name}
+                        </span>
+                        {n.stages.length > 1 ? (
+                          <span className="mt-0.5 block text-[0.56rem] text-muted-fg uppercase tracking-[0.12em]">
+                            {stageRange(n)}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "mt-0.5 shrink-0 text-muted-fg transition-transform",
+                          isOpen && "rotate-180 text-accent"
+                        )}
+                      >
+                        ⌄
+                      </span>
+                    </button>
+                    {isOpen ? (
+                      <div className="pb-4">
+                        <DetailPanel node={n} onSelect={selectMobile} />
+                      </div>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 

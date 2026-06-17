@@ -10,6 +10,7 @@ import {
 } from "motion/react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
+
 import { cn } from "@/lib/utils";
 
 function usePointerFine() {
@@ -116,7 +117,7 @@ export function FilingsRule({
     return (
       <div
         aria-hidden="true"
-        className={cn("flex items-center justify-between gap-1", className)}
+        className={cn("flex items-center justify-between", className)}
       >
         {dots.map((i) => (
           <span className="h-1 w-1 shrink-0 rounded-full bg-fg/20" key={i} />
@@ -136,7 +137,7 @@ export function FilingsRule({
   return (
     <div
       aria-hidden="true"
-      className={cn("flex items-center justify-between gap-1", className)}
+      className={cn("flex items-center justify-between", className)}
       onPointerLeave={() => mx.set(-9999)}
       onPointerMove={onMove}
       ref={ref}
@@ -168,17 +169,20 @@ function FilingDot({ mx }: { mx: MotionValue<number> }) {
     };
   }, []);
 
-  const RADIUS = 130;
+  // Calmed: dividers are the quiet "punctuation" tier of the one dot language —
+  // a gentle lean toward the cursor, not a leap. The hero portrait is the bold
+  // cursor-reactive moment; these stay subtle so nothing competes with it.
+  const RADIUS = 110;
   const prox = useTransform(mx, (x) => {
     const d = Math.abs(x - cx);
     return d > RADIUS ? 0 : 1 - d / RADIUS;
   });
   const y = useSpring(
-    useTransform(prox, (p) => p * -10),
+    useTransform(prox, (p) => p * -6),
     { stiffness: 260, damping: 18, mass: 0.3 }
   );
   const scale = useSpring(
-    useTransform(prox, (p) => 1 + p * 1.6),
+    useTransform(prox, (p) => 1 + p * 0.9),
     { stiffness: 260, damping: 18, mass: 0.3 }
   );
   const color = useTransform(
