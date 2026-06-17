@@ -27,5 +27,8 @@ export type WorkItem = {
   tags: string[];
   href?: string;
   repo?: string;
+  /** Landscape visual — used for the desktop hover reveal. */
   media?: MediaItem;
+  /** Portrait visual — used for the touch/stacked view when present. */
+  mediaMobile?: MediaItem;
 };

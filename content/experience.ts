@@ -40,6 +40,22 @@ export const experience: WorkItem[] = [
       "Built to feel tactile and immediate, not like a form",
     ],
     tags: ["Vue", "Interactive", "Configurator"],
+    media: {
+      kind: "video",
+      src: "/ftg-configurator.mp4",
+      poster: "/ftg-configurator-poster.jpg",
+      alt: "The Frame the Game configurator: choosing frame, background, and finishing for a framed AC Milan shirt, previewed live.",
+      width: 1280,
+      height: 778,
+    },
+    mediaMobile: {
+      kind: "video",
+      src: "/ftg-configurator-mobile.mp4",
+      poster: "/ftg-configurator-mobile-poster.jpg",
+      alt: "The Frame the Game configurator on mobile.",
+      width: 540,
+      height: 1182,
+    },
   },
   {
     slug: "product-360",

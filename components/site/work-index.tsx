@@ -114,6 +114,7 @@ export function WorkIndex({ items }: { items: WorkItem[] }) {
                     aspect={16 / 9}
                     className="w-full"
                     label={item.slug}
+                    media={item.mediaMobile ?? item.media}
                     minimal
                   />
                 </div>
@@ -149,6 +150,7 @@ export function WorkIndex({ items }: { items: WorkItem[] }) {
                   className="w-full"
                   key={items[active].slug}
                   label={items[active].slug}
+                  media={items[active].media}
                   minimal
                 />
               )}
