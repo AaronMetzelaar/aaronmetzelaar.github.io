@@ -6,7 +6,7 @@ import { Hero } from "@/components/site/hero";
 import { MiniCard } from "@/components/site/mini-card";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
-import { WorkEntry } from "@/components/site/work-entry";
+import { WorkIndex } from "@/components/site/work-index";
 import {
   about,
   creativeWork,
@@ -78,7 +78,7 @@ export default function Home() {
             title="Work at MWS"
           />
           <Reveal>
-            <div className="mt-10 flex flex-col gap-5 border-border border-b pb-12 sm:flex-row sm:items-end sm:justify-between sm:gap-12">
+            <div className="mt-10 flex flex-col gap-5 pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-12">
               <p className="max-w-2xl text-muted-fg leading-relaxed">
                 {experienceMeta.summary}
               </p>
@@ -92,15 +92,8 @@ export default function Home() {
               </PullLink>
             </div>
           </Reveal>
-          <div className="mt-12 flex flex-col gap-16 sm:gap-24">
-            {experience.map((item, i) => (
-              <WorkEntry
-                index={pad(i + 1)}
-                item={item}
-                key={item.slug}
-                reversed={i % 2 === 1}
-              />
-            ))}
+          <div className="mt-8">
+            <WorkIndex items={experience} />
           </div>
         </section>
 

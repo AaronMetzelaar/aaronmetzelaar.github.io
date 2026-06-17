@@ -20,6 +20,8 @@ export type WorkItem = {
   title: string;
   org?: string;
   period?: string;
+  /** One deliberate line — what it is, for the Selected Work index. */
+  tagline?: string;
   summary: string;
   highlights?: string[];
   tags: string[];
