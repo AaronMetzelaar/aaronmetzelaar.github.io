@@ -1,0 +1,19 @@
+/* The locked hero: a fine blue dot grid revealed in a soft disc at the cursor. */
+.field {
+  color: var(--accent);
+  background-image: radial-gradient(currentColor 1px, transparent 1.7px);
+  background-size: 26px 26px;
+  opacity: 0.5;
+  -webkit-mask-image: radial-gradient(
+    260px 260px at var(--mx, 50%) var(--my, 40%),
+    #000 0%,
+    rgba(0, 0, 0, 0.35) 48%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    260px 260px at var(--mx, 50%) var(--my, 40%),
+    #000 0%,
+    rgba(0, 0, 0, 0.35) 48%,
+    transparent 72%
+  );
+}

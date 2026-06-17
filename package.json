@@ -2,22 +2,39 @@
   "name": "portfolio",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=20.9"
+  },
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "check": "ultracite check",
+    "dev": "next dev",
+    "fix": "ultracite fix",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "clsx": "^2.1.1",
+    "motion": "^12.40.0",
     "next": "16.2.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.6.0",
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/three": "^0.184.1",
+    "oxfmt": "^0.35.0",
+    "oxlint": "^1.67.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ultracite": "7.2.4"
   }
 }
