@@ -5,21 +5,21 @@ export const creativeWork: WorkItem[] = [
     slug: "promo-video",
     title: "Promo videos",
     summary:
-      "Filmed and edited promotional videos for my student association — events, recaps, and recruitment.",
+      "Event recaps and recruitment films for my student association — shot and cut.",
     tags: ["Video", "Editing", "Storytelling"],
   },
   {
     slug: "posters",
     title: "Posters & graphics",
     summary:
-      "Designed posters and print graphics for events and campaigns — bold, legible, made to stand out on a crowded board.",
+      "Event and campaign posters built to cut through a crowded board.",
     tags: ["Graphic design", "Print", "Branding"],
   },
   {
     slug: "social",
     title: "Social content",
     summary:
-      "Created social posts and campaign content to promote events and grow the association's reach.",
+      "Social campaigns that grew the student association's reach.",
     tags: ["Social", "Content", "Campaigns"],
   },
 ];

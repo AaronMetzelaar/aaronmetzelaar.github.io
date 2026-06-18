@@ -3,11 +3,11 @@ import { ScrambleText } from "@/components/motion/scramble-text";
 import { site } from "@/content/site";
 
 /**
- * Dot-portrait hero. On desktop the portrait is full-bleed behind the text on
- * the right and reacts to the cursor. On mobile it becomes a contained band up
- * top that dissolves into the white canvas, with the name + tagline on clean
- * white below — so text never sits on portrait pixels. One rich visual moment;
- * the rest of the page stays quiet by comparison.
+ * Dot-portrait hero — the page's one choreographed arrival. The name decodes
+ * (ScrambleText fade) in lock-step with the portrait assembling from across the
+ * canvas, so type and face resolve as a single event. Desktop: portrait
+ * full-bleed behind the text on the right, drag to turn it. Mobile: a contained
+ * band up top dissolving into white, text on clean canvas below.
  */
 export function Hero() {
   return (
@@ -31,22 +31,26 @@ export function Hero() {
             {site.roleLine}
           </p>
           <h1 className="mt-6 font-bold text-[clamp(2.75rem,8vw,6rem)] leading-[0.9] tracking-[-0.05em]">
-            <ScrambleText className="block" durationMs={650} text="Aaron" />
+            <ScrambleText className="block" durationMs={1100} fade text="Aaron" />
             <ScrambleText
               className="block"
-              durationMs={950}
-              startDelayMs={140}
+              durationMs={1500}
+              fade
+              startDelayMs={160}
               text="Metzelaar"
             />
           </h1>
-          <p className="mt-8 max-w-md text-muted-fg leading-relaxed">
+          <p className="mt-8 max-w-md text-[1.05rem] text-muted-fg leading-relaxed">
             {site.tagline}
           </p>
-          {/* desktop-only: drag needs a pointer */}
-          <p className="mt-10 hidden items-center gap-2 text-[0.7rem] text-accent uppercase tracking-[0.3em] lg:flex">
-            <span aria-hidden="true">↳</span>
-            Drag to turn — the dots scatter
-          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.7rem] uppercase tracking-[0.25em]">
+            <span className="text-muted-fg">{site.location} · MWS — 3 yrs</span>
+            {/* desktop-only: drag needs a pointer */}
+            <span className="hidden items-center gap-2 text-accent lg:flex">
+              <span aria-hidden="true">↳</span>
+              Drag to turn
+            </span>
+          </div>
         </div>
         <div aria-hidden="true" className="hidden lg:order-2 lg:block" />
       </div>
