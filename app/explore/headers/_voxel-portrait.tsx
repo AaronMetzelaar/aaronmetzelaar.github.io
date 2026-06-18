@@ -388,13 +388,16 @@ function PortraitCloud({
     mesh.rotation.x = swayX + dr.curX;
     mesh.updateMatrixWorld();
 
-    // a fast turn flings the dots outward (∝ drag velocity); the springs below
-    // pull them home. Velocity decays so a held-still drag stops flinging.
+    // turning flings the dots — direction carried from the drag, magnitude
+    // skewed per-dot (most drift, a few fly far) so it reads organic, not a
+    // uniform expansion; a faster turn throws harder. Springs pull them home.
     const throwSpeed = Math.hypot(dr.vx, dr.vy);
+    const flinging = dr.active && throwSpeed > 1.2;
+    const power = Math.min(throwSpeed / 52, 1.7);
+    const dirX = dr.vx * 0.013;
+    const dirY = -dr.vy * 0.013;
     dr.vx *= 0.55;
     dr.vy *= 0.55;
-    const flinging = dr.active && throwSpeed > 1.5;
-    const flingK = (Math.min(throwSpeed, 70) / 70) ** 2 * 0.6;
     if (flinging || Math.abs(dr.curY) > 1e-3 || Math.abs(dr.curX) > 1e-3) {
       awake.current = true;
     }
@@ -425,12 +428,20 @@ function PortraitCloud({
       let oy = disp[i3 + 1];
       let oz = disp[i3 + 2];
 
-      // --- fling outward by drag velocity (spring back to home below) ---
+      // --- fling: radial burst + directional throw + per-dot turbulence,
+      //     with a wide per-dot magnitude (cubic) so a few dots fly far ---
       if (flinging) {
+        const r0 = rr[i3];
+        const r1 = rr[i3 + 1];
+        const r2 = rr[i3 + 2];
         const rad = Math.sqrt(hx * hx + hy * hy + hz * hz) + 1e-3;
-        vel[i3] += (hx / rad) * flingK * (0.55 + rr[i3]);
-        vel[i3 + 1] += (hy / rad) * flingK * (0.55 + rr[i3 + 1]);
-        vel[i3 + 2] += (hz / rad) * flingK + (rr[i3 + 2] - 0.5) * flingK;
+        const mag = power * (0.12 + 1.7 * r0 * r0 * r0);
+        const ang = (r1 + r2) * TAU;
+        vel[i3] +=
+          (hx / rad) * mag * 0.55 + dirX * (0.5 + r1) + Math.cos(ang) * mag * 0.4;
+        vel[i3 + 1] +=
+          (hy / rad) * mag * 0.55 + dirY * (0.5 + r2) + Math.sin(ang) * mag * 0.4;
+        vel[i3 + 2] += (hz / rad) * mag * 0.5 + (r0 - 0.5) * mag * 0.9;
       }
       vel[i3] += -ox * STIFFNESS * dt;
       vel[i3 + 1] += -oy * STIFFNESS * dt;
