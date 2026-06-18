@@ -7,11 +7,22 @@ const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/\\<>[]{}=+*#";
 
 const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
 
+const FADE_CHARS = 8; // chars over which a glyph fades in ahead of the front
+
+type Char = { ch: string; op: number };
+type Frame = string | Char[];
+
 type ScrambleTextProps = {
   text: string;
   className?: string;
   durationMs?: number;
   startDelayMs?: number;
+  /**
+   * Fade each character in (opacity ramps just ahead of the decode front) so
+   * the text appears into being rather than showing its full length from the
+   * first frame. Off by default — the plain in-place decode.
+   */
+  fade?: boolean;
 };
 
 /** Decrypt/scramble text into place. Renders final text when reduced-motion. */
@@ -20,13 +31,14 @@ export function ScrambleText({
   className,
   durationMs = 900,
   startDelayMs = 0,
+  fade = false,
 }: ScrambleTextProps) {
   const reduced = useReducedMotion();
-  const [display, setDisplay] = useState(text);
+  const [frame, setFrame] = useState<Frame>(text);
 
   useEffect(() => {
     if (reduced) {
-      setDisplay(text);
+      setFrame(text);
       return;
     }
 
@@ -40,34 +52,59 @@ export function ScrambleText({
       }
       const elapsed = now - start;
       const progress = elapsed <= 0 ? 0 : Math.min(elapsed / durationMs, 1);
-      const revealed = Math.floor(progress * total);
+      const lead = progress * total;
 
-      setDisplay(
-        text
-          .split("")
-          .map((char, i) => {
+      if (fade) {
+        setFrame(
+          text.split("").map((char, i): Char => {
             if (char === " ") {
-              return " ";
+              return { ch: " ", op: 1 };
             }
-            return i < revealed ? char : randomGlyph();
+            if (i < lead) {
+              return { ch: char, op: 1 };
+            }
+            // ahead of the front: a glyph that fades in as the front nears
+            const op = Math.max(0, Math.min(1, 1 - (i - lead) / FADE_CHARS));
+            return { ch: randomGlyph(), op };
           })
-          .join("")
-      );
+        );
+      } else {
+        const revealed = Math.floor(lead);
+        setFrame(
+          text
+            .split("")
+            .map((char, i) => {
+              if (char === " ") {
+                return " ";
+              }
+              return i < revealed ? char : randomGlyph();
+            })
+            .join("")
+        );
+      }
 
       if (progress < 1) {
         raf = requestAnimationFrame(run);
       } else {
-        setDisplay(text);
+        setFrame(text);
       }
     };
 
     raf = requestAnimationFrame(run);
     return () => cancelAnimationFrame(raf);
-  }, [text, durationMs, startDelayMs, reduced]);
+  }, [text, durationMs, startDelayMs, reduced, fade]);
 
   return (
     <span aria-label={text} className={className}>
-      <span aria-hidden="true">{display}</span>
+      <span aria-hidden="true">
+        {typeof frame === "string"
+          ? frame
+          : frame.map((c, i) => (
+              <span key={i} style={{ opacity: c.op }}>
+                {c.ch}
+              </span>
+            ))}
+      </span>
     </span>
   );
 }

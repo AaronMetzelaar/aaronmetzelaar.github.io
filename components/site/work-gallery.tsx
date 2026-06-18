@@ -168,6 +168,7 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
                     <p className="max-w-md text-muted-fg text-sm leading-relaxed">
                       <ScrambleText
                         durationMs={650}
+                        fade
                         key={plays[i]}
                         text={item.tagline}
                       />
