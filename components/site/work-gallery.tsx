@@ -4,14 +4,23 @@ import { useReducedMotion } from "motion/react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { MediaFrame } from "@/components/media/media-frame";
+import { ScrambleText } from "@/components/motion/scramble-text";
 import type { WorkItem } from "@/content/types";
 import { cn } from "@/lib/utils";
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 const PULL = 0.09; // how strongly each image leans toward the cursor
 const MAX = 24; // px cap on that lean
 const EASE = 0.12; // per-frame follow
+
+// Scattered placement — on desktop each image is absolutely placed in a square
+// "canvas" at a hand-picked spot + size so they overlap vertically as a loose
+// collage (not a grid); on mobile they stack full-width in order.
+const LAYOUT = [
+  "sm:absolute sm:left-0 sm:top-0 sm:w-[45%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[58%] sm:top-[8%] sm:w-[34%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[12%] sm:top-[41%] sm:w-[42%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[53%] sm:top-[53%] sm:w-[39%]",
+];
 
 function usePointerFine() {
   const [fine, setFine] = useState(false);
@@ -26,28 +35,31 @@ function usePointerFine() {
 }
 
 /**
- * Selected Work as an image gallery. On a fine pointer each project image leans
- * gently toward the cursor (a per-card magnetic pull, eased on rAF), and
- * hovering one enlarges it and brings it forward while the rest blur and dim;
- * the title + tags fade in over it. On touch / reduced motion it's a static
- * grid with the info always shown. The configurator card plays its clip.
+ * Selected Work as a scattered image gallery. On a fine pointer each image
+ * leans toward the cursor; hovering an *image* (not its row) enlarges it and
+ * brings it forward while the rest blur. Titles sit under each image in accent,
+ * and the project name scramble-decodes when its image is hovered. The tagline
+ * + tags reveal under the title on hover. Touch / reduced motion = a static
+ * stacked list with everything shown.
  */
 export function WorkGallery({ items }: { items: WorkItem[] }) {
   const reduced = !!useReducedMotion();
   const fine = usePointerFine();
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState<number | null>(null);
+  const [plays, setPlays] = useState(() => items.map(() => 0));
 
   useEffect(() => setMounted(true), []);
   const interactive = mounted && fine && !reduced;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const pointer = useRef<{ x: number; y: number } | null>(null);
   const cur = useRef(items.map(() => ({ x: 0, y: 0 })));
 
-  // rAF: ease each card's translate toward the cursor (measured off offsetLeft/
-  // Top so the transform never feeds back into the target).
+  // rAF: ease each image's translate toward the cursor (off offsetLeft/Top so
+  // the lean never feeds back). The lean rides on an inner element so it doesn't
+  // fight the card's layout transforms.
   useEffect(() => {
     if (!interactive) {
       return;
@@ -55,22 +67,23 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
     let raf = 0;
     const tick = () => {
       for (let i = 0; i < cardRefs.current.length; i++) {
-        const card = cardRefs.current[i];
+        const lean = cardRefs.current[i];
         const o = cur.current[i];
-        if (!(card && o)) {
+        if (!(lean && o)) {
           continue;
         }
         let tx = 0;
         let ty = 0;
         if (pointer.current) {
-          const cx = card.offsetLeft + card.offsetWidth / 2;
-          const cy = card.offsetTop + card.offsetHeight / 2;
+          const host = lean.offsetParent as HTMLElement | null;
+          const cx = (host?.offsetLeft ?? 0) + lean.offsetWidth / 2;
+          const cy = (host?.offsetTop ?? 0) + lean.offsetHeight / 2;
           tx = Math.max(-MAX, Math.min(MAX, (pointer.current.x - cx) * PULL));
           ty = Math.max(-MAX, Math.min(MAX, (pointer.current.y - cy) * PULL));
         }
         o.x += (tx - o.x) * EASE;
         o.y += (ty - o.y) * EASE;
-        card.style.transform = `translate(${o.x.toFixed(2)}px, ${o.y.toFixed(2)}px)`;
+        lean.style.transform = `translate(${o.x.toFixed(2)}px, ${o.y.toFixed(2)}px)`;
       }
       raf = requestAnimationFrame(tick);
     };
@@ -88,12 +101,16 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
   };
   const onLeave = () => {
     pointer.current = null;
-    setActive(null);
+  };
+
+  const enter = (i: number) => {
+    setActive(i);
+    setPlays((p) => p.map((v, idx) => (idx === i ? v + 1 : v)));
   };
 
   return (
     <div
-      className="relative flex flex-col gap-[clamp(4rem,9vw,8.5rem)]"
+      className="relative flex flex-col gap-16 sm:block sm:aspect-square sm:gap-0"
       onPointerLeave={interactive ? onLeave : undefined}
       onPointerMove={interactive ? onMove : undefined}
       ref={containerRef}
@@ -101,73 +118,78 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
       {items.map((item, i) => {
         const dim = interactive && active !== null && active !== i;
         const on = interactive && active === i;
-        // open, asymmetric placement — alternating sides + varied widths so it
-        // breathes instead of sitting in a tight grid
-        const right = i % 2 === 1;
-        const width = ["sm:w-[58%]", "sm:w-[50%]", "sm:w-[54%]", "sm:w-[62%]"][
-          i % 4
-        ];
         return (
-          <div
+          <figure
             className={cn(
-              "group relative w-full transition-[filter,opacity] duration-300",
-              width,
-              right && "sm:self-end",
-              dim && "blur-[5px] opacity-50"
+              "w-full transition-[filter,opacity] duration-300",
+              LAYOUT[i % LAYOUT.length],
+              dim && "blur-[5px] opacity-45"
             )}
             key={item.slug}
-            onPointerEnter={interactive ? () => setActive(i) : undefined}
-            ref={(el) => {
-              cardRefs.current[i] = el;
-            }}
-            style={{ willChange: "transform", zIndex: on ? 10 : 1 }}
+            style={{ zIndex: on ? 10 : 1 }}
           >
-            <div
-              className={cn(
-                "relative origin-center transition-transform duration-500 ease-out",
-                on && "scale-[1.05]"
-              )}
-            >
-              <MediaFrame
-                aspect={16 / 9}
-                className="w-full"
-                label={item.slug}
-                media={item.media}
-                minimal
-              />
-              <span className="absolute top-3 left-3 text-[0.7rem] text-accent tabular-nums tracking-[0.3em]">
-                {pad(i + 1)}
-              </span>
+            {/* lean wrapper — rAF writes its transform */}
+            <div ref={(el) => { cardRefs.current[i] = el; }}>
+              {/* the image is the only hover target for the zoom/blur — the
+                  title/tags live in the figcaption, so nothing is gated here */}
               <div
                 className={cn(
-                  "pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-2 bg-gradient-to-t from-bg via-bg/85 to-transparent p-5 transition-opacity duration-300",
-                  interactive ? (on ? "opacity-100" : "opacity-0") : "opacity-100"
+                  "origin-center transition-transform duration-500 ease-out",
+                  on && "scale-[1.05]"
                 )}
+                onPointerEnter={interactive ? () => enter(i) : undefined}
+                onPointerLeave={interactive ? () => setActive(null) : undefined}
               >
-                <h3 className="font-medium text-xl tracking-[-0.02em]">
-                  {item.title}
-                </h3>
-                {item.tagline ? (
-                  <p className="max-w-md text-muted-fg text-xs leading-relaxed">
-                    {item.tagline}
-                  </p>
-                ) : null}
-                <ul className="flex flex-wrap gap-x-3 gap-y-1">
-                  {item.tags.map((t) => (
-                    <li
-                      className="text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
-                      key={t}
-                    >
-                      <span aria-hidden="true" className="text-accent/60">
-                        →{" "}
-                      </span>
-                      {t}
-                    </li>
-                  ))}
-                </ul>
+                <MediaFrame
+                  aspect={4 / 3}
+                  className="w-full"
+                  label={item.slug}
+                  media={item.media}
+                  minimal
+                />
               </div>
+
+              {/* title UNDER the image, in accent; name scramble-decodes on hover */}
+              <figcaption className="relative mt-4">
+                <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
+                  <span className="text-accent/55">({i + 1}) </span>
+                  <ScrambleText
+                    durationMs={520}
+                    key={plays[i]}
+                    text={item.title.toUpperCase()}
+                  />
+                </p>
+                <div
+                  className={cn(
+                    "flex flex-col gap-2 pt-3 transition-opacity duration-300",
+                    interactive
+                      ? "absolute inset-x-0 top-full opacity-0"
+                      : "opacity-100",
+                    on && "opacity-100"
+                  )}
+                >
+                  {item.tagline ? (
+                    <p className="max-w-md text-muted-fg text-sm leading-relaxed">
+                      {item.tagline}
+                    </p>
+                  ) : null}
+                  <ul className="flex flex-wrap gap-x-3 gap-y-1">
+                    {item.tags.map((t) => (
+                      <li
+                        className="text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
+                        key={t}
+                      >
+                        <span aria-hidden="true" className="text-accent/55">
+                          →{" "}
+                        </span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </figcaption>
             </div>
-          </div>
+          </figure>
         );
       })}
     </div>
