@@ -7,6 +7,14 @@ export const creativeWork: WorkItem[] = [
     summary:
       "Event recaps and recruitment films for my student association — shot and cut.",
     tags: ["Video", "Editing", "Storytelling"],
+    media: {
+      kind: "video",
+      src: "/promo-video.mp4",
+      poster: "/promo-poster.jpg",
+      alt: "Student association promo film — a member hyping up the kit against a brick wall.",
+      width: 540,
+      height: 960,
+    },
   },
   {
     slug: "posters",
@@ -21,5 +29,17 @@ export const creativeWork: WorkItem[] = [
     summary:
       "Social campaigns that grew the student association's reach.",
     tags: ["Social", "Content", "Campaigns"],
+    // first = the hero still; the rest fan out on hover
+    gallery: [
+      { src: "/social/sven.jpg", alt: "Sven is een Ridder — recruitment post." },
+      {
+        src: "/social/bryan.jpg",
+        alt: "Bryan is een Ridder — recruitment post.",
+      },
+      {
+        src: "/social/servaas.jpg",
+        alt: "Servaas is een Ridder — recruitment post.",
+      },
+    ],
   },
 ];

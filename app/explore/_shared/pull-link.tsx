@@ -137,7 +137,10 @@ export function FilingsRule({
   return (
     <div
       aria-hidden="true"
-      className={cn("flex items-center justify-between", className)}
+      // `relative` so each dot's offsetParent IS this row — its offsetLeft then
+      // shares the same origin as `mx` (cursor x measured from this row's left),
+      // so the lean tracks the cursor instead of an ancestor-offset position.
+      className={cn("relative flex items-center justify-between", className)}
       onPointerLeave={() => mx.set(-9999)}
       onPointerMove={onMove}
       ref={ref}

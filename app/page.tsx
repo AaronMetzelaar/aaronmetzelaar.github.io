@@ -4,6 +4,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { Hero } from "@/components/site/hero";
 import { MiniCard } from "@/components/site/mini-card";
+import { CreativeCard } from "@/components/site/creative-card";
 import { Preloader } from "@/components/site/preloader";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
@@ -111,7 +112,7 @@ export default function Home() {
                 rel="noreferrer"
                 target="_blank"
               >
-                matchwornshirt.com
+                mws.com
               </PullLink>
             </div>
           </Reveal>
@@ -146,12 +147,6 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          </Reveal>
-          <Reveal className="mt-12">
-            <p className="max-w-2xl font-display text-[clamp(1.25rem,2.4vw,1.7rem)] text-fg/85 italic leading-[1.3] tracking-[-0.01em]">
-              “The interface is the easy part. The system a team ships it with —
-              that's the work.”
-            </p>
           </Reveal>
           <Reveal className="mt-14">
             <ArchitectureMap />
@@ -232,14 +227,23 @@ export default function Home() {
             title="Off the clock"
           />
           <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
-            {creativeWork.map((item, i) => (
-              <MiniCard
-                delay={i * 0.08}
-                index={pad(i + 1)}
-                item={item}
-                key={item.slug}
-              />
-            ))}
+            {creativeWork.map((item, i) =>
+              item.media || item.gallery ? (
+                <CreativeCard
+                  delay={i * 0.08}
+                  index={pad(i + 1)}
+                  item={item}
+                  key={item.slug}
+                />
+              ) : (
+                <MiniCard
+                  delay={i * 0.08}
+                  index={pad(i + 1)}
+                  item={item}
+                  key={item.slug}
+                />
+              )
+            )}
           </div>
         </section>
 

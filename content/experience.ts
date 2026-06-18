@@ -2,7 +2,7 @@ import type { WorkItem } from "./types";
 
 export const experienceMeta = {
   company: "MWS",
-  companyUrl: "https://matchwornshirt.com",
+  companyUrl: "https://mws.com",
   role: "Frontend Developer",
   period: "2023 — Present",
   summary:
@@ -44,9 +44,9 @@ export const experience: WorkItem[] = [
       kind: "video",
       src: "/ftg-configurator.mp4",
       poster: "/ftg-configurator-poster.jpg",
-      alt: "The Frame the Game configurator: choosing frame, background, and finishing for a framed AC Milan shirt, previewed live.",
+      alt: "The Frame the Game configurator: choosing sleeves, frame, and background for a framed AC Milan shirt, previewed live.",
       width: 1280,
-      height: 778,
+      height: 752,
     },
     mediaMobile: {
       kind: "video",

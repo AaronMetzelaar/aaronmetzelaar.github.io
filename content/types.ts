@@ -31,4 +31,6 @@ export type WorkItem = {
   media?: MediaItem;
   /** Portrait visual — used for the touch/stacked view when present. */
   mediaMobile?: MediaItem;
+  /** A small set of stills (first = the hero); used by the social card. */
+  gallery?: { src: string; alt: string }[];
 };

@@ -9,7 +9,7 @@ export const site = {
   beyondLine: "The part that does not fit in a job title yet.",
   location: "Netherlands",
   age: 25,
-  email: "aaron@matchwornshirt.com",
+  email: "aaronmetzelaar@gmail.com",
   socials: {
     github: "https://github.com/AaronMetzelaar",
     githubHandle: "AaronMetzelaar",

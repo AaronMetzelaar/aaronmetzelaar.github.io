@@ -13,28 +13,24 @@ const VARIANTS: {
   id: LoaderVariant;
   name: string;
   blurb: string;
-  chrome: "number" | "ring" | "bar";
 }[] = [
   {
     id: "field",
     name: "Field",
     blurb:
       "The dots drift in a loose cloud, then converge straight into the portrait.",
-    chrome: "number",
   },
   {
     id: "orbit",
     name: "Orbit",
     blurb:
       "The cloud slowly orbits; at 100% it untwists and tightens into the portrait.",
-    chrome: "ring",
   },
   {
     id: "swarm",
     name: "Swarm",
     blurb:
       "The dots breathe and jitter in place, then spring into the portrait.",
-    chrome: "bar",
   },
 ];
 
@@ -43,72 +39,34 @@ const ASSEMBLE_MS = 2500; // dots converge into the portrait
 const HOLD_MS = 1500; // rest on the finished face
 const easeOutCubic = (p: number) => 1 - (1 - p) ** 3;
 
-function Counter({
-  chrome,
-  p,
-}: {
-  chrome: "number" | "ring" | "bar";
-  p: number;
-}) {
-  const pct = String(Math.round(p)).padStart(3, "0");
-  if (chrome === "ring") {
-    const R = 30;
-    const C = 2 * Math.PI * R;
-    return (
-      <div className="relative grid h-[88px] w-[88px] place-items-center">
-        <svg className="-rotate-90 absolute inset-0" height="88" width="88">
-          <circle
-            cx="44"
-            cy="44"
-            fill="none"
-            r={R}
-            stroke="var(--border)"
-            strokeWidth="1.5"
-          />
-          <circle
-            cx="44"
-            cy="44"
-            fill="none"
-            r={R}
-            stroke="var(--accent)"
-            strokeDasharray={C}
-            strokeDashoffset={C * (1 - p / 100)}
-            strokeLinecap="round"
-            strokeWidth="1.5"
-          />
-        </svg>
-        <span className="text-sm tabular-nums tracking-tight">
-          {Math.round(p)}
+// The loading bar — set in the display serif (the brand's distinctive face) on
+// a frosted plate so it stays crisp and legible over the full-screen dot field.
+function LoadingBar({ p }: { p: number }) {
+  const pct = String(Math.round(p)).padStart(2, "0");
+  return (
+    <div className="w-[min(84vw,460px)] border border-border bg-bg/55 px-8 py-7 backdrop-blur-md">
+      <div className="flex items-end justify-between">
+        <span className="font-display text-[0.7rem] text-muted-fg uppercase tracking-[0.4em]">
+          Laden
         </span>
-      </div>
-    );
-  }
-  if (chrome === "bar") {
-    return (
-      <div className="flex flex-col items-center gap-3">
-        <span className="text-2xl tabular-nums tracking-tight">
+        <span className="font-display text-[clamp(2.75rem,8vw,4rem)] leading-none tracking-[-0.02em] tabular-nums">
           {pct}
           <span className="text-accent">%</span>
         </span>
-        <div className="h-px w-44 bg-border">
-          <div
-            className="h-full bg-accent"
-            style={{ width: `${p}%` }}
-          />
-        </div>
       </div>
-    );
-  }
-  return (
-    <span className="text-5xl tabular-nums tracking-[-0.03em]">
-      {pct}
-      <span className="text-accent">%</span>
-    </span>
+      <div className="mt-5 h-[3px] w-full bg-fg/15">
+        <div
+          className="h-full bg-accent"
+          style={{ width: `${p}%`, transition: "width 140ms linear" }}
+        />
+      </div>
+    </div>
   );
 }
 
 export default function HeadersGallery() {
-  const [vi, setVi] = useState(0);
+  // default to Swarm — the chosen variant
+  const [vi, setVi] = useState(2);
   const [playId, setPlayId] = useState(0);
   const [progress, setProgress] = useState(0);
   const [assembling, setAssembling] = useState(false);
@@ -156,18 +114,15 @@ export default function HeadersGallery() {
         />
       </div>
 
-      {/* in-theme percentage loader — fades out as the portrait resolves */}
+      {/* the loading bar — fades out as the portrait resolves */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-[19vh] z-10 flex flex-col items-center gap-5"
+        className="pointer-events-none absolute inset-0 z-10 grid place-items-center"
         style={{
           opacity: assembling ? 0 : 1,
           transition: "opacity 600ms ease",
         }}
       >
-        <Counter chrome={v.chrome} p={progress} />
-        <p className="text-[0.7rem] text-muted-fg uppercase tracking-[0.35em]">
-          Loading
-        </p>
+        <LoadingBar p={progress} />
       </div>
 
       <div className="absolute top-8 left-8 z-10">

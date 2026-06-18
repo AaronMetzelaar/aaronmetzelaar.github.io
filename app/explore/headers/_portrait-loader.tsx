@@ -17,7 +17,6 @@ export type LoaderVariant = "field" | "orbit" | "swarm";
 
 const ASSEMBLE_DUR = 1.7; // convergence length (s)
 const STAGGER = 0.7; // per-dot assemble stagger (s)
-const SPREAD = 1.0; // hover scatter reach (world units)
 const CAM_FAR = 5.8; // hover: pulled back so the loose cloud fits the frame
 const CAM_NEAR = 4.4; // assembled: zoomed in so the portrait fills it
 
@@ -52,6 +51,9 @@ function LoaderCloud({
   const rnd = useRef<Float32Array | null>(null);
   const assembleStart = useRef<number | null>(null);
   const spin = useRef(0);
+  // the visible world extent at CAM_FAR — captured once so the hover scatter
+  // fills the whole screen rather than clustering in the middle
+  const farVP = useRef<{ w: number; h: number } | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -84,10 +86,12 @@ function LoaderCloud({
     const c = new THREE.Color();
     for (let i = 0; i < data.count; i++) {
       const i3 = i * 3;
+      // a wide screen-spanning estimate for the first paint; the first frame
+      // refines it to the exact viewport (avoids a flash of the assembled face)
       o.position.set(
-        data.pos[i3] + (r[i3] - 0.5) * 2 * SPREAD,
-        data.pos[i3 + 1] + (r[i3 + 1] - 0.5) * 1.6 * SPREAD,
-        data.pos[i3 + 2] + (r[i3 + 2] - 0.5) * SPREAD
+        (r[i3] - 0.5) * 6.5,
+        (r[i3 + 1] - 0.5) * 4,
+        (r[i3 + 2] - 0.5) * 2.4
       );
       o.scale.setScalar(data.scl[i] * 0.6);
       o.updateMatrix();
@@ -123,6 +127,16 @@ function LoaderCloud({
     const camP = assembling ? easeInOut(Math.min(1, te / ASSEMBLE_DUR)) : 0;
     state.camera.position.z = CAM_FAR + (CAM_NEAR - CAM_FAR) * camP;
 
+    // capture the far viewport once → scatter spans the entire screen
+    if (!farVP.current) {
+      farVP.current = {
+        w: state.viewport.width,
+        h: state.viewport.height,
+      };
+    }
+    const fillW = farVP.current.w * 1.08;
+    const fillH = farVP.current.h * 1.08;
+
     // orbit: the whole cloud rotates while hovering, then untwists to front
     if (variant === "orbit") {
       if (assembling) {
@@ -143,10 +157,11 @@ function LoaderCloud({
       const r1 = rr[i3 + 1];
       const r2 = rr[i3 + 2];
 
-      // scatter anchor (loose cloud around the head)
-      let ox = (r0 - 0.5) * 2 * SPREAD;
-      let oy = (r1 - 0.5) * 1.6 * SPREAD;
-      let oz = (r2 - 0.5) * SPREAD;
+      // scatter anchor: an absolute position spread across the WHOLE screen
+      // (not relative to the head), so the loading cloud fills the viewport
+      let ox = (r0 - 0.5) * fillW;
+      let oy = (r1 - 0.5) * fillH;
+      let oz = (r2 - 0.5) * 2.4;
 
       // per-variant hover life
       let dx = 0;
@@ -160,8 +175,8 @@ function LoaderCloud({
         dx = Math.sin(clock * 0.5 + r0 * 6.28) * 0.07;
         dy = Math.cos(clock * 0.45 + r1 * 6.28) * 0.07;
       } else {
-        // swarm: the cloud breathes in/out + a fine jitter
-        const breathe = 1 + Math.sin(clock * 0.8) * 0.13;
+        // swarm: the whole field breathes in/out + a fine jitter
+        const breathe = 1 + Math.sin(clock * 0.8) * 0.1;
         ox *= breathe;
         oy *= breathe;
         oz *= breathe;
@@ -170,9 +185,10 @@ function LoaderCloud({
         dz = Math.sin(clock * 1.3 + r2 * 20) * 0.05;
       }
 
-      const ax = hx + ox + dx;
-      const ay = hy + oy + dy;
-      const az = hz + oz + dz;
+      // absolute scatter position (fills screen), converging to the head (home)
+      const ax = ox + dx;
+      const ay = oy + dy;
+      const az = oz + dz;
 
       let scale = d.scl[i] * 0.6;
       if (assembling) {
