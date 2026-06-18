@@ -16,10 +16,10 @@ const EASE = 0.12; // per-frame follow
 // "canvas" at a hand-picked spot + size so they overlap vertically as a loose
 // collage (not a grid); on mobile they stack full-width in order.
 const LAYOUT = [
-  "sm:absolute sm:left-0 sm:top-0 sm:w-[45%]",
-  "mt-16 sm:mt-0 sm:absolute sm:left-[58%] sm:top-[8%] sm:w-[34%]",
-  "mt-16 sm:mt-0 sm:absolute sm:left-[12%] sm:top-[41%] sm:w-[42%]",
-  "mt-16 sm:mt-0 sm:absolute sm:left-[53%] sm:top-[53%] sm:w-[39%]",
+  "sm:absolute sm:left-0 sm:top-0 sm:w-[41%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[60%] sm:top-[11%] sm:w-[31%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[10%] sm:top-[47%] sm:w-[39%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[57%] sm:top-[62%] sm:w-[35%]",
 ];
 
 function usePointerFine() {
@@ -110,7 +110,7 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
 
   return (
     <div
-      className="relative flex flex-col gap-16 sm:block sm:aspect-square sm:gap-0"
+      className="relative flex flex-col gap-16 sm:block sm:aspect-[5/6] sm:gap-0"
       onPointerLeave={interactive ? onLeave : undefined}
       onPointerMove={interactive ? onMove : undefined}
       ref={containerRef}
@@ -153,11 +153,7 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
               <figcaption className="relative mt-4">
                 <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
                   <span className="text-accent/55">({i + 1}) </span>
-                  <ScrambleText
-                    durationMs={520}
-                    key={plays[i]}
-                    text={item.title.toUpperCase()}
-                  />
+                  {item.title.toUpperCase()}
                 </p>
                 <div
                   className={cn(
@@ -170,7 +166,11 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
                 >
                   {item.tagline ? (
                     <p className="max-w-md text-muted-fg text-sm leading-relaxed">
-                      {item.tagline}
+                      <ScrambleText
+                        durationMs={650}
+                        key={plays[i]}
+                        text={item.tagline}
+                      />
                     </p>
                   ) : null}
                   <ul className="flex flex-wrap gap-x-3 gap-y-1">
