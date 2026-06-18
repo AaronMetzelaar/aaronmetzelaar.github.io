@@ -266,6 +266,11 @@ export default function Home() {
                 </PullLink>
               </div>
             </div>
+            <div className="mt-12">
+              <PullLink arrow="→" href="/cv">
+                Prefer the short version? Read the CV
+              </PullLink>
+            </div>
           </Reveal>
         </section>
 

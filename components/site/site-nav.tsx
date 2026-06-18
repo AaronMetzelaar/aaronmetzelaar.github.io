@@ -98,6 +98,17 @@ export function SiteNav() {
               </a>
             </li>
           ))}
+          <li>
+            <a
+              className="inline-flex items-center gap-1.5 text-fg transition-colors hover:text-accent"
+              href="/cv"
+            >
+              CV
+              <span aria-hidden="true" className="text-accent">
+                ↗
+              </span>
+            </a>
+          </li>
         </ul>
 
         {/* mobile trigger — doubles as a "you are here" indicator */}
@@ -159,6 +170,18 @@ export function SiteNav() {
                 </li>
               );
             })}
+            <li>
+              <a
+                className="flex min-h-12 items-center gap-3 text-sm uppercase tracking-[0.2em] text-fg"
+                href="/cv"
+                onClick={() => setOpen(false)}
+              >
+                <span aria-hidden="true" className="text-[0.7rem] text-accent">
+                  ↗
+                </span>
+                <span>CV</span>
+              </a>
+            </li>
           </ul>
         </div>
       ) : null}
