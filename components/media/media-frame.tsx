@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 
+import { CoordinatedVideo } from "@/components/media/coordinated-video";
 import type { MediaItem } from "@/content/types";
 import { cn } from "@/lib/utils";
 
@@ -154,77 +154,14 @@ function LazyVideo({
   ratio: number;
   className?: string;
 }) {
-  const ref = useRef<HTMLVideoElement>(null);
-  const [reduced, setReduced] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    if (reduced) {
-      return;
-    }
-    const el = ref.current;
-    if (!el) {
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            el.play().catch(() => {
-              // autoplay can be blocked; ignore
-            });
-          } else {
-            el.pause();
-          }
-        }
-      },
-      { threshold: 0.25 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [reduced]);
-
-  if (reduced) {
-    return (
-      <div
-        className={cn("relative overflow-hidden", className)}
-        style={{ aspectRatio: String(ratio) }}
-      >
-        <Image
-          alt={media.alt}
-          className="object-cover"
-          fill
-          sizes={DEFAULT_SIZES}
-          src={media.poster}
-        />
-      </div>
-    );
-  }
-
+  // playback (in-view + hover coordination + reduced-motion poster) lives in
+  // CoordinatedVideo; this just sets the box.
   return (
     <div
       className={cn("relative overflow-hidden", className)}
       style={{ aspectRatio: String(ratio) }}
     >
-      <video
-        aria-label={media.alt}
-        className="h-full w-full object-cover"
-        loop
-        muted
-        playsInline
-        poster={media.poster}
-        preload="none"
-        ref={ref}
-      >
-        <source src={media.src} />
-      </video>
+      <CoordinatedVideo alt={media.alt} poster={media.poster} src={media.src} />
     </div>
   );
 }

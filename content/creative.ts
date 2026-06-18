@@ -31,13 +31,16 @@ export const creativeWork: WorkItem[] = [
     tags: ["Social", "Content", "Campaigns"],
     // first = the hero still; the rest fan out on hover
     gallery: [
-      { src: "/social/sven.jpg", alt: "Sven is een Ridder — recruitment post." },
       {
-        src: "/social/bryan.jpg",
+        src: "/social/svenridder.jpg",
+        alt: "Sven is een Ridder — recruitment post.",
+      },
+      {
+        src: "/social/bryanridder.jpg",
         alt: "Bryan is een Ridder — recruitment post.",
       },
       {
-        src: "/social/servaas.jpg",
+        src: "/social/servaasridder.jpg",
         alt: "Servaas is een Ridder — recruitment post.",
       },
     ],

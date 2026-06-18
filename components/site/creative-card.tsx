@@ -1,13 +1,20 @@
+"use client";
+
+import { useId } from "react";
+
+import { CoordinatedVideo } from "@/components/media/coordinated-video";
 import { Reveal } from "@/components/motion/reveal";
 import type { WorkItem } from "@/content/types";
+import { clearHoveredMedia, setHoveredMedia } from "@/lib/media-bus";
 
 /**
  * A media-forward Creative card. Shows the work itself, then the caption:
- *  - a looping muted video (promo films), or
+ *  - a looping muted video (promo films), playing only in view and pausing when
+ *    any other media is hovered (CoordinatedVideo), or
  *  - a fan of stills where the first is the face and the rest peek out on hover
- *    (social posts).
+ *    (social posts); hovering it also pauses the videos via the media bus.
  * Stills are background images so a not-yet-added file degrades to an empty
- * plate rather than a broken-image glyph. Hover is CSS-only.
+ * plate rather than a broken-image glyph.
  */
 export function CreativeCard({
   item,
@@ -18,6 +25,7 @@ export function CreativeCard({
   index: string;
   delay?: number;
 }) {
+  const id = useId();
   const gallery = item.gallery ?? [];
   const [hero, ...rest] = gallery;
   const peeks = [
@@ -31,23 +39,26 @@ export function CreativeCard({
     },
   ];
   const video = item.media?.kind === "video" ? item.media : null;
+  // a still-fan counts as hovered media → pause the videos while it's hovered
+  const hoverProps = video
+    ? {}
+    : {
+        onPointerEnter: () => setHoveredMedia(id),
+        onPointerLeave: () => clearHoveredMedia(id),
+      };
 
   return (
     <Reveal className="h-full" delay={delay}>
-      <article className="group flex h-full flex-col">
+      <article className="group flex h-full flex-col" {...hoverProps}>
         <div className="relative aspect-[4/5] w-full">
           {video ? (
-            <video
-              aria-label={video.alt}
-              autoPlay
-              className="absolute inset-0 h-full w-full border border-border object-cover"
-              loop
-              muted
-              playsInline
-              poster={video.poster}
-            >
-              <source src={video.src} type="video/mp4" />
-            </video>
+            <div className="absolute inset-0 overflow-hidden border border-border">
+              <CoordinatedVideo
+                alt={video.alt}
+                poster={video.poster}
+                src={video.src}
+              />
+            </div>
           ) : (
             <>
               {peeks.map((peek, i) =>
