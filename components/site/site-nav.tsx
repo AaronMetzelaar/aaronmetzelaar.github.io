@@ -73,7 +73,7 @@ export function SiteNav() {
       ref={headerRef}
     >
       <TopBlur />
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
+      <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
         <a
           className="pointer-events-auto text-sm tracking-[0.2em] transition-colors hover:text-accent"
           href="#top"
@@ -125,7 +125,7 @@ export function SiteNav() {
       {/* mobile menu panel */}
       {open ? (
         <div
-          className="pointer-events-auto border-border border-b bg-bg lg:hidden"
+          className="relative z-10 pointer-events-auto border-border border-b bg-bg lg:hidden"
           id="section-menu"
         >
           <ul className="mx-auto max-w-6xl px-6 py-1.5">
