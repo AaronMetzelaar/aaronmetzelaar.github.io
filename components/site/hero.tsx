@@ -42,10 +42,10 @@ export function Hero() {
           <p className="mt-8 max-w-md text-muted-fg leading-relaxed">
             {site.tagline}
           </p>
-          {/* desktop-only: a literal lie on touch (no cursor) */}
+          {/* desktop-only: drag needs a pointer */}
           <p className="mt-10 hidden items-center gap-2 text-[0.7rem] text-accent uppercase tracking-[0.3em] lg:flex">
             <span aria-hidden="true">↳</span>
-            Sweep the cursor — the dots scatter
+            Drag to turn — the dots scatter
           </p>
         </div>
         <div aria-hidden="true" className="hidden lg:order-2 lg:block" />

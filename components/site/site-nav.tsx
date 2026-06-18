@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { TopBlur } from "@/components/site/top-blur";
 import { site } from "@/content/site";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +72,7 @@ export function SiteNav() {
       className="pointer-events-none fixed inset-x-0 top-0 z-50 font-terminal"
       ref={headerRef}
     >
+      <TopBlur />
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
         <a
           className="pointer-events-auto text-sm tracking-[0.2em] transition-colors hover:text-accent"

@@ -1,9 +1,14 @@
 "use client";
 
-import { OrbitControls } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import * as THREE from "three";
 
 import { cn } from "@/lib/utils";
@@ -202,11 +207,20 @@ function sample(photo: HTMLImageElement, depth: HTMLImageElement): CloudData {
   };
 }
 
-const INFLUENCE = 0.42;
-const PUSH = 0.22;
 const STIFFNESS = 26;
 const DAMPING = 0.9;
-const MAX_SPEED = 6;
+
+type DragState = {
+  active: boolean;
+  lastX: number;
+  lastY: number;
+  vx: number;
+  vy: number;
+  targetX: number;
+  targetY: number;
+  curX: number;
+  curY: number;
+};
 
 // motion modes — entrances build the portrait on load, then it rests
 export type Motion =
@@ -271,6 +285,7 @@ function PortraitCloud({
   reduced,
   anchorX,
   spread,
+  drag,
 }: {
   src: string;
   depthSrc: string;
@@ -280,15 +295,11 @@ function PortraitCloud({
   reduced: boolean;
   anchorX: number;
   spread: number;
+  drag: { current: DragState };
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const [data, setData] = useState<CloudData | null>(null);
   const sim = useRef<{ disp: Float32Array; vel: Float32Array } | null>(null);
-  const plane = useRef(new THREE.Plane(new THREE.Vector3(0, 0, 1), 0));
-  const ptr = useRef(new THREE.Vector3());
-  const loc = useRef(new THREE.Vector3());
-  const prev = useRef(new THREE.Vector3());
-  const hasPrev = useRef(false);
   const obj = useRef(new THREE.Object3D());
   const awake = useRef(false);
   const rnd = useRef<Float32Array | null>(null);
@@ -364,41 +375,36 @@ function PortraitCloud({
     }
     const te = clock - t0.current; // seconds since this motion started
 
-    if (sway) {
-      // gentle left↔right turn (plus a touch of nod) so the depth reads as 3D
-      mesh.rotation.y = Math.sin(clock * 0.34) * 0.2;
-      mesh.rotation.x = Math.sin(clock * 0.23) * 0.04;
-      mesh.updateMatrixWorld();
-    }
+    // drag-to-turn: rotation eases toward the drag target while held, then
+    // springs back to front (0) on release; gentle idle sway layered on top.
+    const dr = drag.current;
+    const rotTargetY = dr.active ? dr.targetY : 0;
+    const rotTargetX = dr.active ? dr.targetX : 0;
+    dr.curY += (rotTargetY - dr.curY) * Math.min(1, dt * 9);
+    dr.curX += (rotTargetX - dr.curX) * Math.min(1, dt * 9);
+    const swayY = sway ? Math.sin(clock * 0.34) * 0.2 : 0;
+    const swayX = sway ? Math.sin(clock * 0.23) * 0.04 : 0;
+    mesh.rotation.y = swayY + dr.curY;
+    mesh.rotation.x = swayX + dr.curX;
+    mesh.updateMatrixWorld();
 
-    state.raycaster.setFromCamera(state.pointer, state.camera);
-    const hit = state.raycaster.ray.intersectPlane(plane.current, ptr.current);
-    let speed = 0;
-    if (hit) {
-      if (hasPrev.current) {
-        speed = ptr.current.distanceTo(prev.current) / Math.max(dt, 1e-3);
-      }
-      prev.current.copy(ptr.current);
-      hasPrev.current = true;
-    } else {
-      hasPrev.current = false;
-    }
-    const sp = Math.min(speed, MAX_SPEED);
-    const active = hit && sp > 0.05;
-    if (active) {
+    // a fast turn flings the dots outward (∝ drag velocity); the springs below
+    // pull them home. Velocity decays so a held-still drag stops flinging.
+    const throwSpeed = Math.hypot(dr.vx, dr.vy);
+    dr.vx *= 0.55;
+    dr.vy *= 0.55;
+    const flinging = dr.active && throwSpeed > 1.5;
+    const flingK = (Math.min(throwSpeed, 70) / 70) ** 2 * 0.6;
+    if (flinging || Math.abs(dr.curY) > 1e-3 || Math.abs(dr.curX) > 1e-3) {
       awake.current = true;
     }
+
     const entrancePlaying = isEntrance && te < ENTR_END;
     // run the per-dot loop only when something is animating
     if (!(entrancePlaying || awake.current || ambientOn)) {
       return;
     }
 
-    loc.current.copy(ptr.current);
-    mesh.worldToLocal(loc.current);
-    const px = loc.current.x;
-    const py = loc.current.y;
-    const pz = loc.current.z;
     const ct = clock; // continuous clock for ambient loops
     // every ambient except the pure depth-turn fades dots toward the page white
     const fadeColor = ambientOn && ambient !== "sway";
@@ -419,20 +425,12 @@ function PortraitCloud({
       let oy = disp[i3 + 1];
       let oz = disp[i3 + 2];
 
-      // --- cursor scatter (spring back to home) ---
-      if (active) {
-        const dx = hx + ox - px;
-        const dy = hy + oy - py;
-        const dz = hz + oz - pz;
-        const dd = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dd < INFLUENCE) {
-          const fl = 1 - dd / INFLUENCE;
-          const kk = fl * fl * sp * PUSH;
-          const inv = 1 / (dd + 1e-3);
-          vel[i3] += dx * inv * kk;
-          vel[i3 + 1] += dy * inv * kk;
-          vel[i3 + 2] += dz * inv * kk + fl * sp * PUSH * 0.4;
-        }
+      // --- fling outward by drag velocity (spring back to home below) ---
+      if (flinging) {
+        const rad = Math.sqrt(hx * hx + hy * hy + hz * hz) + 1e-3;
+        vel[i3] += (hx / rad) * flingK * (0.55 + rr[i3]);
+        vel[i3 + 1] += (hy / rad) * flingK * (0.55 + rr[i3 + 1]);
+        vel[i3 + 2] += (hz / rad) * flingK + (rr[i3 + 2] - 0.5) * flingK;
       }
       vel[i3] += -ox * STIFFNESS * dt;
       vel[i3 + 1] += -oy * STIFFNESS * dt;
@@ -618,7 +616,7 @@ function PortraitCloud({
     if (fadeColor && mesh.instanceColor) {
       mesh.instanceColor.needsUpdate = true;
     }
-    if (!entrancePlaying && !active && maxMag < 1e-4) {
+    if (!(entrancePlaying || flinging) && maxMag < 1e-4) {
       awake.current = false;
     }
   });
@@ -664,10 +662,65 @@ export function VoxelPortrait({
   spread?: number; // assemble fly-in reach
 }) {
   const reduced = !!useReducedMotion();
+  const drag = useRef<DragState>({
+    active: false,
+    lastX: 0,
+    lastY: 0,
+    vx: 0,
+    vy: 0,
+    targetX: 0,
+    targetY: 0,
+    curX: 0,
+    curY: 0,
+  });
+
+  const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (reduced) {
+      return;
+    }
+    const d = drag.current;
+    d.active = true;
+    d.lastX = e.clientX;
+    d.lastY = e.clientY;
+    d.vx = 0;
+    d.vy = 0;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d.active) {
+      return;
+    }
+    const dx = e.clientX - d.lastX;
+    const dy = e.clientY - d.lastY;
+    d.lastX = e.clientX;
+    d.lastY = e.clientY;
+    d.vx = dx;
+    d.vy = dy;
+    d.targetY = Math.max(-0.6, Math.min(0.6, d.targetY + dx * 0.005));
+    d.targetX = Math.max(-0.32, Math.min(0.32, d.targetX - dy * 0.004));
+  };
+  const onUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    d.active = false;
+    d.targetX = 0;
+    d.targetY = 0;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
+
   return (
     <div
       aria-label="Halftone dot portrait of Aaron Metzelaar"
-      className={cn("relative cursor-grab active:cursor-grabbing", className)}
+      className={cn(
+        "relative cursor-grab touch-none active:cursor-grabbing",
+        className
+      )}
+      onPointerDown={onDown}
+      onPointerLeave={onUp}
+      onPointerMove={onMove}
+      onPointerUp={onUp}
       role="img"
     >
       <Canvas
@@ -682,26 +735,12 @@ export function VoxelPortrait({
           ambient={ambient}
           anchorX={anchorX}
           depthSrc={depthSrc}
+          drag={drag}
           motion={motion}
           reduced={reduced}
           spread={spread}
           src={src}
           sway={!reduced}
-        />
-        <OrbitControls
-          autoRotate={false}
-          dampingFactor={0.08}
-          enableDamping
-          enablePan={false}
-          // an offset head can't orbit around origin without arcing, so drag-
-          // tilt is only enabled when the head is centred (anchorX 0)
-          enableRotate={anchorX === 0 && !reduced}
-          enableZoom={false}
-          maxAzimuthAngle={0.5}
-          maxPolarAngle={1.74}
-          minAzimuthAngle={-0.5}
-          minPolarAngle={1.4}
-          target={[0, 0, 0]}
         />
       </Canvas>
     </div>
