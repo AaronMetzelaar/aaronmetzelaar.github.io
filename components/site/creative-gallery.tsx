@@ -14,15 +14,23 @@ import { cn } from "@/lib/utils";
 // Same interaction language as the Selected Work gallery — each tile leans
 // toward the cursor, hovering one enlarges it and brings it forward while the
 // rest blur, and the caption reveals + scramble-decodes on hover. The Creative
-// twist: a promo clip plays only while hovered (never autoplays in your face),
-// and the social tile's secondary stills animate OUT of the hero to flank it,
-// carried on the same cursor-lean. Touch / reduced motion = a static list.
+// twists: a promo clip plays only while hovered (never autoplays), and the
+// social tile's secondary stills fly out into the section's free space as
+// separate, cursor-leaning tiles — not peeking from behind the hero.
 const PULL = 0.09;
 const MAX = 22;
 const EASE = 0.12;
 
 // loose vertical stagger so three tiles read as a collage, not a grid row
 const STAGGER = ["", "sm:mt-20", "sm:mt-8"];
+
+// where the social secondaries come to rest — scattered across the open area to
+// the left of the (right-most) social tile. left/top/width as % of the gallery;
+// `from` is the resting → hidden offset so they emerge from the hero's side.
+const DROPS = [
+  { left: "0%", top: "1%", width: "25%", from: "translate(70px, -16px) scale(0.7)" },
+  { left: "26%", top: "46%", width: "23%", from: "translate(90px, 24px) scale(0.7)" },
+];
 
 function usePointerFine() {
   const [fine, setFine] = useState(false);
@@ -36,12 +44,6 @@ function usePointerFine() {
   return fine;
 }
 
-// where each secondary still lands as it emerges from behind the hero
-const PEEK = [
-  "-translate-x-[64%] -translate-y-[12%] -rotate-[7deg]",
-  "translate-x-[64%] -translate-y-[4%] rotate-[7deg]",
-];
-
 export function CreativeGallery({ items }: { items: WorkItem[] }) {
   const reduced = !!useReducedMotion();
   const fine = usePointerFine();
@@ -53,13 +55,21 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
   useEffect(() => setMounted(true), []);
   const interactive = mounted && fine && !reduced;
 
+  const socialIndex = items.findIndex((it) => (it.gallery?.length ?? 0) > 1);
+  const secondaries =
+    socialIndex >= 0 ? (items[socialIndex].gallery ?? []).slice(1) : [];
+
   const containerRef = useRef<HTMLDivElement>(null);
+  // lean targets: one per tile, then one per floating secondary
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const pointer = useRef<{ x: number; y: number } | null>(null);
-  const cur = useRef(items.map(() => ({ x: 0, y: 0 })));
+  const cur = useRef(
+    Array.from({ length: items.length + secondaries.length }, () => ({
+      x: 0,
+      y: 0,
+    }))
+  );
 
-  // rAF: ease each tile's translate toward the cursor (off offsetLeft/Top so the
-  // lean never feeds back) — identical feel to the Selected Work gallery
   useEffect(() => {
     if (!interactive) {
       return;
@@ -103,12 +113,14 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
   const enter = (i: number) => {
     setActive(i);
     setPlays((p) => p.map((v, idx) => (idx === i ? v + 1 : v)));
-    setHoveredMedia(`${baseId}-${i}`); // pause any other media while this is focused
+    setHoveredMedia(`${baseId}-${i}`);
   };
   const leave = (i: number) => {
     setActive(null);
     clearHoveredMedia(`${baseId}-${i}`);
   };
+
+  const socialOn = interactive && active === socialIndex;
 
   return (
     <div
@@ -121,8 +133,7 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
         const dim = interactive && active !== null && active !== i;
         const on = interactive && active === i;
         const video = item.media?.kind === "video" ? item.media : null;
-        const gallery = item.gallery ?? [];
-        const [hero, ...secondaries] = gallery;
+        const hero = item.gallery?.[0];
         return (
           <figure
             className={cn(
@@ -133,7 +144,6 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
             key={item.slug}
             style={{ zIndex: on ? 10 : 1 }}
           >
-            {/* lean wrapper — rAF writes its transform */}
             <div ref={(el) => { cardRefs.current[i] = el; }}>
               <div
                 className={cn(
@@ -153,29 +163,13 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
                         src={video.src}
                       />
                     </div>
-                  ) : gallery.length > 0 ? (
-                    <>
-                      {/* secondaries emerge from behind the hero to flank it */}
-                      {secondaries.map((s, si) => (
-                        <div
-                          aria-hidden="true"
-                          className={cn(
-                            "absolute inset-0 border border-border bg-bg bg-center bg-cover opacity-0 shadow-lg transition-all duration-500 ease-out",
-                            on && `opacity-100 ${PEEK[si % PEEK.length]} scale-[0.82]`
-                          )}
-                          key={s.src}
-                          style={{ backgroundImage: `url(${s.src})` }}
-                        />
-                      ))}
-                      {hero ? (
-                        <div
-                          aria-label={hero.alt}
-                          className="absolute inset-0 z-10 border border-border bg-bg bg-center bg-cover"
-                          role="img"
-                          style={{ backgroundImage: `url(${hero.src})` }}
-                        />
-                      ) : null}
-                    </>
+                  ) : hero ? (
+                    <div
+                      aria-label={hero.alt}
+                      className="absolute inset-0 border border-border bg-bg bg-center bg-cover"
+                      role="img"
+                      style={{ backgroundImage: `url(${hero.src})` }}
+                    />
                   ) : (
                     <MediaFrame
                       aspect={4 / 5}
@@ -187,7 +181,6 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
                 </div>
               </div>
 
-              {/* caption UNDER, in accent; summary scramble-decodes on hover */}
               <figcaption className="relative z-10 mt-4">
                 <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
                   <span className="text-accent/55">({i + 1}) </span>
@@ -229,6 +222,35 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
           </figure>
         );
       })}
+
+      {/* social secondaries — separate tiles that fly into the open area when
+          the social tile is hovered; they lean toward the cursor like the rest */}
+      {interactive
+        ? secondaries.map((s, si) => {
+            const drop = DROPS[si % DROPS.length];
+            return (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute z-20 transition-[opacity,transform] duration-500 ease-out"
+                key={s.src}
+                style={{
+                  left: drop.left,
+                  top: drop.top,
+                  width: drop.width,
+                  opacity: socialOn ? 1 : 0,
+                  transform: socialOn ? "none" : drop.from,
+                }}
+              >
+                <div ref={(el) => { cardRefs.current[items.length + si] = el; }}>
+                  <div
+                    className="aspect-[4/5] w-full border border-border bg-bg bg-center bg-cover shadow-xl"
+                    style={{ backgroundImage: `url(${s.src})` }}
+                  />
+                </div>
+              </div>
+            );
+          })
+        : null}
     </div>
   );
 }
