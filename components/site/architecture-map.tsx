@@ -363,6 +363,12 @@ function Node({
       style={{ left: `${pt.x}%`, top: `${pt.y}%` }}
       type="button"
     >
+      {/* generous invisible hit area so the small dot + its label are easy to
+          hit — covers the dot and the label below it */}
+      <span
+        aria-hidden="true"
+        className="-translate-x-1/2 absolute -top-4 left-1/2 h-20 w-32"
+      />
       <span
         aria-hidden="true"
         className={cn(

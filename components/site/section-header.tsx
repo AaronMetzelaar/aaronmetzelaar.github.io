@@ -72,12 +72,9 @@ export function SectionHeader({
             ) : null}
           </div>
         ) : density === "statement" ? (
-          <>
-            <h2 className="mt-5 max-w-3xl text-pretty text-[clamp(1.6rem,3.8vw,2.7rem)] leading-[1.12] tracking-[-0.02em]">
-              {title}
-            </h2>
-            <div aria-hidden="true" className="mt-9 h-px w-full bg-border" />
-          </>
+          <h2 className="mt-5 max-w-3xl text-pretty text-[clamp(1.6rem,3.8vw,2.7rem)] leading-[1.12] tracking-[-0.02em]">
+            {title}
+          </h2>
         ) : (
           <h2 className="mt-5 text-[clamp(2rem,5.5vw,3.5rem)] leading-[0.98] tracking-[-0.03em]">
             {title}

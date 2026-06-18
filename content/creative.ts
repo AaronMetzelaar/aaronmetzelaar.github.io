@@ -5,7 +5,7 @@ export const creativeWork: WorkItem[] = [
     slug: "promo-video",
     title: "Promo videos",
     summary:
-      "Event recaps and recruitment films for my student association — shot and cut.",
+      "Event recaps and recruitment films for my student association. Shot and cut by me.",
     tags: ["Video", "Editing", "Storytelling"],
     media: {
       kind: "video",

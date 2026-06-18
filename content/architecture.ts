@@ -29,25 +29,25 @@ export const layers: { id: Layer; label: string; blurb: string }[] = [
     id: "context",
     label: "Context",
     blurb:
-      "The AGENTS.md files every agent reads first — house rules per area.",
+      "The AGENTS.md files every agent reads first. House rules, one set per area.",
   },
   {
     id: "skill",
     label: "Skills",
     blurb:
-      "Slash-invoked specialists. Each owns a job and the project’s way of doing it.",
+      "Slash-invoked specialists. Each one owns a job, and the way we do it here.",
   },
   {
     id: "reviewer",
     label: "Reviewers",
     blurb:
-      "Per-area review personas, spawned by the review skill, scoped by path.",
+      "Review personas, one per area. The review skill spawns the ones a change touches.",
   },
   {
     id: "hook",
     label: "Hooks",
     blurb:
-      "Automation wired to lifecycle events — fires on its own, no prompting.",
+      "Automation tied to lifecycle events. It fires on its own, no prompting.",
   },
 ];
 

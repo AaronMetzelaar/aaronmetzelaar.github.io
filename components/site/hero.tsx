@@ -1,4 +1,5 @@
 import { HeroPortrait } from "@/app/explore/headers/_hero-portrait";
+import { Cursor } from "@/components/motion/cursor";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { site } from "@/content/site";
 
@@ -38,14 +39,16 @@ export function Hero() {
               text="Aaron"
               waitForReveal
             />
-            <ScrambleText
-              className="block"
-              durationMs={1500}
-              fade
-              startDelayMs={160}
-              text="Metzelaar"
-              waitForReveal
-            />
+            <span className="block">
+              <ScrambleText
+                durationMs={1500}
+                fade
+                startDelayMs={160}
+                text="Metzelaar"
+                waitForReveal
+              />
+              <Cursor className="bg-accent" />
+            </span>
           </h1>
           <p className="mt-8 max-w-md text-[1.05rem] text-muted-fg leading-relaxed">
             {site.tagline}

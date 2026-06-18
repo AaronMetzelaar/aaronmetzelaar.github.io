@@ -8,7 +8,6 @@ import { Preloader } from "@/components/site/preloader";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
 import { WorkGallery } from "@/components/site/work-gallery";
-import { ScrambleText } from "@/components/motion/scramble-text";
 import { layers } from "@/content/architecture";
 import {
   about,
@@ -135,7 +134,7 @@ export default function Home() {
           <Reveal className="mt-10">
             <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {layers.map((l, i) => (
-                <div className="border-border border-t pt-4" key={l.id}>
+                <div key={l.id}>
                   <p className="text-[0.7rem] uppercase tracking-[0.25em]">
                     <span className="text-accent tabular-nums">{pad(i + 1)}</span>
                     <span className="ml-3">{l.label}</span>
@@ -229,15 +228,15 @@ export default function Home() {
           <FilingsRule className="mb-12" count={56} />
           <Reveal>
             <p className="text-[0.7rem] text-accent uppercase tracking-[0.3em]">
-              — End of file
+              End of file
             </p>
             <h2 className="mt-6 text-[clamp(2.25rem,7vw,5rem)] leading-[0.92] tracking-[-0.04em]">
               <span className="block">Let&apos;s build</span>
               <span className="block">something sharp.</span>
             </h2>
             <p className="mt-7 max-w-md font-display text-[clamp(1.1rem,2.1vw,1.45rem)] text-muted-fg italic leading-relaxed">
-              Open to frontend roles with an AI edge — and the odd interesting
-              build.
+              Open to frontend roles with an AI edge, plus the odd interesting
+              build on the side.
             </p>
             <div className="mt-12 flex flex-col gap-7">
               <div>
@@ -267,13 +266,6 @@ export default function Home() {
                 </PullLink>
               </div>
             </div>
-            {/* the signature re-decodes — bookends the hero's opening name */}
-            <p className="mt-16 font-bold text-[clamp(1.5rem,4vw,2.4rem)] tracking-[-0.03em]">
-              <ScrambleText fade text="Aaron Metzelaar" />
-              <span aria-hidden="true" className="cursor-blink text-accent">
-                _
-              </span>
-            </p>
           </Reveal>
         </section>
 

@@ -4,9 +4,9 @@ export const site = {
   role: "Frontend Developer",
   roleLine: "Frontend developer × AI / agentic engineer",
   tagline:
-    "I build the interface — and the AI system the team builds it with.",
-  // A line Aaron loves — the range that resists a single job title.
-  beyondLine: "The part that does not fit in a job title yet.",
+    "I build the interface, and the AI tooling my team ships it with.",
+  // A line Aaron loves: the range that resists a single job title.
+  beyondLine: "The part that doesn't fit in a job title yet.",
   location: "Netherlands",
   age: 25,
   email: "aaronmetzelaar@gmail.com",
@@ -33,14 +33,14 @@ export const site = {
 };
 
 export const about = [
-  "I'm a frontend developer based in the Netherlands, three years into shipping production interfaces at MWS — across web and mobile.",
-  "I like clean systems, sharp typography, and tools that disappear into the work.",
+  "I'm a frontend developer in the Netherlands. For the last three years I've built MWS's web and mobile products.",
+  "I care about clean systems, sharp typography, and tools that get out of the way.",
 ];
 
-// The "one layer up" story as a trajectory — rendered as a vertical ledger in
-// About. Each rung is a layer Aaron moved up to, interface → system → agentic.
+// The "one layer up" story as a trajectory, rendered as a vertical ledger in
+// About. Each rung is a layer Aaron moved up to: interface, system, agentic.
 export const trajectory = [
-  { k: "Interface", v: "Production UI at MWS — web and mobile, shipped." },
-  { k: "System", v: "The AI & agentic architecture the team builds with." },
-  { k: "Agentic", v: "Skills, hooks, and reviewers that move other devs faster." },
+  { k: "Interface", v: "Production UI at MWS, on web and mobile." },
+  { k: "System", v: "The AI and agentic setup my team builds with." },
+  { k: "Agentic", v: "Skills, hooks, and reviewers that speed everyone up." },
 ];

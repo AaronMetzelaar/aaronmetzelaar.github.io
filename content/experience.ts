@@ -4,9 +4,9 @@ export const experienceMeta = {
   company: "MWS",
   companyUrl: "https://mws.com",
   role: "Frontend Developer",
-  period: "2023 — Present",
+  period: "Since 2023",
   summary:
-    "MWS is the marketplace for authenticated match-worn sports shirts and memorabilia. Over three years I've built across its whole frontend — the consumer platform, the tooling behind it, and the app — plus a few standout product features.",
+    "MWS is the marketplace for authenticated match-worn shirts and memorabilia. For three years I've worked across its frontend: the consumer platform, the tooling behind it, and the app. A few standout features are mine end to end.",
 };
 
 export const experience: WorkItem[] = [
@@ -17,7 +17,7 @@ export const experience: WorkItem[] = [
     period: "Nuxt 3 · Vue 3 · TypeScript",
     tagline: "Auctions, bidding, and checkout for collectors worldwide.",
     summary:
-      "The consumer marketplace where collectors bid on authenticated shirts — auctions, bidding, and checkout — plus the internal admin that runs catalog, auctions, and operations behind it.",
+      "The consumer marketplace where collectors bid on authenticated shirts: auctions, bidding, checkout. Plus the internal admin that runs the catalog and auctions behind it.",
     highlights: [
       "Auction, bidding, and checkout flows used by collectors worldwide",
       "Data-dense admin interfaces for catalog and auction management",
@@ -33,7 +33,7 @@ export const experience: WorkItem[] = [
     period: "Interactive product builder",
     tagline: "Design your own framed shirt, previewed live before you order.",
     summary:
-      "An interactive configurator that lets collectors design their own framed shirt — picking the frame, layout, and finishing and previewing the result live before they order.",
+      "An interactive configurator for designing your own framed shirt. Pick the frame, layout, and finishing, and watch the result update live before you order.",
     highlights: [
       "Real-time visual preview of a custom framed shirt",
       "Guided, step-by-step configuration flow",
@@ -64,7 +64,7 @@ export const experience: WorkItem[] = [
     period: "Tooling · Media",
     tagline: "Turn a row of photographs into one spinnable object.",
     summary:
-      "A solution for shooting and presenting 360° images of products, so a shirt can be inspected from every angle — turning a row of photographs into a single spinnable object on the page.",
+      "A way to shoot and show products in 360°, so a shirt can be inspected from every angle. It turns a row of photographs into a single spinnable object on the page.",
     highlights: [
       "Capture-to-web pipeline for 360° product spins",
       "Smooth, draggable viewer tuned for detail and weight",
@@ -78,7 +78,7 @@ export const experience: WorkItem[] = [
     period: "React Native",
     tagline: "Bidding and collecting, native on iOS and Android.",
     summary:
-      "The MWS app for iOS and Android — bringing bidding and collecting to mobile with native-feeling interactions and patterns shared cleanly across platforms.",
+      "The MWS app for iOS and Android. Bidding and collecting on mobile, with native-feeling interactions and patterns shared cleanly across both platforms.",
     highlights: [
       "Cross-platform screens and navigation in React Native",
       "Shared interaction patterns across iOS and Android",
