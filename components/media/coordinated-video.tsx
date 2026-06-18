@@ -17,20 +17,30 @@ export function CoordinatedVideo({
   poster,
   alt,
   className,
+  play,
 }: {
   src: string;
   poster: string;
   alt: string;
   className?: string;
+  /**
+   * Controlled mode: when provided, the clip plays iff `play` (and in view), and
+   * the parent owns hover (e.g. a gallery tile). Omit it for autonomous mode —
+   * plays in view unless another media is hovered, broadcasting its own hover.
+   */
+  play?: boolean;
 }) {
   const id = useId();
   const ref = useRef<HTMLVideoElement>(null);
   const reduced = !!useReducedMotion();
   const [inView, setInView] = useState(false);
   const hovered = useHoveredMedia();
+  const autonomous = play === undefined;
 
   const shouldPlay =
-    !reduced && inView && (hovered === null || hovered === id);
+    !reduced &&
+    inView &&
+    (autonomous ? hovered === null || hovered === id : play);
 
   // track in-view
   useEffect(() => {
@@ -76,8 +86,8 @@ export function CoordinatedVideo({
       className={cn("h-full w-full object-cover", className)}
       loop
       muted
-      onPointerEnter={() => setHoveredMedia(id)}
-      onPointerLeave={() => clearHoveredMedia(id)}
+      onPointerEnter={autonomous ? () => setHoveredMedia(id) : undefined}
+      onPointerLeave={autonomous ? () => clearHoveredMedia(id) : undefined}
       playsInline
       poster={poster}
       preload="none"

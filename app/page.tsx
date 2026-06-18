@@ -3,8 +3,7 @@ import { FilingsRule, PullLink } from "@/app/explore/_shared/pull-link";
 import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { Hero } from "@/components/site/hero";
-import { MiniCard } from "@/components/site/mini-card";
-import { CreativeCard } from "@/components/site/creative-card";
+import { CreativeGallery } from "@/components/site/creative-gallery";
 import { Preloader } from "@/components/site/preloader";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
@@ -226,24 +225,8 @@ export default function Home() {
             note="Video · Design · Social"
             title="Off the clock"
           />
-          <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
-            {creativeWork.map((item, i) =>
-              item.media || item.gallery ? (
-                <CreativeCard
-                  delay={i * 0.08}
-                  index={pad(i + 1)}
-                  item={item}
-                  key={item.slug}
-                />
-              ) : (
-                <MiniCard
-                  delay={i * 0.08}
-                  index={pad(i + 1)}
-                  item={item}
-                  key={item.slug}
-                />
-              )
-            )}
+          <div className="mt-12">
+            <CreativeGallery items={creativeWork} />
           </div>
         </section>
 
