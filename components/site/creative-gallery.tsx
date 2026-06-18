@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducedMotion } from "motion/react";
-import type { PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { CoordinatedVideo } from "@/components/media/coordinated-video";
@@ -82,7 +81,6 @@ export function CreativeGallery({
   const secondaries =
     socialIndex >= 0 ? (items[socialIndex].gallery ?? []).slice(1) : [];
 
-  const containerRef = useRef<HTMLDivElement>(null);
   // lean targets: one per tile, then one per floating secondary
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const pointer = useRef<{ x: number; y: number } | null>(null);
@@ -93,45 +91,59 @@ export function CreativeGallery({
     }))
   );
 
+  // Track the cursor across the WHOLE window (viewport coords) so the tiles
+  // lean toward it wherever it is — including the page margins — and never snap
+  // back from leaving a tight box. rAF reads all rects, then writes all
+  // transforms (no read/write thrash); base centre = rect centre minus the lean
+  // we already applied, so the measurement never feeds back on itself.
   useEffect(() => {
     if (!interactive) {
       return;
     }
+    const onPointer = (e: PointerEvent) => {
+      pointer.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener("pointermove", onPointer, { passive: true });
     let raf = 0;
+    const targets: { x: number; y: number }[] = [];
     const tick = () => {
+      const p = pointer.current;
       for (let i = 0; i < cardRefs.current.length; i++) {
         const lean = cardRefs.current[i];
         const o = cur.current[i];
-        if (!(lean && o)) {
+        const t = (targets[i] ??= { x: 0, y: 0 });
+        if (!(lean && o && p)) {
+          if (t) {
+            t.x = 0;
+            t.y = 0;
+          }
           continue;
         }
-        let tx = 0;
-        let ty = 0;
-        if (pointer.current) {
-          const host = lean.offsetParent as HTMLElement | null;
-          const cx = (host?.offsetLeft ?? 0) + lean.offsetWidth / 2;
-          const cy = (host?.offsetTop ?? 0) + lean.offsetHeight / 2;
-          tx = Math.max(-MAX, Math.min(MAX, (pointer.current.x - cx) * PULL));
-          ty = Math.max(-MAX, Math.min(MAX, (pointer.current.y - cy) * PULL));
+        const r = lean.getBoundingClientRect();
+        const cx = r.left + r.width / 2 - o.x;
+        const cy = r.top + r.height / 2 - o.y;
+        t.x = Math.max(-MAX, Math.min(MAX, (p.x - cx) * PULL));
+        t.y = Math.max(-MAX, Math.min(MAX, (p.y - cy) * PULL));
+      }
+      for (let i = 0; i < cardRefs.current.length; i++) {
+        const lean = cardRefs.current[i];
+        const o = cur.current[i];
+        const t = targets[i];
+        if (!(lean && o && t)) {
+          continue;
         }
-        o.x += (tx - o.x) * EASE;
-        o.y += (ty - o.y) * EASE;
+        o.x += (t.x - o.x) * EASE;
+        o.y += (t.y - o.y) * EASE;
         lean.style.transform = `translate(${o.x.toFixed(2)}px, ${o.y.toFixed(2)}px)`;
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onPointer);
+    };
   }, [interactive]);
-
-  const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const c = containerRef.current;
-    if (!c) {
-      return;
-    }
-    const r = c.getBoundingClientRect();
-    pointer.current = { x: e.clientX - r.left, y: e.clientY - r.top };
-  };
 
   const enter = (i: number) => {
     setActive(i);
@@ -149,12 +161,15 @@ export function CreativeGallery({
     // the lean stage is wider (to the section edges) + taller than the tiles, so
     // the cursor keeps the tiles leaning across a generous area instead of
     // snapping back the moment it leaves a tight box
-    <div
-      className="relative -mx-6 px-6 py-14 sm:-mx-10 sm:px-10 sm:py-20"
-      onPointerLeave={interactive ? () => (pointer.current = null) : undefined}
-      onPointerMove={interactive ? onMove : undefined}
-      ref={containerRef}
-    >
+    <div className="relative -mx-6 px-6 py-14 sm:-mx-10 sm:px-10 sm:py-20">
+      {/* focus: blur the whole page behind the hovered tile (header, other
+          tiles, everything) so only the focused work stays sharp */}
+      {interactive && active !== null ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-40 bg-bg/10 backdrop-blur-[3px]"
+        />
+      ) : null}
       <div className="grid gap-10 sm:grid-cols-3 sm:gap-8">
         {items.map((item, i) => {
           const dim = interactive && active !== null && active !== i;
@@ -169,7 +184,7 @@ export function CreativeGallery({
                 dim && "opacity-40 blur-[5px]"
               )}
               key={item.slug}
-              style={{ zIndex: on ? 10 : 1 }}
+              style={{ zIndex: on ? 50 : 1 }}
             >
               <div ref={(el) => { cardRefs.current[i] = el; }}>
                 <div
@@ -259,7 +274,7 @@ export function CreativeGallery({
             return (
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute z-20 transition-[opacity,transform] duration-500 ease-out"
+                className="pointer-events-none absolute z-[55] transition-[opacity,transform] duration-500 ease-out"
                 key={s.src}
                 style={{
                   left: drop.left,

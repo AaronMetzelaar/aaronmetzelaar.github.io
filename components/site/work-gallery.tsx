@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducedMotion } from "motion/react";
-import type { PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { MediaFrame } from "@/components/media/media-frame";
 import { ScrambleText } from "@/components/motion/scramble-text";
@@ -52,56 +51,58 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
   useEffect(() => setMounted(true), []);
   const interactive = mounted && fine && !reduced;
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const pointer = useRef<{ x: number; y: number } | null>(null);
   const cur = useRef(items.map(() => ({ x: 0, y: 0 })));
 
-  // rAF: ease each image's translate toward the cursor (off offsetLeft/Top so
-  // the lean never feeds back). The lean rides on an inner element so it doesn't
-  // fight the card's layout transforms.
+  // Track the cursor across the WHOLE window so the images lean toward it
+  // wherever it is (page margins included) and never snap back from a tight
+  // box. Read all rects, then write all transforms (no thrash); base centre =
+  // rect centre minus the lean already applied, so it never feeds back.
   useEffect(() => {
     if (!interactive) {
       return;
     }
+    const onPointer = (e: PointerEvent) => {
+      pointer.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener("pointermove", onPointer, { passive: true });
     let raf = 0;
+    const targets: { x: number; y: number }[] = [];
     const tick = () => {
+      const p = pointer.current;
       for (let i = 0; i < cardRefs.current.length; i++) {
         const lean = cardRefs.current[i];
         const o = cur.current[i];
-        if (!(lean && o)) {
+        const t = (targets[i] ??= { x: 0, y: 0 });
+        if (!(lean && o && p)) {
           continue;
         }
-        let tx = 0;
-        let ty = 0;
-        if (pointer.current) {
-          const host = lean.offsetParent as HTMLElement | null;
-          const cx = (host?.offsetLeft ?? 0) + lean.offsetWidth / 2;
-          const cy = (host?.offsetTop ?? 0) + lean.offsetHeight / 2;
-          tx = Math.max(-MAX, Math.min(MAX, (pointer.current.x - cx) * PULL));
-          ty = Math.max(-MAX, Math.min(MAX, (pointer.current.y - cy) * PULL));
+        const r = lean.getBoundingClientRect();
+        const cx = r.left + r.width / 2 - o.x;
+        const cy = r.top + r.height / 2 - o.y;
+        t.x = Math.max(-MAX, Math.min(MAX, (p.x - cx) * PULL));
+        t.y = Math.max(-MAX, Math.min(MAX, (p.y - cy) * PULL));
+      }
+      for (let i = 0; i < cardRefs.current.length; i++) {
+        const lean = cardRefs.current[i];
+        const o = cur.current[i];
+        const t = targets[i];
+        if (!(lean && o && t)) {
+          continue;
         }
-        o.x += (tx - o.x) * EASE;
-        o.y += (ty - o.y) * EASE;
+        o.x += (t.x - o.x) * EASE;
+        o.y += (t.y - o.y) * EASE;
         lean.style.transform = `translate(${o.x.toFixed(2)}px, ${o.y.toFixed(2)}px)`;
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onPointer);
+    };
   }, [interactive]);
-
-  const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const c = containerRef.current;
-    if (!c) {
-      return;
-    }
-    const r = c.getBoundingClientRect();
-    pointer.current = { x: e.clientX - r.left, y: e.clientY - r.top };
-  };
-  const onLeave = () => {
-    pointer.current = null;
-  };
 
   const enter = (i: number) => {
     setActive(i);
@@ -109,12 +110,14 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
   };
 
   return (
-    <div
-      className="relative flex flex-col gap-16 sm:block sm:aspect-[5/6] sm:gap-0"
-      onPointerLeave={interactive ? onLeave : undefined}
-      onPointerMove={interactive ? onMove : undefined}
-      ref={containerRef}
-    >
+    <div className="relative flex flex-col gap-16 sm:block sm:aspect-[5/6] sm:gap-0">
+      {/* focus: blur the whole page behind the hovered image so only it stays sharp */}
+      {interactive && active !== null ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-40 bg-bg/10 backdrop-blur-[3px]"
+        />
+      ) : null}
       {items.map((item, i) => {
         const dim = interactive && active !== null && active !== i;
         const on = interactive && active === i;
@@ -126,7 +129,7 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
               dim && "blur-[5px] opacity-45"
             )}
             key={item.slug}
-            style={{ zIndex: on ? 10 : 1 }}
+            style={{ zIndex: on ? 50 : 1 }}
           >
             {/* lean wrapper — rAF writes its transform */}
             <div ref={(el) => { cardRefs.current[i] = el; }}>
