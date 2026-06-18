@@ -93,7 +93,7 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
 
   return (
     <div
-      className="relative grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8"
+      className="relative flex flex-col gap-[clamp(4rem,9vw,8.5rem)]"
       onPointerLeave={interactive ? onLeave : undefined}
       onPointerMove={interactive ? onMove : undefined}
       ref={containerRef}
@@ -101,10 +101,18 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
       {items.map((item, i) => {
         const dim = interactive && active !== null && active !== i;
         const on = interactive && active === i;
+        // open, asymmetric placement — alternating sides + varied widths so it
+        // breathes instead of sitting in a tight grid
+        const right = i % 2 === 1;
+        const width = ["sm:w-[58%]", "sm:w-[50%]", "sm:w-[54%]", "sm:w-[62%]"][
+          i % 4
+        ];
         return (
           <div
             className={cn(
-              "group relative transition-[filter,opacity] duration-300",
+              "group relative w-full transition-[filter,opacity] duration-300",
+              width,
+              right && "sm:self-end",
               dim && "blur-[5px] opacity-50"
             )}
             key={item.slug}
