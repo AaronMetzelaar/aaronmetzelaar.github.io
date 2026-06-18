@@ -86,6 +86,7 @@ export default function HeadersGallery() {
           assemble={assembling}
           className="h-full w-full"
           key={`${v.id}-${playId}`}
+          progress={progress / 100}
           variant={v.id}
         />
       </div>

@@ -68,7 +68,7 @@ export function Preloader() {
       if (revealing.current) {
         return;
       }
-      setProgress(easeOutCubic(Math.min(1, (now - start) / MIN_MS)) * 90);
+      setProgress(easeOutCubic(Math.min(1, (now - start) / MIN_MS)) * 99);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -122,6 +122,7 @@ export function Preloader() {
       <PortraitLoader
         assemble={false}
         className="absolute inset-0 h-full w-full"
+        progress={progress / 100}
         variant="swarm"
       />
       <div className="absolute inset-0 grid place-items-center">

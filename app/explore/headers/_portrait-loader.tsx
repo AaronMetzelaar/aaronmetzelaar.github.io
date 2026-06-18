@@ -37,6 +37,7 @@ function LoaderCloud({
   assemble,
   anchorX,
   reduced,
+  progress,
 }: {
   src: string;
   depthSrc: string;
@@ -44,6 +45,7 @@ function LoaderCloud({
   assemble: boolean;
   anchorX: number;
   reduced: boolean;
+  progress: number; // 0..1 — how many dots have arrived (the loaded fraction)
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const [data, setData] = useState<CloudData | null>(null);
@@ -93,7 +95,9 @@ function LoaderCloud({
         (r[i3 + 1] - 0.5) * 4,
         (r[i3 + 2] - 0.5) * 2.4
       );
-      o.scale.setScalar(data.scl[i] * 0.6);
+      const appearAt = noise(i + 7) * 0.88;
+      const appear = Math.max(0, Math.min(1, (progress - appearAt) / 0.06));
+      o.scale.setScalar(data.scl[i] * 0.6 * appear);
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
       c.setRGB(data.col[i3], data.col[i3 + 1], data.col[i3 + 2]);
@@ -204,7 +208,11 @@ function LoaderCloud({
       } else {
         o.position.set(ax, ay, az);
       }
-      o.scale.setScalar(Math.max(0, scale));
+      // dots arrive as the loaded % climbs: each has a threshold, and scales in
+      // over a small window once progress passes it (all present by 100%)
+      const appearAt = noise(i + 7) * 0.88;
+      const appear = Math.max(0, Math.min(1, (progress - appearAt) / 0.06));
+      o.scale.setScalar(Math.max(0, scale * appear));
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
     }
@@ -238,6 +246,7 @@ export function PortraitLoader({
   variant = "field",
   assemble = false,
   anchorX = 0,
+  progress = 1,
 }: {
   className?: string;
   src?: string;
@@ -245,6 +254,8 @@ export function PortraitLoader({
   variant?: LoaderVariant;
   assemble?: boolean;
   anchorX?: number;
+  /** 0..1 — fraction of dots present (drives the "dots arrive" loading fill). */
+  progress?: number;
 }) {
   const reduced = !!useReducedMotion();
   return (
@@ -261,6 +272,7 @@ export function PortraitLoader({
           anchorX={anchorX}
           assemble={assemble}
           depthSrc={depthSrc}
+          progress={reduced ? 1 : progress}
           reduced={reduced}
           src={src}
           variant={variant}
