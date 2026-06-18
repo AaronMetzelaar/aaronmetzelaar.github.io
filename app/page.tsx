@@ -6,7 +6,7 @@ import { Hero } from "@/components/site/hero";
 import { MiniCard } from "@/components/site/mini-card";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
-import { WorkIndex } from "@/components/site/work-index";
+import { WorkGallery } from "@/components/site/work-gallery";
 import {
   about,
   creativeWork,
@@ -92,8 +92,8 @@ export default function Home() {
               </PullLink>
             </div>
           </Reveal>
-          <div className="mt-8">
-            <WorkIndex items={experience} />
+          <div className="mt-10">
+            <WorkGallery items={experience} />
           </div>
         </section>
 
