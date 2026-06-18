@@ -17,7 +17,7 @@ export function Hero() {
     >
       {/* portrait — mobile: a sized top band; desktop: full-bleed behind text. */}
       <div className="relative h-[44svh] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto">
-        <HeroPortrait />
+        <HeroPortrait gateReveal />
         {/* dissolve the band's lower edge into the white canvas (mobile only) */}
         <div
           aria-hidden="true"
@@ -31,13 +31,20 @@ export function Hero() {
             {site.roleLine}
           </p>
           <h1 className="mt-6 font-bold text-[clamp(2.75rem,8vw,6rem)] leading-[0.9] tracking-[-0.05em]">
-            <ScrambleText className="block" durationMs={1100} fade text="Aaron" />
+            <ScrambleText
+              className="block"
+              durationMs={1100}
+              fade
+              text="Aaron"
+              waitForReveal
+            />
             <ScrambleText
               className="block"
               durationMs={1500}
               fade
               startDelayMs={160}
               text="Metzelaar"
+              waitForReveal
             />
           </h1>
           <p className="mt-8 max-w-md text-[1.05rem] text-muted-fg leading-relaxed">

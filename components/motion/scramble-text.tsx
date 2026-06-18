@@ -3,6 +3,8 @@
 import { useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
+import { onReveal } from "@/lib/page-reveal";
+
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/\\<>[]{}=+*#";
 
 const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
@@ -23,6 +25,11 @@ type ScrambleTextProps = {
    * first frame. Off by default — the plain in-place decode.
    */
   fade?: boolean;
+  /**
+   * Hold the decode until the homepage preloader hands off (page-reveal), so a
+   * gated entrance stays in lock-step with the portrait. Off by default.
+   */
+  waitForReveal?: boolean;
 };
 
 /** Decrypt/scramble text into place. Renders final text when reduced-motion. */
@@ -32,6 +39,7 @@ export function ScrambleText({
   durationMs = 900,
   startDelayMs = 0,
   fade = false,
+  waitForReveal = false,
 }: ScrambleTextProps) {
   const reduced = useReducedMotion();
   const [frame, setFrame] = useState<Frame>(text);
@@ -90,9 +98,20 @@ export function ScrambleText({
       }
     };
 
-    raf = requestAnimationFrame(run);
-    return () => cancelAnimationFrame(raf);
-  }, [text, durationMs, startDelayMs, reduced, fade]);
+    let cancelled = false;
+    const begin = () => {
+      if (!cancelled) {
+        raf = requestAnimationFrame(run);
+      }
+    };
+    // gated: wait for the preloader hand-off (immediate if already revealed)
+    const unsub = waitForReveal ? onReveal(begin) : (begin(), () => undefined);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      unsub();
+    };
+  }, [text, durationMs, startDelayMs, reduced, fade, waitForReveal]);
 
   return (
     <span aria-label={text} className={className}>

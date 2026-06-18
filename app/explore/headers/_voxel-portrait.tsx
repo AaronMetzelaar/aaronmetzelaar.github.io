@@ -11,6 +11,7 @@ import {
 } from "react";
 import * as THREE from "three";
 
+import { onReveal } from "@/lib/page-reveal";
 import { cn } from "@/lib/utils";
 
 // A halftone dot portrait from ONE photo + its depth map. Each dot's size
@@ -286,6 +287,7 @@ function PortraitCloud({
   anchorX,
   spread,
   drag,
+  waitForReveal,
 }: {
   src: string;
   depthSrc: string;
@@ -296,6 +298,7 @@ function PortraitCloud({
   anchorX: number;
   spread: number;
   drag: { current: DragState };
+  waitForReveal: boolean;
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const [data, setData] = useState<CloudData | null>(null);
@@ -305,9 +308,20 @@ function PortraitCloud({
   const rnd = useRef<Float32Array | null>(null);
   const t0 = useRef<number | null>(null);
   const colScratch = useRef(new THREE.Color());
+  // gated entrances stay hidden (scale 0) until the preloader hands off
+  const started = useRef(!waitForReveal);
 
   const isEntrance = ENTRANCES.has(motion) && !reduced;
   const ambientOn = ambient !== "none" && !reduced;
+
+  useEffect(() => {
+    if (!waitForReveal) {
+      return;
+    }
+    return onReveal(() => {
+      started.current = true;
+    });
+  }, [waitForReveal]);
 
   useEffect(() => {
     let alive = true;
@@ -366,6 +380,10 @@ function PortraitCloud({
     const s = sim.current;
     const rr = rnd.current;
     if (!(mesh && d && s && rr) || d.count === 0 || reduced) {
+      return;
+    }
+    // hold a gated entrance hidden until the preloader's reveal hand-off
+    if (isEntrance && !started.current) {
       return;
     }
     const dt = Math.min(delta, 0.04);
@@ -662,6 +680,7 @@ export function VoxelPortrait({
   anchorX = 0,
   camZ = 3.4,
   spread = 2.6,
+  waitForReveal = false,
 }: {
   className?: string;
   src?: string;
@@ -671,6 +690,7 @@ export function VoxelPortrait({
   anchorX?: number; // shift the head horizontally (full-bleed layouts)
   camZ?: number; // camera distance (zoom)
   spread?: number; // assemble fly-in reach
+  waitForReveal?: boolean; // hold the entrance until the page-reveal hand-off
 }) {
   const reduced = !!useReducedMotion();
   const drag = useRef<DragState>({
@@ -752,6 +772,7 @@ export function VoxelPortrait({
           spread={spread}
           src={src}
           sway={!reduced}
+          waitForReveal={waitForReveal}
         />
       </Canvas>
     </div>

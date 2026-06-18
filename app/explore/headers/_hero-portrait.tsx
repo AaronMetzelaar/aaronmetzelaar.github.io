@@ -6,7 +6,7 @@ import { VoxelPortrait } from "./_voxel-portrait";
 // Full-bleed dot portrait behind the hero: on load the dots fly in from across
 // the whole page and assemble into the portrait on the right. On desktop it's
 // interactive (scatter/tilt); on touch it's pass-through so the page scrolls.
-export function HeroPortrait() {
+export function HeroPortrait({ gateReveal = false }: { gateReveal?: boolean }) {
   const [desktop, setDesktop] = useState(true);
 
   useEffect(() => {
@@ -25,6 +25,7 @@ export function HeroPortrait() {
         className="h-full w-full"
         motion="assemble"
         spread={desktop ? 3 : 2.2}
+        waitForReveal={gateReveal}
       />
     </div>
   );

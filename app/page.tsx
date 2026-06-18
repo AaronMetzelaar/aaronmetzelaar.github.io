@@ -4,6 +4,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { Hero } from "@/components/site/hero";
 import { MiniCard } from "@/components/site/mini-card";
+import { Preloader } from "@/components/site/preloader";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
 import { WorkGallery } from "@/components/site/work-gallery";
@@ -28,6 +29,7 @@ export default function Home() {
       className="relative isolate bg-bg font-terminal text-fg"
       style={premiumTheme}
     >
+      <Preloader />
       <SiteNav />
       {/* static ambient dot grid — the page's fine-dot texture, behind everything */}
       <PageDots />
