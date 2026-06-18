@@ -22,14 +22,26 @@ const MAX = 22;
 const EASE = 0.12;
 
 // loose vertical stagger so three tiles read as a collage, not a grid row
-const STAGGER = ["", "sm:mt-20", "sm:mt-8"];
+const STAGGER = ["", "sm:mt-24", "sm:mt-10"];
 
 // where the social secondaries come to rest — scattered across the open area to
-// the left of the (right-most) social tile. left/top/width as % of the gallery;
-// `from` is the resting → hidden offset so they emerge from the hero's side.
+// the left of the (right-most) social tile. left/top/width as % of the padded
+// stage; `from` is the hidden → resting offset so they emerge from the hero side.
 const DROPS = [
-  { left: "0%", top: "1%", width: "25%", from: "translate(70px, -16px) scale(0.7)" },
-  { left: "26%", top: "46%", width: "23%", from: "translate(90px, 24px) scale(0.7)" },
+  {
+    left: "1%",
+    top: "0%",
+    width: "27%",
+    rot: "-rotate-3",
+    from: "translate(80px, -34px) scale(0.66)",
+  },
+  {
+    left: "34%",
+    top: "55%",
+    width: "21%",
+    rot: "rotate-[5deg]",
+    from: "translate(120px, 44px) scale(0.66)",
+  },
 ];
 
 function usePointerFine() {
@@ -44,7 +56,13 @@ function usePointerFine() {
   return fine;
 }
 
-export function CreativeGallery({ items }: { items: WorkItem[] }) {
+export function CreativeGallery({
+  items,
+  onActiveChange,
+}: {
+  items: WorkItem[];
+  onActiveChange?: (active: boolean) => void;
+}) {
   const reduced = !!useReducedMotion();
   const fine = usePointerFine();
   const [mounted, setMounted] = useState(false);
@@ -54,6 +72,11 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
 
   useEffect(() => setMounted(true), []);
   const interactive = mounted && fine && !reduced;
+
+  // tell the section whether a tile is focused (so it can blur its header)
+  useEffect(() => {
+    onActiveChange?.(active !== null);
+  }, [active, onActiveChange]);
 
   const socialIndex = items.findIndex((it) => (it.gallery?.length ?? 0) > 1);
   const secondaries =
@@ -123,105 +146,110 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
   const socialOn = interactive && active === socialIndex;
 
   return (
+    // the lean stage is wider (to the section edges) + taller than the tiles, so
+    // the cursor keeps the tiles leaning across a generous area instead of
+    // snapping back the moment it leaves a tight box
     <div
-      className="relative grid gap-10 sm:grid-cols-3 sm:gap-8"
+      className="relative -mx-6 px-6 py-14 sm:-mx-10 sm:px-10 sm:py-20"
       onPointerLeave={interactive ? () => (pointer.current = null) : undefined}
       onPointerMove={interactive ? onMove : undefined}
       ref={containerRef}
     >
-      {items.map((item, i) => {
-        const dim = interactive && active !== null && active !== i;
-        const on = interactive && active === i;
-        const video = item.media?.kind === "video" ? item.media : null;
-        const hero = item.gallery?.[0];
-        return (
-          <figure
-            className={cn(
-              "relative transition-[filter,opacity] duration-300",
-              STAGGER[i % STAGGER.length],
-              dim && "opacity-45 blur-[5px]"
-            )}
-            key={item.slug}
-            style={{ zIndex: on ? 10 : 1 }}
-          >
-            <div ref={(el) => { cardRefs.current[i] = el; }}>
-              <div
-                className={cn(
-                  "origin-center transition-transform duration-500 ease-out",
-                  on && "scale-[1.04]"
-                )}
-                onPointerEnter={interactive ? () => enter(i) : undefined}
-                onPointerLeave={interactive ? () => leave(i) : undefined}
-              >
-                <div className="relative aspect-[4/5] w-full">
-                  {video ? (
-                    <div className="absolute inset-0 overflow-hidden border border-border">
-                      <CoordinatedVideo
-                        alt={video.alt}
-                        play={on}
-                        poster={video.poster}
-                        src={video.src}
-                      />
-                    </div>
-                  ) : hero ? (
-                    <div
-                      aria-label={hero.alt}
-                      className="absolute inset-0 border border-border bg-bg bg-center bg-cover"
-                      role="img"
-                      style={{ backgroundImage: `url(${hero.src})` }}
-                    />
-                  ) : (
-                    <MediaFrame
-                      aspect={4 / 5}
-                      className="absolute inset-0 h-full w-full"
-                      label={item.slug}
-                      minimal
-                    />
-                  )}
-                </div>
-              </div>
-
-              <figcaption className="relative z-10 mt-4">
-                <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
-                  <span className="text-accent/55">({i + 1}) </span>
-                  {item.title.toUpperCase()}
-                </p>
+      <div className="grid gap-10 sm:grid-cols-3 sm:gap-8">
+        {items.map((item, i) => {
+          const dim = interactive && active !== null && active !== i;
+          const on = interactive && active === i;
+          const video = item.media?.kind === "video" ? item.media : null;
+          const hero = item.gallery?.[0];
+          return (
+            <figure
+              className={cn(
+                "relative transition-[filter,opacity] duration-300",
+                STAGGER[i % STAGGER.length],
+                dim && "opacity-40 blur-[5px]"
+              )}
+              key={item.slug}
+              style={{ zIndex: on ? 10 : 1 }}
+            >
+              <div ref={(el) => { cardRefs.current[i] = el; }}>
                 <div
                   className={cn(
-                    "flex flex-col gap-2 pt-3 transition-opacity duration-300",
-                    interactive
-                      ? "absolute inset-x-0 top-full opacity-0"
-                      : "opacity-100",
-                    on && "opacity-100"
+                    "origin-center transition-transform duration-500 ease-out",
+                    on && "scale-[1.04]"
                   )}
+                  onPointerEnter={interactive ? () => enter(i) : undefined}
+                  onPointerLeave={interactive ? () => leave(i) : undefined}
                 >
-                  <p className="max-w-md text-muted-fg text-sm leading-relaxed">
-                    <ScrambleText
-                      durationMs={650}
-                      fade
-                      key={plays[i]}
-                      text={item.summary}
-                    />
-                  </p>
-                  <ul className="flex flex-wrap gap-x-3 gap-y-1">
-                    {item.tags.map((t) => (
-                      <li
-                        className="text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
-                        key={t}
-                      >
-                        <span aria-hidden="true" className="text-accent/55">
-                          →{" "}
-                        </span>
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="relative aspect-[4/5] w-full">
+                    {video ? (
+                      <div className="absolute inset-0 overflow-hidden border border-border">
+                        <CoordinatedVideo
+                          alt={video.alt}
+                          play={on}
+                          poster={video.poster}
+                          src={video.src}
+                        />
+                      </div>
+                    ) : hero ? (
+                      <div
+                        aria-label={hero.alt}
+                        className="absolute inset-0 border border-border bg-bg bg-center bg-cover"
+                        role="img"
+                        style={{ backgroundImage: `url(${hero.src})` }}
+                      />
+                    ) : (
+                      <MediaFrame
+                        aspect={4 / 5}
+                        className="absolute inset-0 h-full w-full"
+                        label={item.slug}
+                        minimal
+                      />
+                    )}
+                  </div>
                 </div>
-              </figcaption>
-            </div>
-          </figure>
-        );
-      })}
+
+                <figcaption className="relative z-10 mt-4">
+                  <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
+                    <span className="text-accent/55">({i + 1}) </span>
+                    {item.title.toUpperCase()}
+                  </p>
+                  <div
+                    className={cn(
+                      "flex flex-col gap-2 pt-3 transition-opacity duration-300",
+                      interactive
+                        ? "absolute inset-x-0 top-full opacity-0"
+                        : "opacity-100",
+                      on && "opacity-100"
+                    )}
+                  >
+                    <p className="max-w-md text-muted-fg text-sm leading-relaxed">
+                      <ScrambleText
+                        durationMs={650}
+                        fade
+                        key={plays[i]}
+                        text={item.summary}
+                      />
+                    </p>
+                    <ul className="flex flex-wrap gap-x-3 gap-y-1">
+                      {item.tags.map((t) => (
+                        <li
+                          className="text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
+                          key={t}
+                        >
+                          <span aria-hidden="true" className="text-accent/55">
+                            →{" "}
+                          </span>
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </figcaption>
+              </div>
+            </figure>
+          );
+        })}
+      </div>
 
       {/* social secondaries — separate tiles that fly into the open area when
           the social tile is hovered; they lean toward the cursor like the rest */}
@@ -243,7 +271,10 @@ export function CreativeGallery({ items }: { items: WorkItem[] }) {
               >
                 <div ref={(el) => { cardRefs.current[items.length + si] = el; }}>
                   <div
-                    className="aspect-[4/5] w-full border border-border bg-bg bg-center bg-cover shadow-xl"
+                    className={cn(
+                      "aspect-[4/5] w-full border border-border bg-bg bg-center bg-cover shadow-xl",
+                      drop.rot
+                    )}
                     style={{ backgroundImage: `url(${s.src})` }}
                   />
                 </div>

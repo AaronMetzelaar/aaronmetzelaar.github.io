@@ -348,10 +348,12 @@ function Node({
 }) {
   const lit = state === "active" || state === "conn";
   const isHook = node.layer === "hook";
+  // The dot is anchored exactly on the connection point (pt) so curves, dot,
+  // and its hover halo all coincide; the label hangs centered just below it.
   return (
     <button
       className={cn(
-        "-translate-x-1/2 -translate-y-1/2 absolute flex w-[88px] flex-col items-center gap-1.5 text-center transition-opacity duration-200",
+        "-translate-x-1/2 -translate-y-1/2 absolute flex items-center justify-center transition-opacity duration-200",
         state === "dim" && "opacity-25"
       )}
       onClick={() => onSelect(node.id)}
@@ -364,7 +366,7 @@ function Node({
       <span
         aria-hidden="true"
         className={cn(
-          "shrink-0 rounded-full border transition-all",
+          "rounded-full border transition-all",
           isHook ? "border-accent bg-bg" : "border-accent bg-accent",
           state === "active"
             ? "h-3 w-3 ring-4 ring-accent/15"
@@ -377,7 +379,7 @@ function Node({
       />
       <span
         className={cn(
-          "text-[0.64rem] leading-tight tracking-tight transition-colors",
+          "-translate-x-1/2 absolute top-[calc(100%+6px)] left-1/2 w-[88px] text-center text-[0.64rem] leading-tight tracking-tight transition-colors",
           lit ? "text-accent" : "text-fg/70"
         )}
       >

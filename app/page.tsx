@@ -3,7 +3,7 @@ import { FilingsRule, PullLink } from "@/app/explore/_shared/pull-link";
 import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { Hero } from "@/components/site/hero";
-import { CreativeGallery } from "@/components/site/creative-gallery";
+import { CreativeShowcase } from "@/components/site/creative-showcase";
 import { Preloader } from "@/components/site/preloader";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
@@ -218,16 +218,7 @@ export default function Home() {
           className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
           id="creative"
         >
-          <SectionHeader
-            dividerCount={28}
-            index="05"
-            kicker="Beyond code"
-            note="Video · Design · Social"
-            title="Off the clock"
-          />
-          <div className="mt-12">
-            <CreativeGallery items={creativeWork} />
-          </div>
+          <CreativeShowcase items={creativeWork} />
         </section>
 
         {/* Contact */}
