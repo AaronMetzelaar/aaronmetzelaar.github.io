@@ -27,7 +27,7 @@ const DOT_MIN = 0.26; // dot radius range as a fraction of spacing
 const DOT_MAX = 1.12; // dark dots overlap → solid ink (no lattice gaps)
 const GRID_ANGLE = 0.52; // ~30° rotated grid → no axis-aligned squares
 
-type CloudData = {
+export type CloudData = {
   count: number;
   pos: Float32Array;
   scl: Float32Array;
@@ -35,7 +35,7 @@ type CloudData = {
   dark: Float32Array; // 0 (light) .. 1 (dark/structural) — drives which dots move
 };
 
-function loadImg(src: string) {
+export function loadImg(src: string) {
   return new Promise<HTMLImageElement>((res, rej) => {
     const im = new Image();
     im.crossOrigin = "anonymous";
@@ -114,7 +114,10 @@ function tone(t: number) {
   ];
 }
 
-function sample(photo: HTMLImageElement, depth: HTMLImageElement): CloudData {
+export function sample(
+  photo: HTMLImageElement,
+  depth: HTMLImageElement
+): CloudData {
   const empty = {
     count: 0,
     pos: new Float32Array(0),
@@ -272,7 +275,7 @@ function lifecycle(phase: number, ct: number, rate: number, dwell: number) {
 }
 
 // deterministic 0..1 noise per index
-function noise(i: number) {
+export function noise(i: number) {
   const v = Math.sin(i * 127.1 + 311.7) * 43_758.545;
   return v - Math.floor(v);
 }
