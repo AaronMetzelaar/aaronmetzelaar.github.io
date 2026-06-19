@@ -83,8 +83,8 @@ export const experience: WorkItem[] = [
       src: "/work/shirts-360.mp4",
       poster: "/work/shirts-360-poster.jpg",
       alt: "Signed shirts lit and slowly turning, dissolving one into the next, captured for 360-degree product viewing.",
-      width: 600,
-      height: 750,
+      width: 900,
+      height: 1124,
     },
   },
   {
