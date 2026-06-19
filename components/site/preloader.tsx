@@ -4,11 +4,11 @@ import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PortraitLoader } from "@/app/explore/headers/_portrait-loader";
-import { LoadingBar } from "@/components/site/loading-bar";
 import { isRevealed, triggerReveal } from "@/lib/page-reveal";
 
 // The homepage preloader, built from the hero's OWN portrait dots: while assets
-// load they hover in a loose, screen-filling swarm under a percentage bar; when
+// load they drift in a loose, screen-filling swarm. Progress reads on a thin
+// rule along the bottom edge with a small count, not a card in the middle. When
 // the page is ready the overlay dissolves and the hand-off fires, so the hero's
 // portrait assembles from the same dots. One dot language, no second system.
 const MIN_MS = 1600; // premium minimum dwell, even on a warm cache
@@ -119,14 +119,24 @@ export function Preloader() {
         pointerEvents: fading ? "none" : "auto",
       }}
     >
+      {/* the full live swarm of the portrait's dots (not popped in over time) */}
       <PortraitLoader
         assemble={false}
         className="absolute inset-0 h-full w-full"
-        progress={progress / 100}
         variant="swarm"
       />
-      <div className="absolute inset-0 grid place-items-center">
-        <LoadingBar p={progress} />
+      {/* progress: a small count + a hairline that fills along the bottom edge */}
+      <p className="absolute bottom-6 left-6 font-terminal text-[0.7rem] text-muted-fg uppercase tracking-[0.35em] sm:bottom-8 sm:left-10">
+        Laden
+        <span className="ml-3 text-accent tabular-nums">
+          {String(Math.round(progress)).padStart(2, "0")}%
+        </span>
+      </p>
+      <div className="absolute inset-x-0 bottom-0 h-[2px] bg-fg/10">
+        <div
+          className="h-full bg-accent"
+          style={{ width: `${progress}%`, transition: "width 120ms linear" }}
+        />
       </div>
     </div>
   );
