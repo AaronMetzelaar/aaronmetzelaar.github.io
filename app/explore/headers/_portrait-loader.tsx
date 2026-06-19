@@ -98,9 +98,9 @@ function LoaderCloud({
       // start empty: no dot is present until the loaded % passes its threshold
       const arrive = Math.max(
         0,
-        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.1)
+        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.16)
       );
-      o.scale.setScalar(data.scl[i] * 0.6 * easeOutBack(arrive));
+      o.scale.setScalar(data.scl[i] * 0.6 * easeOutCubic(arrive));
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
       c.setRGB(data.col[i3], data.col[i3 + 1], data.col[i3 + 2]);
@@ -202,10 +202,11 @@ function LoaderCloud({
       // 0% → no dots; 100% → the full set, ready to assemble.
       const arrive = Math.max(
         0,
-        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.1)
+        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.16)
       );
-      // during load, dots pop in as they arrive; once assembling, all are present
-      const pop = assembling ? 1 : easeOutBack(arrive);
+      // dots simply fade up in place as the % passes them — no flying around;
+      // once assembling, all are present
+      const grow = assembling ? 1 : easeOutCubic(arrive);
 
       let scale = d.scl[i] * 0.6;
       if (assembling) {
@@ -219,12 +220,10 @@ function LoaderCloud({
         );
         scale = d.scl[i] * (0.6 + 0.4 * Math.max(0, Math.min(1, e)));
       } else {
-        // not fully arrived → sit out along a random heading and fly in
-        const ang = (r1 + r2) * Math.PI * 2;
-        const fly = (1 - arrive) * 0.9;
-        o.position.set(ax + Math.cos(ang) * fly, ay + Math.sin(ang) * fly, az);
+        // materialise right at the swarm spot — it just drifts, never shoots
+        o.position.set(ax, ay, az);
       }
-      o.scale.setScalar(Math.max(0, scale * pop));
+      o.scale.setScalar(Math.max(0, scale * grow));
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
     }
