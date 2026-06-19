@@ -95,9 +95,12 @@ function LoaderCloud({
         (r[i3 + 1] - 0.5) * 4,
         (r[i3 + 2] - 0.5) * 2.4
       );
-      const appearAt = noise(i + 7) * 0.88;
-      const appear = Math.max(0, Math.min(1, (progress - appearAt) / 0.06));
-      o.scale.setScalar(data.scl[i] * 0.6 * appear);
+      // start empty: no dot is present until the loaded % passes its threshold
+      const arrive = Math.max(
+        0,
+        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.1)
+      );
+      o.scale.setScalar(data.scl[i] * 0.6 * easeOutBack(arrive));
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
       c.setRGB(data.col[i3], data.col[i3 + 1], data.col[i3 + 2]);
@@ -194,6 +197,16 @@ function LoaderCloud({
       const ay = oy + dy;
       const az = oz + dz;
 
+      // arrival: each dot spawns as the loaded % passes its own threshold,
+      // flying in from a random direction to its swarm spot and popping to size.
+      // 0% → no dots; 100% → the full set, ready to assemble.
+      const arrive = Math.max(
+        0,
+        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.1)
+      );
+      // during load, dots pop in as they arrive; once assembling, all are present
+      const pop = assembling ? 1 : easeOutBack(arrive);
+
       let scale = d.scl[i] * 0.6;
       if (assembling) {
         const stag = r0 * STAGGER;
@@ -206,13 +219,12 @@ function LoaderCloud({
         );
         scale = d.scl[i] * (0.6 + 0.4 * Math.max(0, Math.min(1, e)));
       } else {
-        o.position.set(ax, ay, az);
+        // not fully arrived → sit out along a random heading and fly in
+        const ang = (r1 + r2) * Math.PI * 2;
+        const fly = (1 - arrive) * 0.9;
+        o.position.set(ax + Math.cos(ang) * fly, ay + Math.sin(ang) * fly, az);
       }
-      // dots arrive as the loaded % climbs: each has a threshold, and scales in
-      // over a small window once progress passes it (all present by 100%)
-      const appearAt = noise(i + 7) * 0.88;
-      const appear = Math.max(0, Math.min(1, (progress - appearAt) / 0.06));
-      o.scale.setScalar(Math.max(0, scale * appear));
+      o.scale.setScalar(Math.max(0, scale * pop));
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
     }

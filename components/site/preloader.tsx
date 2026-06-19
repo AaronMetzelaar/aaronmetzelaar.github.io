@@ -11,11 +11,10 @@ import { isRevealed, triggerReveal } from "@/lib/page-reveal";
 // rule along the bottom edge with a small count, not a card in the middle. When
 // the page is ready the overlay dissolves and the hand-off fires, so the hero's
 // portrait assembles from the same dots. One dot language, no second system.
-const MIN_MS = 1600; // premium minimum dwell, even on a warm cache
+const MIN_MS = 2400; // dwell long enough that the dots visibly spawn in
 const REVEAL_MS = 700; // dissolve length
-const CAP_MS = 6500; // safety: reveal even if an asset hangs
+const CAP_MS = 7000; // safety: reveal even if an asset hangs
 const PORTRAIT_SRCS = ["/portrait-cut.png", "/portrait-depth.jpg"];
-const easeOutCubic = (p: number) => 1 - (1 - p) ** 3;
 
 function preloadImg(src: string) {
   return new Promise<void>((resolve) => {
@@ -68,7 +67,8 @@ export function Preloader() {
       if (revealing.current) {
         return;
       }
-      setProgress(easeOutCubic(Math.min(1, (now - start) / MIN_MS)) * 99);
+      // steady climb so dots spawn in at a constant rate, not front-loaded
+      setProgress(Math.min(99, ((now - start) / MIN_MS) * 99));
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -119,10 +119,11 @@ export function Preloader() {
         pointerEvents: fading ? "none" : "auto",
       }}
     >
-      {/* the full live swarm of the portrait's dots (not popped in over time) */}
+      {/* the portrait's dots, spawning in as the % climbs (0 → full set) */}
       <PortraitLoader
         assemble={false}
         className="absolute inset-0 h-full w-full"
+        progress={progress / 100}
         variant="swarm"
       />
       {/* progress: a small count + a hairline that fills along the bottom edge */}
