@@ -79,7 +79,7 @@ export default function CvPage() {
             role="img"
             style={{
               aspectRatio: "1",
-              backgroundImage: "url(/portrait.jpg)",
+              backgroundImage: "url(/portrait/photo.jpg)",
             }}
           />
         </header>

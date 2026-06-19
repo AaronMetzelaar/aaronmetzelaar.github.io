@@ -9,8 +9,8 @@ export const creativeWork: WorkItem[] = [
     tags: ["Video", "Editing", "Storytelling"],
     media: {
       kind: "video",
-      src: "/promo-video.mp4",
-      poster: "/promo-poster.jpg",
+      src: "/creative/promo.mp4",
+      poster: "/creative/promo-poster.jpg",
       alt: "Student association promo film — a member hyping up the kit against a brick wall.",
       width: 540,
       height: 960,
@@ -32,16 +32,16 @@ export const creativeWork: WorkItem[] = [
     // first = the hero still; the rest fan out on hover
     gallery: [
       {
-        src: "/social/svenridder.jpg",
-        alt: "Sven is een Ridder — recruitment post.",
+        src: "/creative/social/sven.jpg",
+        alt: "Sven is een Ridder, a recruitment post.",
       },
       {
-        src: "/social/bryanridder.jpg",
-        alt: "Bryan is een Ridder — recruitment post.",
+        src: "/creative/social/bryan.jpg",
+        alt: "Bryan is een Ridder, a recruitment post.",
       },
       {
-        src: "/social/servaasridder.jpg",
-        alt: "Servaas is een Ridder — recruitment post.",
+        src: "/creative/social/servaas.jpg",
+        alt: "Servaas is een Ridder, a recruitment post.",
       },
     ],
   },

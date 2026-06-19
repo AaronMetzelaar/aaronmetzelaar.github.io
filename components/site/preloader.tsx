@@ -14,7 +14,7 @@ import { isRevealed, triggerReveal } from "@/lib/page-reveal";
 const MIN_MS = 2400; // dwell long enough that the dots visibly spawn in
 const REVEAL_MS = 700; // dissolve length
 const CAP_MS = 7000; // safety: reveal even if an asset hangs
-const PORTRAIT_SRCS = ["/portrait-cut.png", "/portrait-depth.jpg"];
+const PORTRAIT_SRCS = ["/portrait/cut.png", "/portrait/depth.jpg"];
 
 function preloadImg(src: string) {
   return new Promise<void>((resolve) => {

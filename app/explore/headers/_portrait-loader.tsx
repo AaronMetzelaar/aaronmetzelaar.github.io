@@ -254,8 +254,8 @@ function LoaderCloud({
  */
 export function PortraitLoader({
   className,
-  src = "/portrait-cut.png",
-  depthSrc = "/portrait-depth.jpg",
+  src = "/portrait/cut.png",
+  depthSrc = "/portrait/depth.jpg",
   variant = "field",
   assemble = false,
   anchorX = 0,

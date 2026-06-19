@@ -676,8 +676,8 @@ function PortraitCloud({
  */
 export function VoxelPortrait({
   className,
-  src = "/portrait-cut.png",
-  depthSrc = "/portrait-depth.jpg",
+  src = "/portrait/cut.png",
+  depthSrc = "/portrait/depth.jpg",
   motion = "none",
   ambient = "none",
   anchorX = 0,
