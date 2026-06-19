@@ -25,6 +25,14 @@ export const experience: WorkItem[] = [
       "Performance and accessibility passes on high-traffic pages",
     ],
     tags: ["Nuxt 3", "Vue 3", "TypeScript"],
+    media: {
+      kind: "video",
+      src: "/web-homepage.mp4",
+      poster: "/web-homepage-poster.jpg",
+      alt: "The MWS marketplace on mws.com: the live homepage and an auction event page.",
+      width: 1280,
+      height: 558,
+    },
   },
   {
     slug: "configurator",
@@ -70,6 +78,14 @@ export const experience: WorkItem[] = [
       "Smooth, draggable viewer tuned for detail and weight",
     ],
     tags: ["360°", "Media", "Tooling"],
+    media: {
+      kind: "video",
+      src: "/product-360.mp4",
+      poster: "/product-360-poster.jpg",
+      alt: "A signed shirt lit and turning, captured for 360-degree product viewing.",
+      width: 820,
+      height: 820,
+    },
   },
   {
     slug: "mobile",

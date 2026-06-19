@@ -55,9 +55,9 @@ export default function CvPage() {
               {site.name}
             </h1>
             <p className="mt-4 max-w-lg text-muted-fg text-sm leading-relaxed">
-              Frontend developer with an AI and agentic edge, based in the{" "}
-              {site.location}. I build clean, fast interfaces, and the tooling
-              that helps the team ship them.
+              Frontend developer in the {site.location}, three years into MWS. I
+              build the interface, and lately the harness our agents work
+              inside, so the whole team ships faster.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
               <PullLink arrow="→" href={`mailto:${site.email}`}>

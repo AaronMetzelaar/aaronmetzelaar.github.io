@@ -1,5 +1,4 @@
 import { HeroPortrait } from "@/app/explore/headers/_hero-portrait";
-import { Cursor } from "@/components/motion/cursor";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { site } from "@/content/site";
 
@@ -47,7 +46,10 @@ export function Hero() {
                 text="Metzelaar"
                 waitForReveal
               />
-              <Cursor className="bg-accent" />
+              {/* low, terminal-style underscore caret — not a full-height bar */}
+              <span aria-hidden="true" className="cursor-blink text-accent">
+                _
+              </span>
             </span>
           </h1>
           <p className="mt-8 max-w-md text-[1.05rem] text-muted-fg leading-relaxed">

@@ -2,24 +2,24 @@ import type { WorkItem } from "./types";
 
 export const aiWork: WorkItem[] = [
   {
-    slug: "agent-architecture",
-    title: "AI & agent architecture",
+    slug: "harness-engineering",
+    title: "Harness engineering",
     summary:
-      "Designing how a team builds with AI agents. The conventions, guardrails, and structure that keep agentic development reliable instead of chaotic.",
+      "The part I care about most. An agent is only as good as the harness around it, so I build that harness: the context it reads first, the skills it can run, the reviewers that check its work, and the hooks that fire on their own. Get it right and agentic development stays reliable instead of turning into a mess.",
     highlights: [
-      "Standards and patterns other developers build on top of",
+      "The standards and structure the rest of the team builds on",
       "Guardrails that keep agent output safe and reviewable",
     ],
-    tags: ["Agents", "Architecture", "DX"],
+    tags: ["Harness", "Agents", "DX"],
   },
   {
     slug: "skills-and-hooks",
     title: "Skills & hooks",
     summary:
-      "Authoring reusable agent skills and lifecycle hooks that other developers use day to day, turning repeated workflows into one-command operations.",
+      "Reusable agent skills and lifecycle hooks the team reaches for every day. They take a repeated, easy-to-get-wrong workflow and turn it into a single command.",
     highlights: [
-      "Reusable skills that codify team workflows",
-      "Hooks that automate the boring, error-prone steps",
+      "Reusable skills that capture how we actually work",
+      "Hooks that handle the boring, error-prone steps",
     ],
     tags: ["Claude Code", "Skills", "Hooks", "Automation"],
   },
@@ -27,10 +27,10 @@ export const aiWork: WorkItem[] = [
     slug: "agentic-workflows",
     title: "Agentic workflows",
     summary:
-      "Building multi-step, mostly-autonomous workflows for review, admin, and research. They run on their own, with a human in the loop where it matters.",
+      "Multi-step, mostly-autonomous pipelines for review, admin, and research. They run on their own and pull a human in on the calls that actually matter.",
     highlights: [
       "Multi-agent pipelines for review and research",
-      "Human-in-the-loop checkpoints on high-stakes steps",
+      "Human-in-the-loop checkpoints on the high-stakes steps",
     ],
     tags: ["Workflows", "MCP", "Tooling"],
   },

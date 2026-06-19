@@ -15,10 +15,11 @@ const EASE = 0.12; // per-frame follow
 // "canvas" at a hand-picked spot + size so they overlap vertically as a loose
 // collage (not a grid); on mobile they stack full-width in order.
 const LAYOUT = [
-  "sm:absolute sm:left-0 sm:top-0 sm:w-[41%]",
-  "mt-16 sm:mt-0 sm:absolute sm:left-[60%] sm:top-[11%] sm:w-[31%]",
-  "mt-16 sm:mt-0 sm:absolute sm:left-[10%] sm:top-[47%] sm:w-[39%]",
-  "mt-16 sm:mt-0 sm:absolute sm:left-[57%] sm:top-[62%] sm:w-[35%]",
+  "sm:absolute sm:left-0 sm:top-0 sm:w-[38%]",
+  // configurator — the favourite, given more room
+  "mt-16 sm:mt-0 sm:absolute sm:left-[52%] sm:top-[8%] sm:w-[44%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[8%] sm:top-[52%] sm:w-[36%]",
+  "mt-16 sm:mt-0 sm:absolute sm:left-[58%] sm:top-[64%] sm:w-[34%]",
 ];
 
 function usePointerFine() {

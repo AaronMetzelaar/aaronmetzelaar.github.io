@@ -128,10 +128,16 @@ export default function Home() {
             density="statement"
             index="03"
             kicker="One layer up"
-            note="The system behind the interface"
+            note="Harness engineering"
             title="I stopped shipping features and started shipping the system the team ships with."
           />
-          <Reveal className="mt-10">
+          <Reveal className="mt-8">
+            <p className="max-w-2xl text-muted-fg leading-relaxed">
+              Call it harness engineering. The agents do the typing; my job is
+              the harness they run inside. Four layers keep it reliable:
+            </p>
+          </Reveal>
+          <Reveal className="mt-9">
             <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {layers.map((l, i) => (
                 <div key={l.id}>
