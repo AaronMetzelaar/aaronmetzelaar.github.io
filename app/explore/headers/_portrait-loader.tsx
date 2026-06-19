@@ -95,10 +95,10 @@ function LoaderCloud({
         (r[i3 + 1] - 0.5) * 4,
         (r[i3 + 2] - 0.5) * 2.4
       );
-      // start empty: no dot is present until the loaded % passes its threshold
+      // start empty; thresholds skewed high so the count grows ~ progress³
       const arrive = Math.max(
         0,
-        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.16)
+        Math.min(1, (progress - Math.cbrt(noise(i + 7)) * 0.92) / 0.16)
       );
       o.scale.setScalar(data.scl[i] * 0.6 * easeOutCubic(arrive));
       o.updateMatrix();
@@ -200,9 +200,11 @@ function LoaderCloud({
       // arrival: each dot spawns as the loaded % passes its own threshold,
       // flying in from a random direction to its swarm spot and popping to size.
       // 0% → no dots; 100% → the full set, ready to assemble.
+      // thresholds skewed high (cbrt) so the count grows ~ progress³: stays
+      // sparse early and only fills out near the end, not full too soon
       const arrive = Math.max(
         0,
-        Math.min(1, (progress - noise(i + 7) * 0.92) / 0.16)
+        Math.min(1, (progress - Math.cbrt(noise(i + 7)) * 0.92) / 0.16)
       );
       // dots simply fade up in place as the % passes them — no flying around;
       // once assembling, all are present
