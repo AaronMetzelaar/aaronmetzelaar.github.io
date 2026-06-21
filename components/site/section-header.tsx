@@ -24,6 +24,8 @@ export function SectionHeader({
   density = "default",
   dividerCount = 56,
   meta,
+  lead,
+  hint,
 }: {
   index: string;
   kicker: string;
@@ -33,6 +35,10 @@ export function SectionHeader({
   density?: "default" | "statement" | "record";
   dividerCount?: number;
   meta?: Meta[];
+  /** A short line under the title saying what the section is. */
+  lead?: string;
+  /** A small accent cue telling the reader how to interact with the section. */
+  hint?: string;
 }) {
   return (
     <div className={cn("font-terminal", className)}>
@@ -80,6 +86,16 @@ export function SectionHeader({
             {title}
           </h2>
         )}
+
+        {lead ? (
+          <p className="mt-5 max-w-2xl text-muted-fg leading-relaxed">{lead}</p>
+        ) : null}
+        {hint ? (
+          <p className="mt-5 flex items-center gap-2 text-[0.7rem] text-accent uppercase tracking-[0.25em]">
+            <span aria-hidden="true">↳</span>
+            {hint}
+          </p>
+        ) : null}
       </Reveal>
     </div>
   );

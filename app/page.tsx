@@ -41,7 +41,12 @@ export default function Home() {
           className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
           id="about"
         >
-          <SectionHeader index="01" kicker="Profile" title="About" />
+          <SectionHeader
+            index="01"
+            kicker="Profile"
+            note="Frontend × AI · Netherlands"
+            title="About"
+          />
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
             <Reveal>
               <p className="text-pretty text-[clamp(1.25rem,2.2vw,1.6rem)] leading-[1.45] tracking-[-0.01em]">
@@ -89,10 +94,11 @@ export default function Home() {
           id="work"
         >
           <SectionHeader
+            hint="Hover an image to bring it forward"
             index="02"
-            kicker="Selected work"
-            note={experienceMeta.period}
-            title="Work at MWS"
+            kicker="At MWS"
+            note={`${experienceMeta.role} · ${experienceMeta.period}`}
+            title="Selected work"
           />
           <Reveal>
             <div className="mt-10 flex flex-col gap-5 pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-12">
@@ -120,19 +126,13 @@ export default function Home() {
           id="ai"
         >
           <SectionHeader
-            density="statement"
             index="03"
-            kicker="One layer up"
-            note="Harness engineering"
-            title="I stopped shipping features and started shipping the system the team ships with."
+            kicker="AI · Agentic"
+            lead="The interface is the easy part. The real value is the system a team's AI agents run inside: the context, skills, reviewers, and hooks that keep agentic development reliable instead of chaotic."
+            note="One layer up"
+            title="Harness engineering"
           />
-          <Reveal className="mt-8">
-            <p className="max-w-2xl text-muted-fg leading-relaxed">
-              Call it harness engineering. The agents do the typing; my job is
-              the harness they run inside. Four layers keep it reliable:
-            </p>
-          </Reveal>
-          <Reveal className="mt-9">
+          <Reveal className="mt-10">
             <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {layers.map((l, i) => (
                 <div key={l.id}>
@@ -150,6 +150,10 @@ export default function Home() {
             </div>
           </Reveal>
           <Reveal className="mt-14">
+            <p className="mb-6 flex items-center gap-2 text-[0.7rem] text-accent uppercase tracking-[0.25em]">
+              <span aria-hidden="true">↳</span>
+              Hover a node to trace its connections
+            </p>
             <ArchitectureMap />
           </Reveal>
         </section>
@@ -231,15 +235,14 @@ export default function Home() {
           <FilingsRule className="mb-12" count={56} />
           <Reveal>
             <p className="text-[0.7rem] text-accent uppercase tracking-[0.3em]">
-              End of file
+              Contact
             </p>
             <h2 className="mt-6 text-[clamp(2.25rem,7vw,5rem)] leading-[0.92] tracking-[-0.04em]">
-              <span className="block">Let&apos;s build</span>
-              <span className="block">something sharp.</span>
+              Get in touch.
             </h2>
             <p className="mt-7 max-w-md font-display text-[clamp(1.1rem,2.1vw,1.45rem)] text-muted-fg italic leading-relaxed">
-              Open to frontend roles with an AI edge, plus the odd interesting
-              build on the side.
+              Open to frontend, AI, and design-engineering roles, plus the odd
+              interesting build on the side.
             </p>
             <div className="mt-12 flex flex-col gap-7">
               <div>

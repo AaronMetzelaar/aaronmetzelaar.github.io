@@ -117,7 +117,7 @@ export function FilingsRule({
     return (
       <div
         aria-hidden="true"
-        className={cn("flex items-center justify-between", className)}
+        className={cn("flex items-center justify-between py-4", className)}
       >
         {dots.map((i) => (
           <span className="h-1 w-1 shrink-0 rounded-full bg-fg/20" key={i} />
@@ -140,7 +140,8 @@ export function FilingsRule({
       // `relative` so each dot's offsetParent IS this row — its offsetLeft then
       // shares the same origin as `mx` (cursor x measured from this row's left),
       // so the lean tracks the cursor instead of an ancestor-offset position.
-      className={cn("relative flex items-center justify-between", className)}
+      // `py-4` gives the row a taller cursor target than the 1px dots alone.
+      className={cn("relative flex items-center justify-between py-4", className)}
       onPointerLeave={() => mx.set(-9999)}
       onPointerMove={onMove}
       ref={ref}

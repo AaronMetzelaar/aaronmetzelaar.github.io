@@ -12,7 +12,7 @@ export const experienceMeta = {
 export const experience: WorkItem[] = [
   {
     slug: "platform",
-    title: "Marketplace platform",
+    title: "MWS marketplace",
     org: "MWS",
     period: "Nuxt 3 · Vue 3 · TypeScript",
     tagline: "Auctions, bidding, and checkout for collectors worldwide.",

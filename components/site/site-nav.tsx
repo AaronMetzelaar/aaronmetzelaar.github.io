@@ -98,10 +98,11 @@ export function SiteNav() {
             </li>
           ))}
           <li>
-            {/* CV is the primary CTA — a filled accent pill so it reads as a
-                button and stands clear of the muted text links */}
+            {/* CV is the primary CTA — an outlined accent button that fills on
+                hover, so it reads as a button and stands clear of the muted
+                text links */}
             <a
-              className="-my-1 inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-1.5 text-accent-fg transition-opacity hover:opacity-85"
+              className="-my-2 inline-flex items-center gap-1.5 border border-accent px-3 py-1.5 text-accent transition-colors hover:bg-accent hover:text-bg"
               href="/cv"
             >
               CV

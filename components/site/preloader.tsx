@@ -31,18 +31,7 @@ export function Preloader() {
   const [visible, setVisible] = useState(() => !isRevealed());
   const [fading, setFading] = useState(false);
   const [progress, setProgress] = useState(0);
-  // match the hero layout: desktop fills the screen, mobile keeps the dots in a
-  // top band so they hand off to the hero portrait without jumping.
-  const [desktop, setDesktop] = useState(true);
   const revealing = useRef(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const update = () => setDesktop(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
 
   const beginReveal = useCallback(() => {
     if (revealing.current) {
@@ -130,31 +119,15 @@ export function Preloader() {
         pointerEvents: fading ? "none" : "auto",
       }}
     >
-      {/* the portrait's dots, spawning in as the % climbs (0 → full set).
-          Desktop: a screen-filling swarm. Mobile: contained to a top band the
-          same size as the hero portrait, dissolving into white below — so when
-          the overlay fades, the hero assembles from dots already in place. */}
-      {desktop ? (
-        <PortraitLoader
-          assemble={false}
-          className="absolute inset-0 h-full w-full"
-          progress={progress / 100}
-          variant="swarm"
-        />
-      ) : (
-        <div className="absolute inset-x-0 top-0 h-[clamp(18rem,80vw,26rem)]">
-          <PortraitLoader
-            assemble={false}
-            className="absolute inset-0 h-full w-full"
-            progress={progress / 100}
-            variant="swarm"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-bg"
-          />
-        </div>
-      )}
+      {/* the portrait's dots, spawning in as the % climbs (0 → full set) —
+          a calm, contained cloud rather than a screen-filling swarm */}
+      <PortraitLoader
+        assemble={false}
+        className="absolute inset-0 h-full w-full"
+        progress={progress / 100}
+        spread={0.5}
+        variant="field"
+      />
       {/* progress: a small count + a hairline that fills along the bottom edge */}
       <p className="absolute bottom-6 left-6 font-terminal text-[0.7rem] text-muted-fg uppercase tracking-[0.35em] sm:bottom-8 sm:left-10">
         Laden
