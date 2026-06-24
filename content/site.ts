@@ -3,8 +3,7 @@ export const site = {
   initials: "AM",
   role: "Frontend Developer",
   roleLine: "Frontend developer × AI / agentic engineer",
-  tagline:
-    "I build the interface, and the AI tooling my team ships it with.",
+  tagline: "I build the interface, and the AI tooling my team ships it with.",
   // A line Aaron loves: the range that resists a single job title.
   beyondLine: "The part that doesn't fit in a job title yet.",
   location: "Netherlands",
@@ -33,14 +32,21 @@ export const site = {
 };
 
 export const about = [
-  "I'm a frontend developer in the Netherlands. For the last three years I've built MWS's web and mobile products.",
-  "I care about clean systems, sharp typography, and tools that get out of the way.",
+  "I'm a frontend developer in the Netherlands. For three years I've built MWS's marketplace across web and mobile — and lately, the AI tooling the team ships it with.",
+  "I care about intuitive interfaces, interactions that feel effortless, and tools that get out of the way.",
 ];
 
-// The "one layer up" story as a trajectory, rendered as a vertical ledger in
-// About. Each rung is a layer Aaron moved up to: interface, system, agentic.
+// A short trajectory rendered as a vertical ledger in About: each rung is a
+// step up in leverage, from the interface users touch to the tooling the whole
+// team builds with. This is what "one layer up" means, made concrete.
 export const trajectory = [
-  { k: "Interface", v: "Production UI at MWS, on web and mobile." },
-  { k: "System", v: "The AI and agentic setup my team builds with." },
-  { k: "Agentic", v: "Skills, hooks, and reviewers that speed everyone up." },
+  {
+    k: "Interface",
+    v: "The products collectors use — MWS on web and in the app.",
+  },
+  {
+    k: "System",
+    v: "The agentic dev setup underneath it: skills, hooks, reviewers.",
+  },
+  { k: "Leverage", v: "Tooling the whole team now builds with, every day." },
 ];

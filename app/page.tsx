@@ -2,13 +2,12 @@ import { PageDots } from "@/app/explore/_shared/page-dots";
 import { FilingsRule, PullLink } from "@/app/explore/_shared/pull-link";
 import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
-import { Hero } from "@/components/site/hero";
 import { CreativeShowcase } from "@/components/site/creative-showcase";
+import { Hero } from "@/components/site/hero";
 import { Preloader } from "@/components/site/preloader";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
 import { WorkGallery } from "@/components/site/work-gallery";
-import { layers } from "@/content/architecture";
 import {
   about,
   creativeWork,
@@ -18,6 +17,7 @@ import {
   thesis,
   trajectory,
 } from "@/content";
+import { layers } from "@/content/architecture";
 import { premiumTheme } from "@/lib/premium-theme";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -56,14 +56,14 @@ export default function Home() {
                 {about[1]}
               </p>
             </Reveal>
-            {/* the "one layer up" story as a vertical ledger — climbing layers,
-                a deliberate counter-shape to the AI section's horizontal grid */}
+            {/* the trajectory as a vertical ledger — each rung a step up in
+                leverage, a deliberate counter-shape to the AI section's grid */}
             <Reveal delay={0.1}>
               <p className="text-[0.7rem] text-muted-fg uppercase tracking-[0.25em]">
                 <span aria-hidden="true" className="text-accent">
                   ↑
                 </span>{" "}
-                One layer up
+                Interface to system
               </p>
               <ol className="mt-7 border-border border-l">
                 {trajectory.map((t, i) => (
@@ -142,7 +142,9 @@ export default function Home() {
               {layers.map((l, i) => (
                 <div key={l.id}>
                   <p className="text-[0.7rem] uppercase tracking-[0.25em]">
-                    <span className="text-accent tabular-nums">{pad(i + 1)}</span>
+                    <span className="text-accent tabular-nums">
+                      {pad(i + 1)}
+                    </span>
                     <span className="ml-3">{l.label}</span>
                   </p>
                   <p className="mt-3 text-muted-fg text-sm leading-relaxed">

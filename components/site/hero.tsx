@@ -15,14 +15,21 @@ export function Hero() {
       className="relative flex min-h-[100svh] flex-col overflow-hidden font-terminal lg:block"
       id="top"
     >
-      {/* portrait — mobile: a sized top band; desktop: full-bleed behind text. */}
-      <div className="relative h-[44svh] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto">
+      {/* portrait — mobile: a sized top band; desktop: full-bleed behind text.
+          The band height is derived from viewport WIDTH (not height) so the
+          mobile address bar collapsing on scroll can't rescale the portrait. */}
+      <div className="relative h-[clamp(18rem,80vw,26rem)] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto">
         <HeroPortrait gateReveal />
         {/* dissolve the band's lower edge into the white canvas (mobile only) */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-bg lg:hidden"
         />
+        {/* touch hint, pinned in the band; desktop has its own in the meta row */}
+        <span className="pointer-events-none absolute bottom-3 left-6 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em] sm:left-10 lg:hidden">
+          <span aria-hidden="true">↔</span>
+          Drag to turn
+        </span>
       </div>
 
       <div className="pointer-events-none relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-center gap-12 px-6 pb-20 sm:px-10 lg:min-h-screen lg:grid-cols-[1fr_0.9fr] lg:py-24 lg:pb-24">

@@ -459,9 +459,13 @@ function PortraitCloud({
         const mag = power * (0.12 + 1.7 * r0 * r0 * r0);
         const ang = (r1 + r2) * TAU;
         vel[i3] +=
-          (hx / rad) * mag * 0.55 + dirX * (0.5 + r1) + Math.cos(ang) * mag * 0.4;
+          (hx / rad) * mag * 0.55 +
+          dirX * (0.5 + r1) +
+          Math.cos(ang) * mag * 0.4;
         vel[i3 + 1] +=
-          (hy / rad) * mag * 0.55 + dirY * (0.5 + r2) + Math.sin(ang) * mag * 0.4;
+          (hy / rad) * mag * 0.55 +
+          dirY * (0.5 + r2) +
+          Math.sin(ang) * mag * 0.4;
         vel[i3 + 2] += (hz / rad) * mag * 0.5 + (r0 - 0.5) * mag * 0.9;
       }
       vel[i3] += -ox * STIFFNESS * dt;
@@ -732,7 +736,11 @@ export function VoxelPortrait({
     d.vx = dx;
     d.vy = dy;
     d.targetY = Math.max(-0.6, Math.min(0.6, d.targetY + dx * 0.005));
-    d.targetX = Math.max(-0.32, Math.min(0.32, d.targetX - dy * 0.004));
+    // touch keeps the vertical axis for page scroll (touch-action: pan-y), so
+    // only the horizontal drag turns the head; a mouse can also tilt it.
+    if (e.pointerType !== "touch") {
+      d.targetX = Math.max(-0.32, Math.min(0.32, d.targetX - dy * 0.004));
+    }
   };
   const onUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
@@ -748,9 +756,12 @@ export function VoxelPortrait({
     <div
       aria-label="Halftone dot portrait of Aaron Metzelaar"
       className={cn(
-        "relative cursor-grab touch-none active:cursor-grabbing",
+        // touch-pan-y: vertical swipes still scroll the page, horizontal drags
+        // turn the portrait. A mouse is unaffected and drags on both axes.
+        "relative cursor-grab touch-pan-y active:cursor-grabbing",
         className
       )}
+      onPointerCancel={onUp}
       onPointerDown={onDown}
       onPointerLeave={onUp}
       onPointerMove={onMove}

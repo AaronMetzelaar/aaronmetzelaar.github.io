@@ -2,6 +2,7 @@
 
 import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+
 import { MediaFrame } from "@/components/media/media-frame";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import type { WorkItem } from "@/content/types";
@@ -35,22 +36,141 @@ function usePointerFine() {
 }
 
 /**
- * Selected Work as a scattered image gallery. On a fine pointer each image
- * leans toward the cursor; hovering an *image* (not its row) enlarges it and
- * brings it forward while the rest blur. Titles sit under each image in accent,
- * and the project name scramble-decodes when its image is hovered. The tagline
- * + tags reveal under the title on hover. Touch / reduced motion = a static
- * stacked list with everything shown.
+ * Selected Work. Two presentations from one data set:
+ *  - Fine pointer (desktop): a scattered image collage. Each image leans toward
+ *    the cursor; hovering one enlarges it and blurs the rest, and its tagline +
+ *    tags reveal beneath.
+ *  - Touch / reduced motion (mobile): a stack of tappable cards. Each one reads
+ *    at a glance — number, title, one-line tagline — and expands on tap to show
+ *    what was built. Clear affordance so it's obviously interactive.
  */
 export function WorkGallery({ items }: { items: WorkItem[] }) {
   const reduced = !!useReducedMotion();
   const fine = usePointerFine();
   const [mounted, setMounted] = useState(false);
-  const [active, setActive] = useState<number | null>(null);
-  const [plays, setPlays] = useState(() => items.map(() => 0));
 
   useEffect(() => setMounted(true), []);
   const interactive = mounted && fine && !reduced;
+
+  if (!interactive) {
+    return <WorkList items={items} />;
+  }
+  return <WorkCollage items={items} />;
+}
+
+// ── Mobile / touch: tappable cards that expand to reveal what was built ──
+function WorkList({ items }: { items: WorkItem[] }) {
+  // start collapsed: each card reads at a glance (image + title + one line),
+  // and the "More" toggle invites the tap that reveals what was built.
+  const [open, setOpen] = useState<number | null>(null);
+
+  return (
+    <ul className="flex flex-col gap-4">
+      {items.map((item, i) => {
+        const isOpen = open === i;
+        return (
+          <li
+            className={cn(
+              "overflow-hidden border bg-bg transition-colors duration-300",
+              isOpen ? "border-accent/60" : "border-border"
+            )}
+            key={item.slug}
+          >
+            <button
+              aria-expanded={isOpen}
+              className="group block w-full text-left transition-[transform] duration-200 active:scale-[0.995]"
+              onClick={() => setOpen((c) => (c === i ? null : i))}
+              type="button"
+            >
+              <div className="relative">
+                <MediaFrame
+                  aspect={16 / 9}
+                  className="w-full"
+                  label={item.slug}
+                  media={item.media}
+                  minimal
+                />
+                <span
+                  className="absolute top-3 left-3 font-terminal text-[0.62rem] text-accent uppercase tracking-[0.25em] tabular-nums"
+                  aria-hidden="true"
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+
+              <div className="flex items-start justify-between gap-4 px-4 py-4">
+                <div className="min-w-0">
+                  <p className="font-terminal text-[0.82rem] text-accent uppercase tracking-[0.22em]">
+                    {item.title.toUpperCase()}
+                  </p>
+                  {item.tagline ? (
+                    <p className="mt-1.5 text-pretty text-muted-fg text-sm leading-relaxed">
+                      {item.tagline}
+                    </p>
+                  ) : null}
+                </div>
+                {/* affordance: a labelled toggle so it's clearly tappable */}
+                <span className="mt-0.5 flex shrink-0 items-center gap-1.5 font-terminal text-[0.6rem] text-muted-fg uppercase tracking-[0.16em]">
+                  {isOpen ? "Less" : "More"}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "text-accent transition-transform duration-300",
+                      isOpen && "rotate-180"
+                    )}
+                  >
+                    ⌄
+                  </span>
+                </span>
+              </div>
+            </button>
+
+            {isOpen ? (
+              <div className="px-4 pb-5">
+                <p className="text-muted-fg text-sm leading-relaxed">
+                  {item.summary}
+                </p>
+                {item.highlights && item.highlights.length > 0 ? (
+                  <ul className="mt-4 space-y-2.5 border-border border-t pt-4">
+                    {item.highlights.map((h, hi) => (
+                      <li className="flex gap-3 text-sm leading-snug" key={h}>
+                        <span
+                          aria-hidden="true"
+                          className="font-terminal text-[0.7rem] text-accent tabular-nums"
+                        >
+                          {String(hi + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-fg/80">{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
+                  {item.tags.map((t) => (
+                    <li
+                      className="font-terminal text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
+                      key={t}
+                    >
+                      <span aria-hidden="true" className="text-accent/55">
+                        →{" "}
+                      </span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+// ── Desktop / fine pointer: the scattered, cursor-reactive collage ──
+function WorkCollage({ items }: { items: WorkItem[] }) {
+  const [active, setActive] = useState<number | null>(null);
+  const [plays, setPlays] = useState(() => items.map(() => 0));
 
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const pointer = useRef<{ x: number; y: number } | null>(null);
@@ -61,9 +181,6 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
   // box. Read all rects, then write all transforms (no thrash); base centre =
   // rect centre minus the lean already applied, so it never feeds back.
   useEffect(() => {
-    if (!interactive) {
-      return;
-    }
     const onPointer = (e: PointerEvent) => {
       pointer.current = { x: e.clientX, y: e.clientY };
     };
@@ -103,7 +220,7 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onPointer);
     };
-  }, [interactive]);
+  }, []);
 
   const enter = (i: number) => {
     setActive(i);
@@ -111,17 +228,17 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
   };
 
   return (
-    <div className="relative flex flex-col gap-16 sm:block sm:aspect-[5/6] sm:gap-0">
+    <div className="relative block aspect-[5/6]">
       {/* focus: blur the whole page behind the hovered image so only it stays sharp */}
-      {interactive && active !== null ? (
+      {active !== null ? (
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 z-40 bg-bg/10 backdrop-blur-[3px]"
         />
       ) : null}
       {items.map((item, i) => {
-        const dim = interactive && active !== null && active !== i;
-        const on = interactive && active === i;
+        const dim = active !== null && active !== i;
+        const on = active === i;
         return (
           <figure
             className={cn(
@@ -133,7 +250,11 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
             style={{ zIndex: on ? 50 : 1 }}
           >
             {/* lean wrapper — rAF writes its transform */}
-            <div ref={(el) => { cardRefs.current[i] = el; }}>
+            <div
+              ref={(el) => {
+                cardRefs.current[i] = el;
+              }}
+            >
               {/* the image is the only hover target for the zoom/blur — the
                   title/tags live in the figcaption, so nothing is gated here */}
               <div
@@ -141,8 +262,8 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
                   "origin-center transition-transform duration-500 ease-out",
                   on && "scale-[1.05]"
                 )}
-                onPointerEnter={interactive ? () => enter(i) : undefined}
-                onPointerLeave={interactive ? () => setActive(null) : undefined}
+                onPointerEnter={() => enter(i)}
+                onPointerLeave={() => setActive(null)}
               >
                 <MediaFrame
                   aspect={4 / 3}
@@ -161,10 +282,7 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
                 </p>
                 <div
                   className={cn(
-                    "flex flex-col gap-2 pt-3 transition-opacity duration-300",
-                    interactive
-                      ? "absolute inset-x-0 top-full opacity-0"
-                      : "opacity-100",
+                    "absolute inset-x-0 top-full flex flex-col gap-2 pt-3 opacity-0 transition-opacity duration-300",
                     on && "opacity-100"
                   )}
                 >

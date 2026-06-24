@@ -231,103 +231,114 @@ function MobileMap({
   selectMobile: (id: string) => void;
 }) {
   return (
-    <ol className="relative font-terminal lg:hidden">
-      <span
-        aria-hidden="true"
-        className="absolute top-2 bottom-2 left-[3px] w-px bg-border"
-      />
-      {stages.map((s, i) => {
-        const nodes = archNodes
-          .filter((n) => firstStage(n) === i)
-          .sort((a, b) => layerRank(a) - layerRank(b));
-        if (nodes.length === 0) {
-          return null;
-        }
-        return (
-          <li className="mb-9 last:mb-0" key={s}>
-            <div className="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
-              />
-              <span className="text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]">
-                {s}
-              </span>
-            </div>
-            <ul className="mt-1 ml-5 divide-y divide-border/60">
-              {nodes.map((n) => {
-                const state: NState = activeId
-                  ? activeId === n.id
-                    ? "active"
-                    : connected.has(n.id)
-                      ? "conn"
-                      : "dim"
-                  : "idle";
-                const lit = state === "active" || state === "conn";
-                const isHook = n.layer === "hook";
-                const isOpen = selected === n.id;
-                return (
-                  <li id={`am-${n.id}`} key={n.id}>
-                    <button
-                      aria-expanded={isOpen}
-                      className={cn(
-                        "flex w-full items-start gap-3 py-3 text-left transition-opacity",
-                        state === "dim" && "opacity-60"
-                      )}
-                      onClick={() => onSelect(n.id)}
-                      type="button"
-                    >
-                      <span
-                        aria-hidden="true"
+    <div className="font-terminal lg:hidden">
+      {/* touch lead-in: orients the spine and states the interaction plainly */}
+      <p className="text-muted-fg text-sm leading-relaxed">
+        Every piece of the system, laid out along the pipeline it runs in. Tap
+        any one to see what it does and what it connects to.
+      </p>
+      <ol className="relative mt-8">
+        <span
+          aria-hidden="true"
+          className="absolute top-2 bottom-2 left-[3px] w-px bg-border"
+        />
+        {stages.map((s, i) => {
+          const nodes = archNodes
+            .filter((n) => firstStage(n) === i)
+            .sort((a, b) => layerRank(a) - layerRank(b));
+          if (nodes.length === 0) {
+            return null;
+          }
+          return (
+            <li className="mb-9 last:mb-0" key={s}>
+              <div className="flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                />
+                <span className="text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]">
+                  {s}
+                </span>
+              </div>
+              <ul className="mt-1 ml-5 divide-y divide-border/60">
+                {nodes.map((n) => {
+                  const state: NState = activeId
+                    ? activeId === n.id
+                      ? "active"
+                      : connected.has(n.id)
+                        ? "conn"
+                        : "dim"
+                    : "idle";
+                  const lit = state === "active" || state === "conn";
+                  const isHook = n.layer === "hook";
+                  const isOpen = selected === n.id;
+                  return (
+                    <li id={`am-${n.id}`} key={n.id}>
+                      <button
+                        aria-expanded={isOpen}
                         className={cn(
-                          "mt-1 h-2 w-2 shrink-0 rounded-full border",
-                          isHook ? "bg-bg" : lit ? "bg-accent" : "bg-accent/55",
-                          lit ? "border-accent" : "border-accent/55"
+                          "flex w-full items-start gap-3 py-3.5 text-left transition-opacity active:opacity-70",
+                          state === "dim" && "opacity-60"
                         )}
-                      />
-                      <span className="min-w-0 flex-1">
-                        {n.role ? (
-                          <span className="block text-[0.6rem] text-muted-fg uppercase tracking-[0.16em]">
-                            {n.role}
-                          </span>
-                        ) : null}
+                        onClick={() => onSelect(n.id)}
+                        type="button"
+                      >
                         <span
+                          aria-hidden="true"
                           className={cn(
-                            "block text-sm tracking-tight",
-                            lit ? "text-accent" : "text-fg/85"
+                            "mt-1 h-2 w-2 shrink-0 rounded-full border",
+                            isHook
+                              ? "bg-bg"
+                              : lit
+                                ? "bg-accent"
+                                : "bg-accent/55",
+                            lit ? "border-accent" : "border-accent/55"
+                          )}
+                        />
+                        <span className="min-w-0 flex-1">
+                          {n.role ? (
+                            <span className="block text-[0.6rem] text-muted-fg uppercase tracking-[0.16em]">
+                              {n.role}
+                            </span>
+                          ) : null}
+                          <span
+                            className={cn(
+                              "block text-sm tracking-tight",
+                              lit ? "text-accent" : "text-fg/85"
+                            )}
+                          >
+                            {n.name}
+                          </span>
+                          {n.stages.length > 1 ? (
+                            <span className="mt-0.5 block text-[0.56rem] text-muted-fg uppercase tracking-[0.12em]">
+                              {stageRange(n)}
+                            </span>
+                          ) : null}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "mt-0.5 shrink-0 text-muted-fg transition-transform",
+                            isOpen && "rotate-180 text-accent"
                           )}
                         >
-                          {n.name}
+                          ⌄
                         </span>
-                        {n.stages.length > 1 ? (
-                          <span className="mt-0.5 block text-[0.56rem] text-muted-fg uppercase tracking-[0.12em]">
-                            {stageRange(n)}
-                          </span>
-                        ) : null}
-                      </span>
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "mt-0.5 shrink-0 text-muted-fg transition-transform",
-                          isOpen && "rotate-180 text-accent"
-                        )}
-                      >
-                        ⌄
-                      </span>
-                    </button>
-                    {isOpen ? (
-                      <div className="pb-4">
-                        <DetailPanel node={n} onSelect={selectMobile} />
-                      </div>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
-          </li>
-        );
-      })}
-    </ol>
+                      </button>
+                      {isOpen ? (
+                        <div className="mb-3 bg-muted/50 px-4 pt-1 pb-5">
+                          <DetailPanel node={n} onSelect={selectMobile} />
+                        </div>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }
 
@@ -407,8 +418,8 @@ function DetailPanel({
       <div className="border-border border-t pt-6 font-terminal text-muted-fg text-sm leading-relaxed">
         <p className="text-[0.7rem] uppercase tracking-[0.2em]">The system</p>
         <p className="mt-4">
-          Hover or tap any node — it lights its links to everything it connects
-          to across the lifecycle.
+          Hover any node to trace its connections across the pipeline; click to
+          pin the detail here.
         </p>
       </div>
     );
