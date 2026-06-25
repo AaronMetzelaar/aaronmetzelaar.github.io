@@ -41,12 +41,7 @@ export default function Home() {
           className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
           id="about"
         >
-          <SectionHeader
-            index="01"
-            kicker="Profile"
-            note="Frontend × AI — Netherlands"
-            title="About"
-          />
+          <SectionHeader index="01" kicker="Profile" title="About" />
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
             <Reveal>
               <p className="text-pretty text-[clamp(1.25rem,2.2vw,1.6rem)] leading-[1.45] tracking-[-0.01em]">
@@ -96,7 +91,7 @@ export default function Home() {
           <SectionHeader
             index="02"
             kicker="Selected work"
-            note={`${experienceMeta.role} · ${experienceMeta.period}`}
+            note={experienceMeta.period}
             title="Work at MWS"
           />
           <Reveal>
@@ -282,12 +277,9 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <footer className="mx-auto flex max-w-6xl flex-col gap-3 px-6 pb-12 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+        <footer className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 pb-12 sm:px-10">
           <span className="text-[0.7rem] text-muted-fg uppercase tracking-[0.25em]">
             {site.name}
-          </span>
-          <span className="text-[0.7rem] text-muted-fg uppercase tracking-[0.25em]">
-            {site.roleLine}
           </span>
           <span className="text-[0.7rem] text-muted-fg uppercase tracking-[0.25em]">
             {site.location} · ©2026

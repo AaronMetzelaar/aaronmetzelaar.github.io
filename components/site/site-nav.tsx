@@ -59,8 +59,7 @@ export function SiteNav() {
 
   // Neutral until scroll-spy reports a real section (the hero is #top, not a
   // nav section), so the trigger doesn't falsely claim "About" on load.
-  const activeLabel =
-    SECTIONS.find((s) => s.id === active)?.label ?? "Menu";
+  const activeLabel = SECTIONS.find((s) => s.id === active)?.label ?? "Menu";
   const triggerAria = open
     ? "Close sections menu"
     : active
@@ -99,14 +98,14 @@ export function SiteNav() {
             </li>
           ))}
           <li>
+            {/* CV is the primary CTA — a filled accent pill so it reads as a
+                button and stands clear of the muted text links */}
             <a
-              className="inline-flex items-center gap-1.5 text-fg transition-colors hover:text-accent"
+              className="-my-1 inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-1.5 text-accent-fg transition-opacity hover:opacity-85"
               href="/cv"
             >
               CV
-              <span aria-hidden="true" className="text-accent">
-                ↗
-              </span>
+              <span aria-hidden="true">↗</span>
             </a>
           </li>
         </ul>
@@ -170,16 +169,16 @@ export function SiteNav() {
                 </li>
               );
             })}
-            <li>
+            <li className="mt-2 mb-2">
+              {/* primary CTA: a filled accent button, clearly set apart from
+                  the section links above it */}
               <a
-                className="flex min-h-12 items-center gap-3 text-sm uppercase tracking-[0.2em] text-fg"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-accent text-sm uppercase tracking-[0.2em] text-accent-fg"
                 href="/cv"
                 onClick={() => setOpen(false)}
               >
-                <span aria-hidden="true" className="text-[0.7rem] text-accent">
-                  ↗
-                </span>
-                <span>CV</span>
+                Read the CV
+                <span aria-hidden="true">↗</span>
               </a>
             </li>
           </ul>

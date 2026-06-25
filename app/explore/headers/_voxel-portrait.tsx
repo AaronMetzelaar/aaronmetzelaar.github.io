@@ -22,7 +22,7 @@ const WORK_W = 260;
 const WORK_H = 325;
 const GH = 150; // grid rows over the model height → dot density
 const SCALE = 1.8; // model height in world units
-const Z_AMP = 0.46; // relief depth — felt as parallax on tilt/sway
+const Z_AMP = 0.95; // relief depth — felt as parallax on tilt/sway
 const DOT_MIN = 0.26; // dot radius range as a fraction of spacing
 const DOT_MAX = 1.12; // dark dots overlap → solid ink (no lattice gaps)
 const GRID_ANGLE = 0.52; // ~30° rotated grid → no axis-aligned squares
@@ -160,6 +160,26 @@ export function sample(
   }
   const dSm = blurField(dLum, 2);
 
+  // Normalise the depth field over the cutout so the relief uses the FULL
+  // Z range regardless of how flat/low-contrast the source depth map is —
+  // otherwise a compressed depth map leaves the face nearly flat.
+  let dMin = 1;
+  let dMax = 0;
+  for (let y = 0; y < WORK_H; y++) {
+    for (let x = 0; x < WORK_W; x++) {
+      if (pd[(y * WORK_W + x) * 4 + 3] > 128) {
+        const v = dSm[y * WORK_W + x];
+        if (v < dMin) {
+          dMin = v;
+        }
+        if (v > dMax) {
+          dMax = v;
+        }
+      }
+    }
+  }
+  const dRange = Math.max(1e-3, dMax - dMin);
+
   const step = WORK_H / GH;
   const spacing = (step / bh) * SCALE; // real world spacing → solid coverage
   const ca = Math.cos(GRID_ANGLE);
@@ -192,7 +212,10 @@ export function sample(
 
       const X = ((sx - cx) / bh) * SCALE;
       const Y = ((cyMid - sy) / bh) * SCALE;
-      const Z = (dv - 0.5) * Z_AMP;
+      // contrast-stretched depth → full relief, then a mild gamma to push the
+      // nose/brow forward more than the flats so it reads as a face, not a slab
+      const dn = (dv - dMin) / dRange;
+      const Z = (dn ** 1.25 - 0.5) * Z_AMP;
 
       P.push(X, Y, Z);
       S.push(spacing * (DOT_MIN + (DOT_MAX - DOT_MIN) * dark));
@@ -403,8 +426,9 @@ function PortraitCloud({
     const rotTargetX = dr.active ? dr.targetX : 0;
     dr.curY += (rotTargetY - dr.curY) * Math.min(1, dt * 9);
     dr.curX += (rotTargetX - dr.curX) * Math.min(1, dt * 9);
-    const swayY = sway ? Math.sin(clock * 0.34) * 0.2 : 0;
-    const swayX = sway ? Math.sin(clock * 0.23) * 0.04 : 0;
+    // a touch more yaw so the deeper relief catches the light and reads as 3D
+    const swayY = sway ? Math.sin(clock * 0.34) * 0.26 : 0;
+    const swayX = sway ? Math.sin(clock * 0.23) * 0.05 : 0;
     mesh.rotation.y = swayY + dr.curY;
     mesh.rotation.x = swayX + dr.curX;
     mesh.updateMatrixWorld();
