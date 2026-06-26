@@ -18,7 +18,7 @@ import {
   trajectory,
 } from "@/content";
 import { layers } from "@/content/architecture";
-import { premiumTheme } from "@/lib/premium-theme";
+import { darkSection, premiumTheme } from "@/lib/premium-theme";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -118,42 +118,43 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 03 — AI & Agentic */}
+        {/* 03 — AI & Agentic — the page's one dark "chapter": full-bleed and
+            inverted so the harness work reads as the centerpiece, not another
+            white card. The nav inverts to stay legible while it scrolls over. */}
         <section
-          className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
+          className="relative bg-bg py-24 text-fg sm:py-32"
           id="ai"
+          style={darkSection}
         >
-          <SectionHeader
-            index="03"
-            kicker="AI · Agentic"
-            lead="The interface is the easy part. The real value is the system a team's AI agents run inside: the context, skills, reviewers, and hooks that turn raw agent output into work you can ship."
-            note="One layer up"
-            title="Harness engineering"
-          />
-          <Reveal className="mt-10">
-            <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-              {layers.map((l, i) => (
-                <div key={l.id}>
-                  <p className="text-[0.7rem] uppercase tracking-[0.25em]">
-                    <span className="text-accent tabular-nums">
-                      {pad(i + 1)}
-                    </span>
-                    <span className="ml-3">{l.label}</span>
-                  </p>
-                  <p className="mt-3 text-muted-fg text-sm leading-relaxed">
-                    {l.blurb}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-          <Reveal className="mt-14">
-            <p className="mb-6 flex items-center gap-2 text-[0.7rem] text-accent uppercase tracking-[0.25em]">
-              <span aria-hidden="true">↳</span>
-              Hover a node to trace its connections
-            </p>
-            <ArchitectureMap />
-          </Reveal>
+          <div className="mx-auto max-w-6xl px-6 sm:px-10">
+            <SectionHeader
+              index="03"
+              kicker="AI · Agentic"
+              lead="The interface is the easy part. The real value is the system a team's AI agents run inside: the context, skills, reviewers, and hooks that turn raw agent output into work you can ship."
+              note="One layer up"
+              title="Harness engineering"
+            />
+            <Reveal className="mt-10">
+              <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+                {layers.map((l, i) => (
+                  <div key={l.id}>
+                    <p className="text-[0.7rem] uppercase tracking-[0.25em]">
+                      <span className="text-accent tabular-nums">
+                        {pad(i + 1)}
+                      </span>
+                      <span className="ml-3">{l.label}</span>
+                    </p>
+                    <p className="mt-3 text-muted-fg text-sm leading-relaxed">
+                      {l.blurb}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+            <Reveal className="mt-14">
+              <ArchitectureMap />
+            </Reveal>
+          </div>
         </section>
 
         {/* 04 — Thesis */}

@@ -32,7 +32,7 @@ export const site = {
 };
 
 export const about = [
-  "I'm a frontend developer in the Netherlands. For three years I've built MWS's marketplace across web and mobile — and lately, the AI tooling the team ships it with.",
+  "I work at the seam between design and engineering, where a good interface stops feeling like software. The same instinct keeps pulling me up a layer, toward the systems my whole team builds on.",
   "I care about intuitive interfaces, interactions that feel effortless, and tools that get out of the way.",
 ];
 

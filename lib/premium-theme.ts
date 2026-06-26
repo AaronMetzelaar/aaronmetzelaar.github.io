@@ -18,3 +18,21 @@ export const premiumTheme = {
   "--accent": PREMIUM_BLUE,
   "--accent-fg": "#ffffff",
 } as CSSProperties;
+
+/**
+ * Inverted palette for the one dark "chapter" (the Harness section): the same
+ * tokens flipped to a near-black canvas with light ink, a lifted border, and a
+ * brightened blue so the accent still sings on dark. Applied as an inline style
+ * on the section's root, so every token utility inside (bg-bg, text-fg,
+ * text-muted-fg, border-border, text-accent) flips automatically. The nav reuses
+ * it to stay legible while it scrolls over the dark band.
+ */
+export const darkSection = {
+  "--bg": "#0a0a0b",
+  "--fg": "#f4f4f2",
+  "--muted": "#161618",
+  "--muted-fg": "#9a9aa2",
+  "--border": "#2a2a31",
+  "--accent": "#5169ff",
+  "--accent-fg": "#ffffff",
+} as CSSProperties;

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { TopBlur } from "@/components/site/top-blur";
 import { site } from "@/content/site";
+import { darkSection } from "@/lib/premium-theme";
 import { cn } from "@/lib/utils";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -19,6 +20,7 @@ const SECTIONS = site.nav.map((n) => ({ ...n, id: n.href.replace("#", "") }));
 export function SiteNav() {
   const [active, setActive] = useState("");
   const [open, setOpen] = useState(false);
+  const [overDark, setOverDark] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
   // One IntersectionObserver feeds both the desktop link state and the mobile
@@ -34,13 +36,42 @@ export function SiteNav() {
       },
       { rootMargin: "-45% 0px -45% 0px" }
     );
-    for (const s of SECTIONS) {
-      const el = document.getElementById(s.id);
+    // Observe the hero (#top) too, so at the very top the bar reports a neutral
+    // state instead of clinging to whichever section was last active.
+    for (const id of ["top", ...SECTIONS.map((s) => s.id)]) {
+      const el = document.getElementById(id);
       if (el) {
         observer.observe(el);
       }
     }
     return () => observer.disconnect();
+  }, []);
+
+  // The Harness section is a full-bleed dark band; invert the bar while it sits
+  // behind it so the links never go dark-on-dark.
+  useEffect(() => {
+    const dark = document.getElementById("ai");
+    if (!dark) {
+      return;
+    }
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
+      const r = dark.getBoundingClientRect();
+      // true while the dark band spans the bar's text baseline (~32px down)
+      setOverDark(r.top <= 32 && r.bottom >= 32);
+    };
+    const onScroll = () => {
+      raf ||= requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   // Close the mobile menu on a tap outside the header.
@@ -70,11 +101,12 @@ export function SiteNav() {
     <header
       className="pointer-events-none fixed inset-x-0 top-0 z-50 font-terminal"
       ref={headerRef}
+      style={overDark ? darkSection : undefined}
     >
       <TopBlur />
       <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
         <a
-          className="pointer-events-auto text-sm tracking-[0.2em] transition-colors hover:text-accent"
+          className="pointer-events-auto text-fg text-sm tracking-[0.2em] transition-colors hover:text-accent"
           href="#top"
         >
           {site.initials}
