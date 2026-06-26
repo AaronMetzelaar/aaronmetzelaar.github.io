@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { SECTION_RAMP } from "@/components/site/section-dot-edges";
 import { TopBlur } from "@/components/site/top-blur";
 import { site } from "@/content/site";
 import { darkSection } from "@/lib/premium-theme";
@@ -58,8 +59,9 @@ export function SiteNav() {
     const measure = () => {
       raf = 0;
       const r = dark.getBoundingClientRect();
-      // true while the dark band spans the bar's text baseline (~32px down)
-      setOverDark(r.top <= 32 && r.bottom >= 32);
+      // flip only while the SOLID body is behind the bar's baseline (~32px) —
+      // not the dotted ramp zones at each edge, which are mostly white page
+      setOverDark(r.top + SECTION_RAMP <= 32 && r.bottom - SECTION_RAMP >= 32);
     };
     const onScroll = () => {
       raf ||= requestAnimationFrame(measure);

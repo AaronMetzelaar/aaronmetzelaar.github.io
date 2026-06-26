@@ -1,4 +1,4 @@
-import { FilingsRule } from "@/app/explore/_shared/pull-link";
+import { FilingsRule } from "@/components/site/pull-link";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +23,7 @@ export function SectionHeader({
   className,
   density = "default",
   dividerCount = 56,
+  divider = true,
   meta,
   lead,
   hint,
@@ -34,6 +35,8 @@ export function SectionHeader({
   className?: string;
   density?: "default" | "statement" | "record";
   dividerCount?: number;
+  /** Show the dot rule above the header. Off where a section edge already divides (the dark chapter). */
+  divider?: boolean;
   meta?: Meta[];
   /** A short line under the title saying what the section is. */
   lead?: string;
@@ -42,7 +45,7 @@ export function SectionHeader({
 }) {
   return (
     <div className={cn("font-terminal", className)}>
-      <FilingsRule className="mb-8" count={dividerCount} />
+      {divider ? <FilingsRule className="mb-8" count={dividerCount} /> : null}
       <Reveal>
         <div className="flex items-baseline justify-between gap-6">
           <p className="text-[0.7rem] uppercase tracking-[0.3em]">

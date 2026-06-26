@@ -29,10 +29,10 @@ export const premiumTheme = {
  */
 export const darkSection = {
   "--bg": "#0a0a0b",
-  "--fg": "#f4f4f2",
-  "--muted": "#161618",
-  "--muted-fg": "#9a9aa2",
-  "--border": "#2a2a31",
-  "--accent": "#5169ff",
+  "--fg": "#f6f6f4",
+  "--muted": "#17171a",
+  "--muted-fg": "#b6b6c0",
+  "--border": "#37373f",
+  "--accent": "#5e76ff",
   "--accent-fg": "#ffffff",
 } as CSSProperties;

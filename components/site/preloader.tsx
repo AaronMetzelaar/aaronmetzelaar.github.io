@@ -3,16 +3,22 @@
 import { useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { PortraitLoader } from "@/app/explore/headers/_portrait-loader";
+import {
+  type LoaderVariant,
+  PortraitLoader,
+} from "@/components/site/portrait-loader";
 import { isRevealed, triggerReveal } from "@/lib/page-reveal";
 
-// The homepage preloader, built from the hero's OWN portrait dots: while assets
-// load they drift in a loose, screen-filling swarm. Progress reads on a thin
-// rule along the bottom edge with a small count, not a card in the middle. When
-// the page is ready the overlay dissolves and the hand-off fires, so the hero's
-// portrait assembles from the same dots. One dot language, no second system.
-const MIN_MS = 2400; // dwell long enough that the dots visibly spawn in
-const REVEAL_MS = 700; // dissolve length
+// The homepage preloader IS the hero's portrait, mid-boot. The portrait's own
+// dots ride a spinning, growing formation around the % as assets load; when the
+// page is ready those same dots fly inward and assemble into the face at the
+// hero's exact framing, then the overlay dissolves onto the identical resting
+// hero. One dot language, one continuous motion — no second system.
+// Formation chosen from the explored takes — see portrait-loader's CFG.
+const LOADER_VARIANT: LoaderVariant = "comet";
+const MIN_MS = 1600; // dwell: the ring fills as assets load
+const ASSEMBLE_MS = 1700; // ring -> portrait convergence shown on the overlay
+const REVEAL_MS = 650; // final dissolve onto the resting hero
 const CAP_MS = 7000; // safety: reveal even if an asset hangs
 const PORTRAIT_SRCS = ["/portrait/cut.png", "/portrait/depth.jpg"];
 
@@ -27,11 +33,22 @@ function preloadImg(src: string) {
 
 export function Preloader() {
   const reduced = useReducedMotion();
-  // skip entirely if we've already revealed once this session (client nav back)
   const [visible, setVisible] = useState(() => !isRevealed());
+  const [desktop, setDesktop] = useState(true);
+  const [assembling, setAssembling] = useState(false);
   const [fading, setFading] = useState(false);
   const [progress, setProgress] = useState(0);
   const revealing = useRef(false);
+
+  // match the hero's framing so the assembled ring lands exactly on the resting
+  // portrait and the dissolve is invisible
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const beginReveal = useCallback(() => {
     if (revealing.current) {
@@ -39,9 +56,10 @@ export function Preloader() {
     }
     revealing.current = true;
     setProgress(100);
-    triggerReveal(); // the hero assembles from the same dots as the overlay fades
-    setFading(true);
-    window.setTimeout(() => setVisible(false), REVEAL_MS + 80);
+    triggerReveal(); // mark revealed (so a client-nav back skips the boot)
+    setAssembling(true); // the ring's dots fly in and assemble into the face
+    window.setTimeout(() => setFading(true), ASSEMBLE_MS);
+    window.setTimeout(() => setVisible(false), ASSEMBLE_MS + REVEAL_MS + 60);
   }, []);
 
   // lock scroll while the overlay is up
@@ -56,7 +74,7 @@ export function Preloader() {
     };
   }, [visible]);
 
-  // count the bar up to ~90% over the dwell; beginReveal snaps it to 100
+  // fill the ring up to ~99% over the dwell; beginReveal snaps it to 100
   useEffect(() => {
     if (reduced) {
       return;
@@ -67,7 +85,6 @@ export function Preloader() {
       if (revealing.current) {
         return;
       }
-      // steady climb so dots spawn in at a constant rate, not front-loaded
       setProgress(Math.min(99, ((now - start) / MIN_MS) * 99));
       raf = requestAnimationFrame(tick);
     };
@@ -119,27 +136,33 @@ export function Preloader() {
         pointerEvents: fading ? "none" : "auto",
       }}
     >
-      {/* the portrait's dots, spawning in as the % climbs (0 → full set) —
-          a calm, contained cloud rather than a screen-filling swarm */}
+      {/* the portrait's own dots: a spinning, growing formation around the %,
+          then converging into the face at the hero's framing */}
       <PortraitLoader
-        assemble={false}
+        assemble={assembling}
+        assembleAnchorX={desktop ? 1.05 : 0}
+        assembleCamZ={desktop ? 4.8 : 4.0}
         className="absolute inset-0 h-full w-full"
         progress={progress / 100}
-        spread={0.5}
-        variant="field"
+        variant={LOADER_VARIANT}
       />
-      {/* progress: a small count + a hairline that fills along the bottom edge */}
-      <p className="absolute bottom-6 left-6 font-terminal text-[0.7rem] text-muted-fg uppercase tracking-[0.35em] sm:bottom-8 sm:left-10">
-        Laden
-        <span className="ml-3 text-accent tabular-nums">
-          {String(Math.round(progress)).padStart(2, "0")}%
-        </span>
-      </p>
-      <div className="absolute inset-x-0 bottom-0 h-[2px] bg-fg/10">
-        <div
-          className="h-full bg-accent"
-          style={{ width: `${progress}%`, transition: "width 120ms linear" }}
-        />
+      {/* the percentage, in the centre of the ring; fades as the face forms */}
+      <div
+        className="absolute inset-0 grid place-items-center"
+        style={{
+          opacity: assembling ? 0 : 1,
+          transition: "opacity 450ms ease-out",
+        }}
+      >
+        <div className="text-center font-terminal">
+          <p className="text-[0.62rem] text-muted-fg uppercase tracking-[0.4em]">
+            Laden
+          </p>
+          <p className="mt-2 font-bold text-[clamp(2.2rem,7vw,3.2rem)] text-accent leading-none tabular-nums">
+            {Math.round(progress)}
+            <span className="text-[0.5em] text-fg">%</span>
+          </p>
+        </div>
       </div>
     </div>
   );

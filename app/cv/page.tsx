@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { PageDots } from "@/app/explore/_shared/page-dots";
-import { PullLink } from "@/app/explore/_shared/pull-link";
+import { PageDots } from "@/components/site/page-dots";
+import { PullLink } from "@/components/site/pull-link";
 import { experience, experienceMeta, site, thesis } from "@/content";
 import { premiumTheme } from "@/lib/premium-theme";
 
@@ -74,7 +74,8 @@ export default function CvPage() {
             <p className="mt-5 max-w-xl text-muted-fg text-sm leading-relaxed">
               Frontend engineer with three years shipping production web and
               mobile at MWS, the marketplace for authenticated match-worn
-              shirts. I go deep on Vue 3 / Nuxt 3 / TypeScript interfaces used by
+              shirts and sports memorabilia. I go deep on Vue 3 / Nuxt 3 /
+              TypeScript interfaces used by
               collectors worldwide, with real performance, accessibility, and
               design-system work on high-traffic pages. I also build one layer
               up: the code-review tooling, shared standards, and developer
@@ -120,7 +121,7 @@ export default function CvPage() {
           </div>
           <p className="mt-1.5 text-muted-fg text-sm leading-relaxed">
             Built across the whole frontend of the marketplace for authenticated
-            match-worn shirts: the consumer platform, the internal tooling, and
+            match-worn shirts and sports memorabilia: the consumer platform, the internal tooling, and
             the app.
           </p>
           <ul className="mt-4 space-y-3">

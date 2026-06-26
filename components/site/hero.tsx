@@ -1,4 +1,4 @@
-import { HeroPortrait } from "@/app/explore/headers/_hero-portrait";
+import { HeroPortrait } from "@/components/site/hero-portrait";
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { site } from "@/content/site";
 

@@ -1,5 +1,5 @@
 /**
- * The real AI / agentic development system Aaron set up in the MWS monorepo,
+ * The real AI / agentic development system Aaron set up in a production monorepo,
  * as a data model the schema page renders. The horizontal axis is the
  * development lifecycle (`stages`); every `node` lands in the stage(s) where it
  * acts. Layers stack the system: the context that grounds every agent, the
@@ -96,7 +96,7 @@ export const archNodes: ArchNode[] = [
     stages: ["Ship"],
     detail:
       "Stages only the relevant files, branches off main when needed, and writes a conventional-commit message, never a blind git add -A.",
-    source: ".agents/skills/mws-commit",
+    source: ".agents/skills/commit",
     deps: ["ctx-root"],
   },
   {
@@ -107,7 +107,7 @@ export const archNodes: ArchNode[] = [
     stages: ["Ship"],
     detail:
       "The full ship: commit, push with tracking, and open a GitHub PR with a structured body (references, change list, demo steps) after pre-flighting the gh CLI and auth.",
-    source: ".agents/skills/mws-pr",
+    source: ".agents/skills/pr",
     deps: ["skill-commit", "ctx-root"],
   },
   {
@@ -118,18 +118,18 @@ export const archNodes: ArchNode[] = [
     stages: ["Review"],
     detail:
       "Runs a full review pipeline and adds the stack reviewers to the persona pool, picked by what the change touches. Findings flow through one merge/dedup pass into a single structured report.",
-    source: ".agents/skills/mws-review",
+    source: ".agents/skills/review",
     deps: ["rev-stack"],
   },
   {
     id: "skill-wbso",
     layer: "skill",
     role: "The Administrator",
-    name: "wbso",
+    name: "report",
     stages: ["Operate"],
     detail:
-      "The WBSO R&D-tax loop: audits authored PRs, commits, and reviews, links them to Linear tickets, estimates hours, and writes back to the sheet, under-claiming by default.",
-    source: ".agents/skills/mws-wbso",
+      "An admin loop that audits authored PRs, commits, and reviews over a period, links each to its ticket (e.g. Linear), estimates the hours, and writes the summary back to a sheet.",
+    source: ".agents/skills/report",
   },
   {
     id: "skill-context",
@@ -138,7 +138,7 @@ export const archNodes: ArchNode[] = [
     name: "string context",
     stages: ["Operate"],
     detail:
-      "Writes translator-ready context into Crowdin JSONL, disambiguating short words and ICU strings, touching only the ai_context field and leaving the rest intact.",
+      "Writes translator-ready context for the localization platform (e.g. Crowdin), disambiguating short words and ICU strings, and touching only the context field it owns.",
     source: ".agents/skills/context-extraction",
   },
 
@@ -162,7 +162,7 @@ export const archNodes: ArchNode[] = [
     name: "Seed worktree env",
     stages: ["Context"],
     detail:
-      "On session start (and on git worktree add, via post-checkout) copies .env and LocalSecrets files into a fresh worktree so codegen and tooling work immediately. One shared script, two triggers.",
+      "On session start (and on git worktree add, via post-checkout) copies .env and local secrets into a fresh worktree so codegen and tooling work immediately. One shared script, two triggers.",
     source: "SessionStart · .githooks/post-checkout",
   },
   {
@@ -171,7 +171,7 @@ export const archNodes: ArchNode[] = [
     name: "Format C#",
     stages: ["Build"],
     detail:
-      "A PostToolUse hook runs CSharpier on every .cs file the moment it's edited or written, so formatting never reaches review.",
+      "A PostToolUse hook runs the formatter the moment a file is edited or written (e.g. CSharpier on .cs files), so formatting never reaches review.",
     source: "settings.json · PostToolUse Edit/Write(*.cs)",
   },
   {
@@ -189,7 +189,7 @@ export const archNodes: ArchNode[] = [
     name: "Verify on stop",
     stages: ["Test"],
     detail:
-      "At session end, Stop hooks run across changed modules: typecheck, lint, and unit tests (Vitest / Jest / NUnit), plus a Roslyn pass that prunes unused C# usings.",
+      "At session end, Stop hooks run across changed modules: typecheck, lint, and unit tests (e.g. Vitest, Jest), plus a pass that prunes unused imports.",
     source: "settings.json · Stop",
   },
   {
@@ -198,7 +198,7 @@ export const archNodes: ArchNode[] = [
     name: "Skill telemetry",
     stages: ["Operate"],
     detail:
-      "Fires a Mixpanel event whenever a skill is invoked, caught at both the Skill tool and the /slash-command path, to track adoption without blocking the call.",
+      "Fires an analytics event (e.g. Mixpanel) whenever a skill is invoked, caught at both the Skill tool and the slash-command path, to track adoption without blocking the call.",
     source: "settings.json · PreToolUse · UserPromptSubmit",
   },
 ];

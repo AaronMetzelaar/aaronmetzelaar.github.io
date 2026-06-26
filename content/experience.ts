@@ -6,7 +6,7 @@ export const experienceMeta = {
   role: "Frontend Developer",
   period: "Since 2023",
   summary:
-    "MWS is the marketplace for authenticated match-worn shirts and memorabilia. I work across its frontend; the builds below are mine end to end.",
+    "MWS is the marketplace for authenticated match-worn shirts and sports memorabilia. I work across its frontend; the builds below are mine end to end.",
 };
 
 export const experience: WorkItem[] = [
@@ -17,7 +17,7 @@ export const experience: WorkItem[] = [
     period: "Nuxt 3 · Vue 3 · TypeScript",
     tagline: "Auctions, bidding, and checkout for collectors worldwide.",
     summary:
-      "The consumer marketplace where collectors bid on authenticated shirts: auctions, bidding, checkout. Plus the internal admin that runs the catalog and auctions behind it.",
+      "The consumer marketplace where collectors bid on authenticated match-worn shirts and sports memorabilia: auctions, bidding, checkout. Plus the internal admin that runs the catalog and auctions behind it.",
     highlights: [
       "Auction, bidding, and checkout flows used by collectors worldwide",
       "Data-dense admin interfaces for catalog and auction management",

@@ -1,10 +1,11 @@
-import { PageDots } from "@/app/explore/_shared/page-dots";
-import { FilingsRule, PullLink } from "@/app/explore/_shared/pull-link";
+import { PageDots } from "@/components/site/page-dots";
+import { FilingsRule, PullLink } from "@/components/site/pull-link";
 import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { CreativeShowcase } from "@/components/site/creative-showcase";
 import { Hero } from "@/components/site/hero";
 import { Preloader } from "@/components/site/preloader";
+import { SectionDotEdges } from "@/components/site/section-dot-edges";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
 import { WorkGallery } from "@/components/site/work-gallery";
@@ -21,25 +22,6 @@ import { layers } from "@/content/architecture";
 import { darkSection, premiumTheme } from "@/lib/premium-theme";
 
 const pad = (n: number) => String(n).padStart(2, "0");
-
-// The dark Harness section dissolves into the white sections through a dotted
-// gradient rather than a hard line: the dark fill feathers out at each edge,
-// and a field of ink dots (var(--bg) is the near-black in this scope) rides the
-// transition so the block reads as scattering into the page's dot texture.
-const EDGE_FEATHER =
-  "linear-gradient(to bottom, transparent, #000 6rem, #000 calc(100% - 6rem), transparent)";
-const DOT_TILE = "radial-gradient(var(--bg) 1.1px, transparent 1.7px)";
-const DOT_DISSOLVE_TOP = {
-  backgroundImage: DOT_TILE,
-  backgroundSize: "13px 13px",
-  maskImage: "linear-gradient(to top, transparent, #000 58%, transparent)",
-  WebkitMaskImage: "linear-gradient(to top, transparent, #000 58%, transparent)",
-};
-const DOT_DISSOLVE_BOTTOM = {
-  ...DOT_DISSOLVE_TOP,
-  maskImage: "linear-gradient(to bottom, transparent, #000 58%, transparent)",
-  WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 58%, transparent)",
-};
 
 export default function Home() {
   return (
@@ -137,33 +119,25 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 03 — AI & Agentic — the page's one dark "chapter": full-bleed and
-            inverted so the harness work reads as the centerpiece, not another
-            white card. The nav inverts to stay legible while it scrolls over. */}
+        {/* 03 — AI & Agentic — the dark "chapter". Its edges dissolve into the
+            page through the dot grid (SectionDotEdges): the page's dots ink up
+            into solid at the top and fade back out at the bottom. The nav
+            inverts while the solid body is behind it. */}
         <section
-          className="relative py-24 text-fg sm:py-32"
+          className="relative isolate text-fg"
           id="ai"
           style={darkSection}
         >
-          {/* dark fill, feathered at top + bottom so it fades instead of cutting */}
+          {/* solid body — also the SSR fallback so content reads before the
+              canvas paints; the dotted edges overlay the top/bottom 200px */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-bg"
-            style={{ maskImage: EDGE_FEATHER, WebkitMaskImage: EDGE_FEATHER }}
+            className="absolute inset-x-0 top-[600px] bottom-[600px] bg-bg"
           />
-          {/* ink-dot dither riding each edge: the dark scatters into dots */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-40"
-            style={DOT_DISSOLVE_TOP}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
-            style={DOT_DISSOLVE_BOTTOM}
-          />
-          <div className="relative mx-auto max-w-6xl px-6 sm:px-10">
+          <SectionDotEdges />
+          <div className="relative mx-auto max-w-6xl px-6 py-[39rem] sm:px-10">
             <SectionHeader
+              divider={false}
               index="03"
               kicker="AI · Agentic"
               lead="The interface is the easy part. The real value is the system agents run inside: context, skills, reviewers, and hooks that turn raw output into shippable work."
@@ -200,6 +174,7 @@ export default function Home() {
         >
           <SectionHeader
             density="record"
+            divider={false}
             index="04"
             kicker="Research"
             meta={[
