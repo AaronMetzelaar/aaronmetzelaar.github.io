@@ -69,15 +69,15 @@ export const experience: WorkItem[] = [
     slug: "product-360",
     title: "360° product imaging",
     org: "MWS",
-    period: "Tooling · Media",
-    tagline: "Turn a row of photographs into one spinnable object.",
+    period: "Interaction · Web & app",
+    tagline: "A draggable 360° view of every shirt, on web and in the app.",
     summary:
-      "A way to shoot and show products in 360°, so a shirt can be inspected from every angle. It turns a row of photographs into a single spinnable object on the page.",
+      "A way to inspect a shirt from every angle. I built the capture-to-web pipeline and the draggable viewer, with the interaction system and UI shipped on both web and the app.",
     highlights: [
-      "Capture-to-web pipeline for 360° product spins",
-      "Smooth, draggable viewer tuned for detail and weight",
+      "Built the viewer's interaction system and UI, on web and in the app",
+      "Capture-to-web pipeline that turns a row of photos into one spin",
     ],
-    tags: ["360°", "Media", "Tooling"],
+    tags: ["360°", "Interaction", "Web & app"],
     media: {
       kind: "video",
       src: "/work/shirts-360.mp4",
