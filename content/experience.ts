@@ -6,7 +6,7 @@ export const experienceMeta = {
   role: "Frontend Developer",
   period: "Since 2023",
   summary:
-    "MWS is the marketplace for authenticated match-worn shirts and memorabilia. For three years I've worked across its frontend: the consumer platform, the tooling behind it, and the app. A few standout features are mine end to end.",
+    "MWS is the marketplace for authenticated match-worn shirts and memorabilia. I work across its frontend; the builds below are mine end to end.",
 };
 
 export const experience: WorkItem[] = [

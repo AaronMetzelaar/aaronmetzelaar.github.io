@@ -44,7 +44,6 @@ export default function Home() {
           <SectionHeader
             index="01"
             kicker="Profile"
-            note="Frontend × AI · Netherlands"
             title="About"
           />
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
@@ -94,7 +93,6 @@ export default function Home() {
           id="work"
         >
           <SectionHeader
-            hint="Hover an image to bring it forward"
             index="02"
             kicker="At MWS"
             note={`${experienceMeta.role} · ${experienceMeta.period}`}
@@ -128,7 +126,7 @@ export default function Home() {
           <SectionHeader
             index="03"
             kicker="AI · Agentic"
-            lead="The interface is the easy part. The real value is the system a team's AI agents run inside: the context, skills, reviewers, and hooks that keep agentic development reliable instead of chaotic."
+            lead="The interface is the easy part. The real value is the system a team's AI agents run inside: the context, skills, reviewers, and hooks that turn raw agent output into work you can ship."
             note="One layer up"
             title="Harness engineering"
           />
@@ -173,7 +171,6 @@ export default function Home() {
               { k: "Year", v: "2024" },
               { k: "Stack", v: "Unity · C# · CV" },
             ]}
-            note="Filed 2024"
             title={thesis.title}
           />
           <Reveal>
@@ -241,8 +238,8 @@ export default function Home() {
               Get in touch.
             </h2>
             <p className="mt-7 max-w-md font-display text-[clamp(1.1rem,2.1vw,1.45rem)] text-muted-fg italic leading-relaxed">
-              Open to frontend, AI, and design-engineering roles, plus the odd
-              interesting build on the side.
+              Open to frontend, AI, and design-engineering roles, and the
+              occasional build on the side.
             </p>
             <div className="mt-12 flex flex-col gap-7">
               <div>

@@ -223,8 +223,7 @@ export default function CvPage() {
           </dl>
         </Row>
 
-        <footer className="mt-16 flex flex-wrap items-center justify-between gap-4 border-border border-t pt-6 text-[0.7rem] text-muted-fg uppercase tracking-[0.22em]">
-          <span>{site.roleLine}</span>
+        <footer className="mt-16 flex flex-wrap items-center justify-end gap-4 border-border border-t pt-6 text-[0.7rem] text-muted-fg uppercase tracking-[0.22em]">
           <PullLink arrow="→" href="/">
             See the full site
           </PullLink>
