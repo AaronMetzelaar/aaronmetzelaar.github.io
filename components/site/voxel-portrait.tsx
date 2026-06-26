@@ -426,9 +426,14 @@ function PortraitCloud({
     const rotTargetX = dr.active ? dr.targetX : 0;
     dr.curY += (rotTargetY - dr.curY) * Math.min(1, dt * 9);
     dr.curX += (rotTargetX - dr.curX) * Math.min(1, dt * 9);
-    // a touch more yaw so the deeper relief catches the light and reads as 3D
-    const swayY = sway ? Math.sin(clock * 0.34) * 0.26 : 0;
-    const swayX = sway ? Math.sin(clock * 0.23) * 0.05 : 0;
+    // a touch more yaw so the deeper relief catches the light and reads as 3D.
+    // Phase off a shared wall clock (not this canvas's elapsedTime) so the
+    // preloader's portrait-loader can match this exact rotation at the hand-off
+    // — otherwise the head snaps from the loader's front-facing assemble to the
+    // hero's mid-sway angle when the overlay dissolves.
+    const swayT = performance.now() / 1000;
+    const swayY = sway ? Math.sin(swayT * 0.34) * 0.26 : 0;
+    const swayX = sway ? Math.sin(swayT * 0.23) * 0.05 : 0;
     mesh.rotation.y = swayY + dr.curY;
     mesh.rotation.x = swayX + dr.curX;
     mesh.updateMatrixWorld();

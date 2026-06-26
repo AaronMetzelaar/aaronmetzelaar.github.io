@@ -202,6 +202,13 @@ function LoaderCloud({
     state.camera.position.z = CAM_FAR + (assembleCamZ - CAM_FAR) * camP;
     mesh.position.x = assembleAnchorX * camP;
 
+    // gentle idle sway, phase-locked to the hero's (shared wall clock) so the
+    // assembled head sits at the hero's exact rotation when the overlay
+    // dissolves — no rotate-on-reveal jump
+    const swayT = performance.now() / 1000;
+    mesh.rotation.y = reduced ? 0 : Math.sin(swayT * 0.34) * 0.26;
+    mesh.rotation.x = reduced ? 0 : Math.sin(swayT * 0.23) * 0.05;
+
     if (!farVP.current) {
       farVP.current = { w: state.viewport.width, h: state.viewport.height };
     }
