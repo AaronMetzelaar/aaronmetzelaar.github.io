@@ -11,7 +11,7 @@ export const creativeWork: WorkItem[] = [
       kind: "video",
       src: "/creative/promo.mp4",
       poster: "/creative/promo-poster.jpg",
-      alt: "Student association promo film — a member hyping up the kit against a brick wall.",
+      alt: "Student association promo film: a member hyping up the kit against a brick wall.",
       width: 540,
       height: 960,
     },

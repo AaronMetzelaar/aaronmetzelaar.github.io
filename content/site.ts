@@ -42,7 +42,7 @@ export const about = [
 export const trajectory = [
   {
     k: "Interface",
-    v: "The products collectors use — MWS on web and in the app.",
+    v: "The products collectors use: MWS on web and in the app.",
   },
   {
     k: "System",

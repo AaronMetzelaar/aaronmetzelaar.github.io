@@ -74,7 +74,7 @@ export const archNodes: ArchNode[] = [
     name: "Root AGENTS.md · CLAUDE.md",
     stages: ["Context", "Plan", "Build", "Review", "Ship"],
     detail:
-      "Monorepo-wide house rules: the `task` runner as the single entry point, branch + conventional-commit conventions, and the standing instruction to always commit and ship through the project’s own skills. Every nested AGENTS.md overrides it locally — nearest file wins.",
+      "Monorepo-wide house rules: the `task` runner as the single entry point, branch and commit conventions, and shipping through the project's own skills. Nested AGENTS.md files override it locally; nearest file wins.",
     source: "/AGENTS.md · /CLAUDE.md",
   },
   {
@@ -83,7 +83,7 @@ export const archNodes: ArchNode[] = [
     name: "Per-area rulebooks",
     stages: ["Context", "Build", "Review"],
     detail:
-      "Every app and service in the codebase carries its own AGENTS.md — the conventions, patterns, and pitfalls for that part of the stack. Agents read the nearest one, so each change is judged by the right local rules.",
+      "Every app and service carries its own AGENTS.md: the conventions, patterns, and pitfalls for that part of the stack. Agents read the nearest one, so each change is judged by the right local rules.",
     source: "nested AGENTS.md, one per area",
   },
 
@@ -95,7 +95,7 @@ export const archNodes: ArchNode[] = [
     name: "commit",
     stages: ["Ship"],
     detail:
-      "Stages only the relevant files, branches off main as {github-username}/{description} when needed, and writes a conventional-commit message — never a blind git add -A.",
+      "Stages only the relevant files, branches off main when needed, and writes a conventional-commit message, never a blind git add -A.",
     source: ".agents/skills/mws-commit",
     deps: ["ctx-root"],
   },
@@ -106,7 +106,7 @@ export const archNodes: ArchNode[] = [
     name: "pr",
     stages: ["Ship"],
     detail:
-      "The full ship: commit, push with tracking, and open a GitHub PR with a structured body — references, change list, demo steps, context — after pre-flighting the gh CLI and auth.",
+      "The full ship: commit, push with tracking, and open a GitHub PR with a structured body (references, change list, demo steps) after pre-flighting the gh CLI and auth.",
     source: ".agents/skills/mws-pr",
     deps: ["skill-commit", "ctx-root"],
   },
@@ -128,7 +128,7 @@ export const archNodes: ArchNode[] = [
     name: "wbso",
     stages: ["Operate"],
     detail:
-      "The WBSO R&D-tax loop: audits authored PRs, co-authored commits, and substantive reviews, links them to Linear tickets, applies Technical-Bottleneck labels, estimates hours, and writes back to the sheet — under-claiming by default.",
+      "The WBSO R&D-tax loop: audits authored PRs, commits, and reviews, links them to Linear tickets, estimates hours, and writes back to the sheet, under-claiming by default.",
     source: ".agents/skills/mws-wbso",
   },
   {
@@ -138,7 +138,7 @@ export const archNodes: ArchNode[] = [
     name: "string context",
     stages: ["Operate"],
     detail:
-      "Writes translator-ready context into Crowdin JSONL — disambiguating short words, colour/status names, and ICU strings — touching only the ai_context field and leaving everything else intact.",
+      "Writes translator-ready context into Crowdin JSONL, disambiguating short words and ICU strings, touching only the ai_context field and leaving the rest intact.",
     source: ".agents/skills/context-extraction",
   },
 
@@ -150,7 +150,7 @@ export const archNodes: ArchNode[] = [
     name: "Per-area review personas",
     stages: ["Review"],
     detail:
-      "A reviewer persona for each part of the stack. The review skill spawns only the ones a change touches and runs them in parallel — each checks its area against that area's rulebook, then findings merge into one report.",
+      "A reviewer persona for each part of the stack. The review skill spawns only the ones a change touches and runs them in parallel; each checks its area against that area's rulebook, then findings merge into one report.",
     source: ".agents/agents, one per area",
     deps: ["ctx-area"],
   },
@@ -171,7 +171,7 @@ export const archNodes: ArchNode[] = [
     name: "Format C#",
     stages: ["Build"],
     detail:
-      "A PostToolUse hook runs CSharpier on every .cs file the moment it's edited or written — formatting never reaches review.",
+      "A PostToolUse hook runs CSharpier on every .cs file the moment it's edited or written, so formatting never reaches review.",
     source: "settings.json · PostToolUse Edit/Write(*.cs)",
   },
   {
@@ -189,7 +189,7 @@ export const archNodes: ArchNode[] = [
     name: "Verify on stop",
     stages: ["Test"],
     detail:
-      "At session end, three Stop hooks run in turn: typecheck (TS + dotnet), lint (ESLint + CSharpier + analyzers), and unit tests (Vitest / Jest / NUnit) across changed modules — plus a Roslyn pass that prunes unused C# usings.",
+      "At session end, Stop hooks run across changed modules: typecheck, lint, and unit tests (Vitest / Jest / NUnit), plus a Roslyn pass that prunes unused C# usings.",
     source: "settings.json · Stop",
   },
   {
@@ -198,7 +198,7 @@ export const archNodes: ArchNode[] = [
     name: "Skill telemetry",
     stages: ["Operate"],
     detail:
-      "Fires a Mixpanel event whenever one of the skills is invoked — caught at both the Skill tool and the /slash-command path — to track adoption without blocking the call.",
+      "Fires a Mixpanel event whenever a skill is invoked, caught at both the Skill tool and the /slash-command path, to track adoption without blocking the call.",
     source: "settings.json · PreToolUse · UserPromptSubmit",
   },
 ];

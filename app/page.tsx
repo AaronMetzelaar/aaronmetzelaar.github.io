@@ -22,6 +22,25 @@ import { darkSection, premiumTheme } from "@/lib/premium-theme";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+// The dark Harness section dissolves into the white sections through a dotted
+// gradient rather than a hard line: the dark fill feathers out at each edge,
+// and a field of ink dots (var(--bg) is the near-black in this scope) rides the
+// transition so the block reads as scattering into the page's dot texture.
+const EDGE_FEATHER =
+  "linear-gradient(to bottom, transparent, #000 6rem, #000 calc(100% - 6rem), transparent)";
+const DOT_TILE = "radial-gradient(var(--bg) 1.1px, transparent 1.7px)";
+const DOT_DISSOLVE_TOP = {
+  backgroundImage: DOT_TILE,
+  backgroundSize: "13px 13px",
+  maskImage: "linear-gradient(to top, transparent, #000 58%, transparent)",
+  WebkitMaskImage: "linear-gradient(to top, transparent, #000 58%, transparent)",
+};
+const DOT_DISSOLVE_BOTTOM = {
+  ...DOT_DISSOLVE_TOP,
+  maskImage: "linear-gradient(to bottom, transparent, #000 58%, transparent)",
+  WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 58%, transparent)",
+};
+
 export default function Home() {
   return (
     <main
@@ -122,15 +141,32 @@ export default function Home() {
             inverted so the harness work reads as the centerpiece, not another
             white card. The nav inverts to stay legible while it scrolls over. */}
         <section
-          className="relative bg-bg py-24 text-fg sm:py-32"
+          className="relative py-24 text-fg sm:py-32"
           id="ai"
           style={darkSection}
         >
-          <div className="mx-auto max-w-6xl px-6 sm:px-10">
+          {/* dark fill, feathered at top + bottom so it fades instead of cutting */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-bg"
+            style={{ maskImage: EDGE_FEATHER, WebkitMaskImage: EDGE_FEATHER }}
+          />
+          {/* ink-dot dither riding each edge: the dark scatters into dots */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-40"
+            style={DOT_DISSOLVE_TOP}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
+            style={DOT_DISSOLVE_BOTTOM}
+          />
+          <div className="relative mx-auto max-w-6xl px-6 sm:px-10">
             <SectionHeader
               index="03"
               kicker="AI · Agentic"
-              lead="The interface is the easy part. The real value is the system a team's AI agents run inside: the context, skills, reviewers, and hooks that turn raw agent output into work you can ship."
+              lead="The interface is the easy part. The real value is the system agents run inside: context, skills, reviewers, and hooks that turn raw output into shippable work."
               note="One layer up"
               title="Harness engineering"
             />

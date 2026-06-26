@@ -10,7 +10,7 @@ export const thesis: WorkItem = {
   org: "University of Amsterdam",
   period: "BSc Computer Science · 2024",
   summary:
-    "My bachelor thesis: a modular Mixed Reality framework, built in Unity, that turns any surface into an interactive space. A camera and projector track real, tangible objects and give them a digital double. The calibration, object-initialisation, and object-detection parts are all reusable, and I demonstrated them with a live RGB colour-mixing app.",
+    "A modular Mixed Reality framework in Unity that turns any surface into an interactive space: a camera and projector track real objects and give them a digital double. The reusable parts are detailed below.",
   highlights: [
     "Modular MR framework: calibration, object init, and detection as reusable parts",
     "Camera + projector pipeline that tracks tangible objects in real time",
