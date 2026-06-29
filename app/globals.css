@@ -81,3 +81,79 @@
     animation: none;
   }
 }
+
+/*
+ * The /cv route (`.cv-doc`) is built to be saved as a one-page PDF via the
+ * browser's native "Save as PDF". This block scales the type down and collapses
+ * the airy web rhythm so the content fills exactly one A4 sheet. It's scoped to
+ * `.cv-doc` and intentionally unlayered, so it overrides Tailwind's utilities
+ * (which live in @layer utilities) without needing !important. Tune the .text-sm
+ * size and the section margin to fit the page; the rest scales off the base.
+ */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 14mm;
+  }
+
+  .cv-doc {
+    line-height: 1.4;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Down-scale the web type scale to print sizes (these win over .text-* utils) */
+  .cv-doc h1 {
+    font-size: 26px;
+  }
+  .cv-doc .text-base {
+    font-size: 12.5px;
+  }
+  .cv-doc .text-sm {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  /* Collapse the airy web rhythm. Print spacing is roughly half the screen
+     values; it's listed per utility because Tailwind's spacing is rem-based and
+     can't be scaled in one shot without restyling <html> globally. */
+  .cv-doc header {
+    margin-top: 0;
+  }
+  .cv-doc section {
+    margin-top: 11px;
+    padding-top: 9px;
+  }
+  /* Tighten the skill chips — they wrap several rows in the print column */
+  .cv-doc dd span {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 10px;
+  }
+  .cv-doc .mt-6 {
+    margin-top: 10px;
+  }
+  .cv-doc .mt-5 {
+    margin-top: 9px;
+  }
+  .cv-doc .mt-4 {
+    margin-top: 7px;
+  }
+  .cv-doc .mt-3 {
+    margin-top: 5px;
+  }
+  .cv-doc .mt-2,
+  .cv-doc .mt-1\.5 {
+    margin-top: 3px;
+  }
+  .cv-doc .space-y-4 > * + * {
+    margin-top: 7px;
+  }
+  .cv-doc .space-y-3 > * + *,
+  .cv-doc .space-y-2\.5 > * + * {
+    margin-top: 4px;
+  }
+  .cv-doc .space-y-1 > * + * {
+    margin-top: 2px;
+  }
+}
