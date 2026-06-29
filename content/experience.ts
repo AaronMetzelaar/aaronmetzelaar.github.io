@@ -29,9 +29,9 @@ export const experience: WorkItem[] = [
       kind: "video",
       src: "/work/marketplace.mp4",
       poster: "/work/marketplace-poster.jpg",
-      alt: "The MWS marketplace on mws.com: the live homepage and an auction event page.",
+      alt: "The MWS marketplace on mws.com: the live homepage, an auction event page, and instant-buy.",
       width: 1280,
-      height: 558,
+      height: 622,
     },
   },
   {

@@ -132,11 +132,12 @@ export default function CvPage() {
           </div>
           <div
             aria-label={`Portrait of ${site.name}`}
-            className="w-28 shrink-0 border border-border bg-bg bg-center bg-cover sm:w-32"
+            className="w-28 shrink-0 border border-border bg-bg bg-cover sm:w-32"
             role="img"
             style={{
               aspectRatio: "1",
-              backgroundImage: "url(/portrait/photo.jpg)",
+              backgroundImage: "url(/me.jpg)",
+              backgroundPosition: "center 22%",
             }}
           />
         </header>
