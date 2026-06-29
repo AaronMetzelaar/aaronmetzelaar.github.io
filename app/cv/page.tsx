@@ -13,10 +13,11 @@ export const metadata = {
     "Frontend engineer with three years of production Vue 3, Nuxt 3, and TypeScript at MWS. Performance, accessibility, design systems, and the code-review tooling and standards a team builds on.",
 };
 
-// The deployed portfolio origin. Printed links must be absolute and shown as
-// readable text — a PDF has no page to resolve relative URLs against, and some
-// "Save as PDF" paths (e.g. macOS') flatten link annotations, so the visible
-// URL is the only thing guaranteed to survive.
+// The deployed portfolio origin. Used to build absolute links (portfolio,
+// thesis PDF) so they resolve from a standalone PDF, which has no page to
+// resolve a relative URL against. The GitHub and thesis-repo links still show
+// their full URL so they survive a flattened PDF export that drops link
+// annotations; the portfolio link is friendly text by choice.
 const SITE_URL = "https://aaronmetzelaar.github.io";
 
 // Keyword-grouped so a recruiter (or an ATS) can scan the stack fast. `primary`
@@ -123,7 +124,7 @@ export default function CvPage() {
                 rel="noreferrer"
                 target="_blank"
               >
-                aaronmetzelaar.github.io
+                Check out my portfolio!
               </PullLink>
               <span className="text-[0.72rem] text-muted-fg uppercase tracking-[0.18em]">
                 {site.location}
