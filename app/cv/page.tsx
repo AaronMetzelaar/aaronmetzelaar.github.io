@@ -94,18 +94,16 @@ export default function CvPage() {
               {site.name}
             </h1>
             <p className="mt-5 max-w-xl text-muted-fg text-sm leading-relaxed">
-              I&apos;m a frontend engineer happiest at the seam where design
-              meets engineering — where a good interface stops feeling like
-              software. Three years at MWS building production web and mobile
-              for collectors worldwide pulled me a layer up, too: into the
-              code-review tooling and shared standards my whole team now ships
-              with. I care about craft, momentum, and tools that get out of the
-              way.
+              For the past three years I&apos;ve worked as a frontend developer
+              at MWS, the marketplace for match-worn shirts and sports
+              memorabilia. I build the website and the mobile app, and I pay
+              close attention to how things feel to use. Lately I&apos;ve also
+              been building the tools the rest of the team relies on, like our
+              code review setup and shared coding standards.
             </p>
             <p className="mt-3 max-w-xl text-muted-fg text-sm leading-relaxed">
-              Off the clock you&apos;ll find me on the football pitch,
-              organizing events for friends, or tracking down a great specialty
-              coffee.
+              Off the clock I play football, organize events for friends, and
+              I&apos;m always up for a good specialty coffee.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
               <PullLink arrow="→" href={`mailto:${site.email}`}>
@@ -154,8 +152,8 @@ export default function CvPage() {
             </span>
           </div>
           <p className="mt-1.5 text-muted-fg text-sm leading-relaxed">
-            Across the whole frontend: the consumer marketplace, the internal
-            tooling, and the app.
+            I work across the whole frontend here: the public marketplace, the
+            internal admin tools, and the mobile app.
           </p>
           <ul className="mt-4 space-y-3">
             {experience.map((item) => {
@@ -198,10 +196,9 @@ export default function CvPage() {
                 className="mt-2 h-px w-3 shrink-0 bg-accent"
               />
               <span className="text-muted-fg">
-                Built the team's automated code-review system — per-area
-                reviewer personas, each with its own rulebook, behind a
-                session-end gate that runs typecheck, lint, and tests (Vitest /
-                Jest).
+                Built an automated code review system for the team. Separate
+                reviewers check each part of the code, and a final step runs
+                type-checking, linting, and tests (Vitest and Jest).
               </span>
             </li>
             <li className="flex gap-3">
@@ -210,8 +207,8 @@ export default function CvPage() {
                 className="mt-2 h-px w-3 shrink-0 bg-accent"
               />
               <span className="text-muted-fg">
-                Authored the team's living engineering conventions (layered
-                AGENTS.md) and the reusable skills they run every day.
+                Wrote our shared coding guidelines and the everyday tools the
+                team builds with.
               </span>
             </li>
           </ul>
@@ -262,8 +259,9 @@ export default function CvPage() {
             </span>
           </div>
           <p className="mt-2 text-muted-fg text-sm leading-relaxed">
-            Thesis: <span className="text-fg">{thesis.title}</span>. A modular
-            Mixed Reality framework in Unity (computer vision).
+            Thesis: <span className="text-fg">{thesis.title}</span>. A Mixed
+            Reality framework I built in Unity that uses a camera and projector
+            to track real objects.
           </p>
           {/* Links show their full URL so they survive a flattened PDF export. */}
           <div className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
