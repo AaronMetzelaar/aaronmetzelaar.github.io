@@ -100,5 +100,13 @@ export const experience: WorkItem[] = [
       "Shared interaction patterns across iOS and Android",
     ],
     tags: ["React Native", "iOS", "Android"],
+    media: {
+      kind: "video",
+      src: "/work/mobile.mp4",
+      poster: "/work/mobile-poster.jpg",
+      alt: "The MWS mobile app: browsing live auctions of match-worn shirts, with current bids.",
+      width: 540,
+      height: 1170,
+    },
   },
 ];
