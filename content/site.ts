@@ -1,18 +1,15 @@
 export const site = {
   name: "Aaron Metzelaar",
   initials: "AM",
-  role: "Frontend Developer",
   roleLine: "Frontend developer × AI / agentic engineer",
   tagline: "I build the interface, and the AI tooling my team ships it with.",
   // A line Aaron loves: the range that resists a single job title.
   beyondLine: "The part that doesn't fit in a job title yet.",
   location: "Netherlands",
-  age: 25,
   email: "aaronmetzelaar@gmail.com",
   socials: {
     github: "https://github.com/AaronMetzelaar",
     githubHandle: "AaronMetzelaar",
-    linkedin: "",
   },
   education: {
     degree: "BSc Computer Science",

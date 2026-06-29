@@ -113,10 +113,8 @@ export function CreativeGallery({
         const o = cur.current[i];
         const t = (targets[i] ??= { x: 0, y: 0 });
         if (!(lean && o && p)) {
-          if (t) {
-            t.x = 0;
-            t.y = 0;
-          }
+          t.x = 0;
+          t.y = 0;
           continue;
         }
         const r = lean.getBoundingClientRect();

@@ -226,7 +226,7 @@ function LoaderCloud({
     for (let i = 0; i < d.count; i++) {
       const i3 = i * 3;
       orbitClump(f, i / d.count, rr[i3], rr[i3 + 1], rr[i3 + 2], prog, spin, reach, cfg);
-      const loadScale = d.scl[i] * f.scale * easeOutCubic(clamp01(f.present));
+      const loadScale = d.scl[i] * f.scale * easeOutCubic(f.present);
       if (assembling) {
         const hx = d.pos[i3];
         const hy = d.pos[i3 + 1];

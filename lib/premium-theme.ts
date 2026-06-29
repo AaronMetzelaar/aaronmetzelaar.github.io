@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 /** The bold blue that anchors the premium direction. */
-export const PREMIUM_BLUE = "#1b34ff";
+const PREMIUM_BLUE = "#1b34ff";
 
 /**
  * Forces a white canvas + bold blue accent regardless of the OS color scheme,

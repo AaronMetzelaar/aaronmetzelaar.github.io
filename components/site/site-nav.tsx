@@ -158,8 +158,8 @@ export function SiteNav() {
           <span
             aria-hidden="true"
             className={cn(
-              "transition-transform duration-300",
-              open ? "rotate-180 text-accent" : "text-accent"
+              "transition-transform duration-300 text-accent",
+              open && "rotate-180"
             )}
           >
             ⌄

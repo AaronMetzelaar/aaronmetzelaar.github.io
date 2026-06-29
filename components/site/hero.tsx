@@ -19,7 +19,7 @@ export function Hero() {
           The band height is derived from viewport WIDTH (not height) so the
           mobile address bar collapsing on scroll can't rescale the portrait. */}
       <div className="relative h-[clamp(18rem,80vw,26rem)] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto">
-        <HeroPortrait gateReveal />
+        <HeroPortrait />
         {/* dissolve the band's lower edge into the white canvas (mobile only) */}
         <div
           aria-hidden="true"

@@ -110,7 +110,6 @@ export function SectionDotEdges() {
           continue;
         }
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, w, SECTION_RAMP);
         drawRamp(ctx, w, SECTION_RAMP, solidAtTop, seed);
       }
     };

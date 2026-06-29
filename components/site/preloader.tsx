@@ -137,18 +137,23 @@ export function Preloader() {
       }}
     >
       {/* the portrait's own dots: a spinning, growing formation around the %,
-          then converging into the face at the hero's framing */}
-      <PortraitLoader
-        assemble={assembling}
-        assembleAnchorX={desktop ? 1.05 : 0}
-        assembleCamZ={desktop ? 4.8 : 4.0}
-        className="absolute inset-0 h-full w-full"
-        progress={progress / 100}
-        variant={LOADER_VARIANT}
-      />
-      {/* the percentage, in the centre of the ring; fades as the face forms */}
+          then converging into the face at the hero's framing. The box matches
+          the hero portrait's exactly — full-bleed on desktop, a sized top band
+          on mobile (same clamp) — so the assembled head is pixel-identical to
+          the resting hero when the overlay dissolves (no shrink-on-reveal). */}
+      <div className="absolute inset-x-0 top-0 h-[clamp(18rem,80vw,26rem)] lg:h-full">
+        <PortraitLoader
+          assemble={assembling}
+          assembleAnchorX={desktop ? 1.05 : 0}
+          assembleCamZ={desktop ? 4.8 : 4.0}
+          className="h-full w-full"
+          progress={progress / 100}
+          variant={LOADER_VARIANT}
+        />
+      </div>
+      {/* the percentage, centred in that same box; fades as the face forms */}
       <div
-        className="absolute inset-0 grid place-items-center"
+        className="absolute inset-x-0 top-0 grid h-[clamp(18rem,80vw,26rem)] place-items-center lg:h-full"
         style={{
           opacity: assembling ? 0 : 1,
           transition: "opacity 450ms ease-out",

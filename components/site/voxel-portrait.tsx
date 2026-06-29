@@ -11,7 +11,6 @@ import {
 } from "react";
 import * as THREE from "three";
 
-import { onReveal } from "@/lib/page-reveal";
 import { cn } from "@/lib/utils";
 
 // A halftone dot portrait from ONE photo + its depth map. Each dot's size
@@ -249,53 +248,7 @@ type DragState = {
   curY: number;
 };
 
-// motion modes — entrances build the portrait on load, then it rests
-export type Motion =
-  | "none"
-  | "assemble"
-  | "rise"
-  | "scan"
-  | "develop"
-  | "depth";
-
-const ENTRANCES = new Set<Motion>([
-  "assemble",
-  "rise",
-  "scan",
-  "develop",
-  "depth",
-]);
-const DUR = 1.9; // entrance duration (s)
-const STAG = 0.9; // entrance per-dot stagger (s)
-const ENTR_END = DUR + STAG + 0.4;
-
-// ambient modes — continuous, *partial* motion layered on top of the resting
-// portrait. A sparse subset of dots peels off and floats/falls away, fading to
-// white (the page colour) so it truly dissolves, then silently respawns home.
-// The whole head also turns gently left↔right so the depth reads as 3D.
-// Only a small fraction is ever in flight at once, so the picture stays clear.
-export type Ambient =
-  | "none"
-  | "shed" // dots peel off the sides and drift outward
-  | "fall" // dots detach and fall, fading toward the bottom
-  | "rise" // light dots lift away like embers
-  | "evaporate" // rim dots dissolve radially outward
-  | "drift" // light dots wander off in random directions
-  | "stream" // a steady trickle sheds from the lower edge
-  | "breeze" // the head leans on a breeze; trailing dots peel off
-  | "lift" // dots near the base rise up and fade
-  | "sparkle" // dots wink out in place and return
-  | "sway"; // no shedding — just the left↔right depth turn
-
 const TAU = Math.PI * 2;
-
-// per-dot lifecycle: rest at home for `dwell` of the cycle (no gap in the
-// portrait), then travel + fade over the remainder. Returns 0..1 (0 = home).
-function lifecycle(phase: number, ct: number, rate: number, dwell: number) {
-  const cyc = (ct * rate + phase) % 1;
-  const c = cyc < 0 ? cyc + 1 : cyc;
-  return c < dwell ? 0 : (c - dwell) / (1 - dwell);
-}
 
 // deterministic 0..1 noise per index
 export function noise(i: number) {
@@ -307,24 +260,16 @@ function PortraitCloud({
   src,
   depthSrc,
   sway,
-  motion,
-  ambient,
   reduced,
   anchorX,
-  spread,
   drag,
-  waitForReveal,
 }: {
   src: string;
   depthSrc: string;
   sway: boolean;
-  motion: Motion;
-  ambient: Ambient;
   reduced: boolean;
   anchorX: number;
-  spread: number;
   drag: { current: DragState };
-  waitForReveal: boolean;
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const [data, setData] = useState<CloudData | null>(null);
@@ -332,22 +277,6 @@ function PortraitCloud({
   const obj = useRef(new THREE.Object3D());
   const awake = useRef(false);
   const rnd = useRef<Float32Array | null>(null);
-  const t0 = useRef<number | null>(null);
-  const colScratch = useRef(new THREE.Color());
-  // gated entrances stay hidden (scale 0) until the preloader hands off
-  const started = useRef(!waitForReveal);
-
-  const isEntrance = ENTRANCES.has(motion) && !reduced;
-  const ambientOn = ambient !== "none" && !reduced;
-
-  useEffect(() => {
-    if (!waitForReveal) {
-      return;
-    }
-    return onReveal(() => {
-      started.current = true;
-    });
-  }, [waitForReveal]);
 
   useEffect(() => {
     let alive = true;
@@ -375,11 +304,9 @@ function PortraitCloud({
     mesh.position.x = anchorX; // shift the head within a full-bleed canvas
     const o = obj.current;
     const c = new THREE.Color();
-    // entrances start hidden (scale 0) so there's no flash of the full portrait
-    const startScale = isEntrance ? 0 : 1;
     for (let i = 0; i < data.count; i++) {
       o.position.set(data.pos[i * 3], data.pos[i * 3 + 1], data.pos[i * 3 + 2]);
-      o.scale.setScalar(data.scl[i] * startScale);
+      o.scale.setScalar(data.scl[i]);
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
       c.setRGB(data.col[i * 3], data.col[i * 3 + 1], data.col[i * 3 + 2]);
@@ -398,9 +325,9 @@ function PortraitCloud({
       disp: new Float32Array(data.count * 3),
       vel: new Float32Array(data.count * 3),
     };
-  }, [data, isEntrance, anchorX]);
+  }, [data, anchorX]);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     const mesh = meshRef.current;
     const d = data;
     const s = sim.current;
@@ -408,16 +335,7 @@ function PortraitCloud({
     if (!(mesh && d && s && rr) || d.count === 0 || reduced) {
       return;
     }
-    // hold a gated entrance hidden until the preloader's reveal hand-off
-    if (isEntrance && !started.current) {
-      return;
-    }
     const dt = Math.min(delta, 0.04);
-    const clock = state.clock.elapsedTime;
-    if (t0.current === null) {
-      t0.current = clock;
-    }
-    const te = clock - t0.current; // seconds since this motion started
 
     // drag-to-turn: rotation eases toward the drag target while held, then
     // springs back to front (0) on release; gentle idle sway layered on top.
@@ -452,16 +370,11 @@ function PortraitCloud({
       awake.current = true;
     }
 
-    const entrancePlaying = isEntrance && te < ENTR_END;
-    // run the per-dot loop only when something is animating
-    if (!(entrancePlaying || awake.current || ambientOn)) {
+    // run the per-dot loop only while the dots are still displaced
+    if (!awake.current) {
       return;
     }
 
-    const ct = clock; // continuous clock for ambient loops
-    // every ambient except the pure depth-turn fades dots toward the page white
-    const fadeColor = ambientOn && ambient !== "sway";
-    const cs = colScratch.current;
     const pos = d.pos;
     const scl = d.scl;
     const disp = s.disp;
@@ -514,174 +427,13 @@ function PortraitCloud({
         Math.abs(ox) + Math.abs(oy) + Math.abs(oz) + Math.abs(vel[i3])
       );
 
-      // --- motion mode: extra offset (mx,my,mz) + scale multiplier (sm) ---
-      let mx = 0;
-      let my = 0;
-      let mz = 0;
-      let sm = 1;
-      const r0 = rr[i3];
-      const r1 = rr[i3 + 1];
-      const r2 = rr[i3 + 2];
-
-      if (isEntrance) {
-        const delay =
-          motion === "rise" ? ((hy + 0.95) / 1.9) * STAG : r0 * STAG;
-        const p = Math.max(0, Math.min(1, (te - delay) / DUR));
-        const e = 1 - (1 - p) * (1 - p) * (1 - p); // easeOutCubic
-        if (motion === "assemble") {
-          // start spread across the whole canvas (the page), converging home
-          const k = 1 - e;
-          mx = (r0 - 0.5) * 2.4 * spread * k;
-          my = (r1 - 0.5) * 1.7 * spread * k;
-          mz = (r2 - 0.5) * 1.2 * spread * k;
-          sm = 0.4 + 0.6 * e;
-        } else if (motion === "rise") {
-          my = -1.9 * (1 - e);
-          sm = 0.3 + 0.7 * e;
-        } else if (motion === "depth") {
-          mz = -2.8 * (1 - e);
-          sm = 0.1 + 0.9 * e;
-        } else if (motion === "develop") {
-          sm = e;
-        } else if (motion === "scan") {
-          const lineY = 0.98 - (te / (DUR + 0.4)) * 2.1; // sweep top → bottom
-          const below = hy - lineY;
-          const rev = Math.max(0, Math.min(1, (below + 0.05) / 0.14));
-          const edge = Math.exp(-(below * 11 * (below * 11)));
-          sm = rev * (1 + edge);
-        }
-      }
-
-      // --- ambient mode: a sparse subset peels away + fades; picture stays ---
-      // fade 0 = solid home colour, 1 = fully dissolved into the page (white)
-      let fade = 0;
-      if (ambientOn) {
-        const dk = d.dark[i]; // 0 light/background .. 1 dark/structural
-        switch (ambient) {
-          case "shed": {
-            // side dots peel outward and float away
-            if (Math.abs(hx) > 0.26 && r1 > 0.62) {
-              const life = lifecycle(r0, ct, 0.16, 0.55);
-              const e = life * life;
-              mx += Math.sign(hx) * e * 0.9;
-              my += (r2 - 0.4) * e * 0.4;
-              fade = life;
-            }
-            break;
-          }
-          case "fall": {
-            // dots detach and fall, fading toward the bottom (gravity-eased)
-            if (r1 > 0.8 && hy < 0.45) {
-              const life = lifecycle(r0, ct, 0.2, 0.5);
-              my -= life * life * 1.7;
-              mx += (r2 - 0.5) * life * 0.35;
-              fade = life;
-            }
-            break;
-          }
-          case "rise": {
-            // light dots lift away like embers
-            if (dk < 0.32 && r1 > 0.55) {
-              const life = lifecycle(r0, ct, 0.16, 0.5);
-              my += life * 1.4;
-              mx += Math.sin(life * 6 + r0 * TAU) * 0.12;
-              fade = life;
-            }
-            break;
-          }
-          case "evaporate": {
-            // rim dots dissolve straight outward from the centre
-            const rad = Math.sqrt(hx * hx + hy * hy * 0.85) + 1e-3;
-            if (rad > 0.48 && r1 > 0.55) {
-              const life = lifecycle(r0, ct, 0.18, 0.5);
-              const e = life * life;
-              mx += (hx / rad) * e * 0.9;
-              my += (hy / rad) * e * 0.9;
-              fade = life;
-            }
-            break;
-          }
-          case "drift": {
-            // light dots wander off in their own random direction
-            if (dk < 0.3 && r1 > 0.5) {
-              const life = lifecycle(r0, ct, 0.13, 0.45);
-              const a = r2 * TAU;
-              mx += Math.cos(a) * life * 0.8;
-              my += Math.sin(a) * life * 0.8;
-              fade = life;
-            }
-            break;
-          }
-          case "stream": {
-            // a steady trickle sheds from the lower edge
-            if (hy < -0.15 && r1 > 0.45) {
-              const life = lifecycle(r0, ct, 0.34, 0.25);
-              my -= life * life * 1.6;
-              mx += Math.sin(life * 5 + r0 * TAU) * 0.18;
-              fade = life;
-            }
-            break;
-          }
-          case "breeze": {
-            // the whole head leans on a breeze; trailing-edge dots peel off
-            const gust = Math.sin(ct * 0.5);
-            mx += gust * 0.05 * (0.4 + 0.6 * (hy + 1) * 0.5);
-            if (hx * gust > 0.2 && r1 > 0.7) {
-              const life = lifecycle(r0, ct, 0.18, 0.5);
-              mx += Math.sign(hx) * life * life * 0.7;
-              my += (r2 - 0.3) * life * 0.4;
-              fade = life;
-            }
-            break;
-          }
-          case "lift": {
-            // dots near the base rise up and fade
-            if (hy < -0.05 && r1 > 0.72) {
-              const life = lifecycle(r0, ct, 0.15, 0.5);
-              my += life * 1.2;
-              mx += (r2 - 0.5) * life * 0.3;
-              fade = life;
-            }
-            break;
-          }
-          case "sparkle": {
-            // a few dots wink out in place and return
-            if (r1 > 0.88) {
-              const cyc = (ct * 0.5 + r0) % 1;
-              const c = cyc < 0 ? cyc + 1 : cyc;
-              fade = c < 0.5 ? 0 : Math.sin((c - 0.5) * TAU * 0.5) ** 2 * 0.5;
-            }
-            break;
-          }
-          default:
-            break; // "sway" — depth turn only, handled by the sway block
-        }
-      }
-
-      sm *= 1 - fade;
-      o.position.set(hx + ox + mx, hy + oy + my, hz + oz + mz);
-      o.scale.setScalar(scl[i] * Math.max(0, sm));
+      o.position.set(hx + ox, hy + oy, hz + oz);
+      o.scale.setScalar(Math.max(0, scl[i]));
       o.updateMatrix();
       mesh.setMatrixAt(i, o.matrix);
-
-      if (fadeColor) {
-        // lerp toward page-white so a departing dot dissolves, not just shrinks
-        const cr = d.col[i3];
-        const cg = d.col[i3 + 1];
-        const cb = d.col[i3 + 2];
-        cs.setRGB(
-          cr + (1 - cr) * fade,
-          cg + (1 - cg) * fade,
-          cb + (1 - cb) * fade
-        );
-        mesh.setColorAt(i, cs);
-      }
     }
     mesh.instanceMatrix.needsUpdate = true;
-    if (fadeColor && mesh.instanceColor) {
-      mesh.instanceColor.needsUpdate = true;
-    }
-    if (!(entrancePlaying || flinging) && maxMag < 1e-4) {
+    if (!flinging && maxMag < 1e-4) {
       awake.current = false;
     }
   });
@@ -711,22 +463,14 @@ export function VoxelPortrait({
   className,
   src = "/portrait/cut.png",
   depthSrc = "/portrait/depth.jpg",
-  motion = "none",
-  ambient = "none",
   anchorX = 0,
   camZ = 3.4,
-  spread = 2.6,
-  waitForReveal = false,
 }: {
   className?: string;
   src?: string;
   depthSrc?: string;
-  motion?: Motion; // one-shot entrance on load
-  ambient?: Ambient; // continuous motion layered on the resting portrait
   anchorX?: number; // shift the head horizontally (full-bleed layouts)
   camZ?: number; // camera distance (zoom)
-  spread?: number; // assemble fly-in reach
-  waitForReveal?: boolean; // hold the entrance until the page-reveal hand-off
 }) {
   const reduced = !!useReducedMotion();
   const drag = useRef<DragState>({
@@ -806,16 +550,12 @@ export function VoxelPortrait({
         <ambientLight intensity={0.62} />
         <directionalLight intensity={1.05} position={[1.5, 1.5, 2.5]} />
         <PortraitCloud
-          ambient={ambient}
           anchorX={anchorX}
           depthSrc={depthSrc}
           drag={drag}
-          motion={motion}
           reduced={reduced}
-          spread={spread}
           src={src}
           sway={!reduced}
-          waitForReveal={waitForReveal}
         />
       </Canvas>
     </div>

@@ -5,11 +5,10 @@ import { cn } from "@/lib/utils";
 type Meta = { k: string; v: string };
 
 /**
- * A numbered section header in the "dossier" language. One component, three
+ * A numbered section header in the "dossier" language. One component, two
  * densities so the page reads as one running document whose entries differ in
  * KIND rather than as six different layouts:
  *  - "default"   — a big editorial noun title (Work, Creative)
- *  - "statement" — a lead sentence as the header + a baseline axis rule (About, AI)
  *  - "record"    — a small record label + a mono label/value spec table (Thesis)
  * The eyebrow (index + kicker + note) and the cursor-reactive dot divider stay
  * identical across all three so they cohere; `dividerCount` varies the divider
@@ -26,22 +25,19 @@ export function SectionHeader({
   divider = true,
   meta,
   lead,
-  hint,
 }: {
   index: string;
   kicker: string;
   title: string;
   note?: string;
   className?: string;
-  density?: "default" | "statement" | "record";
+  density?: "default" | "record";
   dividerCount?: number;
   /** Show the dot rule above the header. Off where a section edge already divides (the dark chapter). */
   divider?: boolean;
   meta?: Meta[];
   /** A short line under the title saying what the section is. */
   lead?: string;
-  /** A small accent cue telling the reader how to interact with the section. */
-  hint?: string;
 }) {
   return (
     <div className={cn("font-terminal", className)}>
@@ -80,10 +76,6 @@ export function SectionHeader({
               </dl>
             ) : null}
           </div>
-        ) : density === "statement" ? (
-          <h2 className="mt-5 max-w-3xl text-pretty text-[clamp(1.6rem,3.8vw,2.7rem)] leading-[1.12] tracking-[-0.02em]">
-            {title}
-          </h2>
         ) : (
           <h2 className="mt-5 text-[clamp(2rem,5.5vw,3.5rem)] leading-[0.98] tracking-[-0.03em]">
             {title}
@@ -92,12 +84,6 @@ export function SectionHeader({
 
         {lead ? (
           <p className="mt-5 max-w-2xl text-muted-fg leading-relaxed">{lead}</p>
-        ) : null}
-        {hint ? (
-          <p className="mt-5 flex items-center gap-2 text-[0.7rem] text-accent uppercase tracking-[0.25em]">
-            <span aria-hidden="true">↳</span>
-            {hint}
-          </p>
         ) : null}
       </Reveal>
     </div>

@@ -1,4 +1,3 @@
-export { aiWork } from "./ai";
 export { creativeWork } from "./creative";
 export { experience, experienceMeta } from "./experience";
 export { about, site, trajectory } from "./site";
