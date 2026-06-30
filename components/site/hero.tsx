@@ -20,10 +20,11 @@ export function Hero() {
           mobile address bar collapsing on scroll can't rescale the portrait. */}
       <div className="relative h-[clamp(18rem,80vw,26rem)] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto">
         <HeroPortrait />
-        {/* dissolve the band's lower edge into the white canvas (mobile only) */}
+        {/* a slim dissolve at the very bottom edge, just enough to settle the
+            portrait onto the canvas without a hard line (mobile only) */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-bg lg:hidden"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-bg lg:hidden"
         />
         {/* touch hint, pinned in the band; desktop has its own in the meta row */}
         <span className="pointer-events-none absolute bottom-3 left-6 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em] sm:left-10 lg:hidden">
