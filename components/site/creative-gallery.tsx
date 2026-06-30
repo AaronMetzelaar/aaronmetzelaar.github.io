@@ -12,36 +12,18 @@ import { cn } from "@/lib/utils";
 
 // Same interaction language as the Selected Work gallery — each tile leans
 // toward the cursor, hovering one enlarges it and brings it forward while the
-// rest blur, and the caption reveals + scramble-decodes on hover. The Creative
-// twists: a promo clip plays only while hovered (never autoplays), and the
-// social tile's secondary stills fly out into the section's free space as
-// separate, cursor-leaning tiles — not peeking from behind the hero.
+// rest blur, and the caption reveals + scramble-decodes on hover. That lean +
+// page-blur focus is a wide-desktop, fine-pointer affordance; narrower screens
+// get the same content laid out statically (no lean, no blur). A gallery tile
+// (the posters/social one) shows its extra stills as a tidy grid beneath the
+// hero at every width — kept in the tile's own box, never floated across the
+// section, so it can't land disconnected or shrink to nothing on small screens.
 const PULL = 0.09;
 const MAX = 22;
 const EASE = 0.12;
 
-// loose vertical stagger so three tiles read as a collage, not a grid row
+// loose vertical stagger so the tiles read as a collage, not a grid row
 const STAGGER = ["", "sm:mt-24", "sm:mt-10"];
-
-// where the social secondaries come to rest — scattered across the open area to
-// the left of the (right-most) social tile. left/top/width as % of the padded
-// stage; `from` is the hidden → resting offset so they emerge from the hero side.
-const DROPS = [
-  {
-    left: "1%",
-    top: "0%",
-    width: "27%",
-    rot: "-rotate-3",
-    from: "translate(80px, -34px) scale(0.66)",
-  },
-  {
-    left: "34%",
-    top: "55%",
-    width: "21%",
-    rot: "rotate-[5deg]",
-    from: "translate(120px, 44px) scale(0.66)",
-  },
-];
 
 function usePointerFine() {
   const [fine, setFine] = useState(false);
@@ -55,6 +37,20 @@ function usePointerFine() {
   return fine;
 }
 
+// the lean + page-blur focus needs room and a real pointer; gate it to wide
+// desktop so it never fires (and mispositions) on phones / narrow windows
+function useWide() {
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    setWide(mq.matches);
+    const onChange = () => setWide(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return wide;
+}
+
 export function CreativeGallery({
   items,
   onActiveChange,
@@ -64,31 +60,25 @@ export function CreativeGallery({
 }) {
   const reduced = !!useReducedMotion();
   const fine = usePointerFine();
+  const wide = useWide();
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState<number | null>(null);
   const [plays, setPlays] = useState(() => items.map(() => 0));
   const baseId = useId();
 
   useEffect(() => setMounted(true), []);
-  const interactive = mounted && fine && !reduced;
+  const interactive = mounted && fine && wide && !reduced;
 
   // tell the section whether a tile is focused (so it can blur its header)
   useEffect(() => {
     onActiveChange?.(active !== null);
   }, [active, onActiveChange]);
 
-  const socialIndex = items.findIndex((it) => (it.gallery?.length ?? 0) > 1);
-  const secondaries =
-    socialIndex >= 0 ? (items[socialIndex].gallery ?? []).slice(1) : [];
-
-  // lean targets: one per tile, then one per floating secondary
+  // lean targets: one per tile
   const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const pointer = useRef<{ x: number; y: number } | null>(null);
   const cur = useRef(
-    Array.from({ length: items.length + secondaries.length }, () => ({
-      x: 0,
-      y: 0,
-    }))
+    Array.from({ length: items.length }, () => ({ x: 0, y: 0 }))
   );
 
   // Track the cursor across the WHOLE window (viewport coords) so the tiles
@@ -153,8 +143,6 @@ export function CreativeGallery({
     clearHoveredMedia(`${baseId}-${i}`);
   };
 
-  const socialOn = interactive && active === socialIndex;
-
   return (
     // the lean stage is wider (to the section edges) + taller than the tiles, so
     // the cursor keeps the tiles leaning across a generous area instead of
@@ -168,12 +156,21 @@ export function CreativeGallery({
           className="pointer-events-none fixed inset-0 z-40 bg-bg/10 backdrop-blur-[3px]"
         />
       ) : null}
-      <div className="grid gap-10 sm:grid-cols-3 sm:gap-8">
+      <div
+        className={cn(
+          "grid gap-10 sm:gap-8",
+          // two tiles read as a balanced, centered pair; three fill the row
+          items.length <= 2
+            ? "sm:mx-auto sm:max-w-3xl sm:grid-cols-2"
+            : "sm:grid-cols-3"
+        )}
+      >
         {items.map((item, i) => {
           const dim = interactive && active !== null && active !== i;
           const on = interactive && active === i;
           const video = item.media?.kind === "video" ? item.media : null;
           const hero = item.gallery?.[0];
+          const extras = item.gallery?.slice(1) ?? [];
           return (
             <figure
               className={cn(
@@ -184,7 +181,11 @@ export function CreativeGallery({
               key={item.slug}
               style={{ zIndex: on ? 50 : 1 }}
             >
-              <div ref={(el) => { cardRefs.current[i] = el; }}>
+              <div
+                ref={(el) => {
+                  cardRefs.current[i] = el;
+                }}
+              >
                 <div
                   className={cn(
                     "origin-center transition-transform duration-500 ease-out",
@@ -220,6 +221,22 @@ export function CreativeGallery({
                     )}
                   </div>
                 </div>
+
+                {/* a gallery tile's other stills, laid out beneath the hero —
+                    stays in the tile's own box at every width */}
+                {extras.length > 0 ? (
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    {extras.map((g) => (
+                      <div
+                        aria-label={g.alt}
+                        className="aspect-[4/5] border border-border bg-bg bg-center bg-cover"
+                        key={g.src}
+                        role="img"
+                        style={{ backgroundImage: `url(${g.src})` }}
+                      />
+                    ))}
+                  </div>
+                ) : null}
 
                 <figcaption className="relative z-10 mt-4">
                   <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
@@ -263,38 +280,6 @@ export function CreativeGallery({
           );
         })}
       </div>
-
-      {/* social secondaries — separate tiles that fly into the open area when
-          the social tile is hovered; they lean toward the cursor like the rest */}
-      {interactive
-        ? secondaries.map((s, si) => {
-            const drop = DROPS[si % DROPS.length];
-            return (
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute z-[55] transition-[opacity,transform] duration-500 ease-out"
-                key={s.src}
-                style={{
-                  left: drop.left,
-                  top: drop.top,
-                  width: drop.width,
-                  opacity: socialOn ? 1 : 0,
-                  transform: socialOn ? "none" : drop.from,
-                }}
-              >
-                <div ref={(el) => { cardRefs.current[items.length + si] = el; }}>
-                  <div
-                    className={cn(
-                      "aspect-[4/5] w-full border border-border bg-bg bg-center bg-cover shadow-xl",
-                      drop.rot
-                    )}
-                    style={{ backgroundImage: `url(${s.src})` }}
-                  />
-                </div>
-              </div>
-            );
-          })
-        : null}
     </div>
   );
 }

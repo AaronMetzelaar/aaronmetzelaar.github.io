@@ -7,6 +7,8 @@ import {
   type LoaderVariant,
   PortraitLoader,
 } from "@/components/site/portrait-loader";
+import { creativeWork, experience } from "@/content";
+import type { MediaItem } from "@/content/types";
 import { isRevealed, triggerReveal } from "@/lib/page-reveal";
 
 // The homepage preloader IS the hero's portrait, mid-boot. The portrait's own
@@ -21,6 +23,18 @@ const ASSEMBLE_MS = 1700; // ring -> portrait convergence shown on the overlay
 const REVEAL_MS = 650; // final dissolve onto the resting hero
 const CAP_MS = 7000; // safety: reveal even if an asset hangs
 const PORTRAIT_SRCS = ["/portrait/cut.png", "/portrait/depth.jpg"];
+
+// Every tile's low-res still: the work/creative video posters and the social
+// gallery images. Warmed during the loader so those sections paint instantly
+// once the visitor scrolls, instead of fetching a poster on first sight.
+const posterOf = (m?: MediaItem) => (m?.kind === "video" ? m.poster : null);
+const LOW_RES_MEDIA = [...experience, ...creativeWork]
+  .flatMap((w) => [
+    posterOf(w.media),
+    posterOf(w.mediaMobile),
+    ...(w.gallery?.map((g) => g.src) ?? []),
+  ])
+  .filter((s): s is string => Boolean(s));
 
 function preloadImg(src: string) {
   return new Promise<void>((resolve) => {
@@ -121,6 +135,18 @@ export function Preloader() {
       window.clearTimeout(cap);
     };
   }, [reduced, beginReveal]);
+
+  // Warm the low-res stills at low priority while the loader dwells. This never
+  // gates the reveal (that still waits only on fonts + the portrait maps), so the
+  // Work/Creative tiles are cached by the time the visitor scrolls down. The HD
+  // video itself still loads on play (preload="none").
+  useEffect(() => {
+    for (const src of LOW_RES_MEDIA) {
+      const img = new Image();
+      img.setAttribute("fetchpriority", "low");
+      img.src = src;
+    }
+  }, []);
 
   if (!visible) {
     return null;

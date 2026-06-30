@@ -17,31 +17,24 @@ export const creativeWork: WorkItem[] = [
     },
   },
   {
-    slug: "posters",
-    title: "Posters & graphics",
-    summary:
-      "Event and campaign posters built to cut through a crowded board.",
-    tags: ["Graphic design", "Print", "Branding"],
-  },
-  {
     slug: "social",
-    title: "Social content",
+    title: "Posters & social",
     summary:
-      "Social campaigns that grew the student association's reach.",
-    tags: ["Social", "Content", "Campaigns"],
+      "Recruitment posters and social posts I designed for my student association, like the 'is een Ridder' series.",
+    tags: ["Graphic design", "Posters", "Social"],
     // first = the hero still; the rest fan out on hover
     gallery: [
       {
         src: "/creative/social/sven.jpg",
-        alt: "Sven is een Ridder, a recruitment post.",
+        alt: "Sven is een Ridder, a recruitment poster.",
       },
       {
         src: "/creative/social/bryan.jpg",
-        alt: "Bryan is een Ridder, a recruitment post.",
+        alt: "Bryan is een Ridder, a recruitment poster.",
       },
       {
         src: "/creative/social/servaas.jpg",
-        alt: "Servaas is een Ridder, a recruitment post.",
+        alt: "Servaas is een Ridder, a recruitment poster.",
       },
     ],
   },
