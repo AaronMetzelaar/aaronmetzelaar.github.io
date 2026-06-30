@@ -332,7 +332,10 @@ function PortraitCloud({
     const d = data;
     const s = sim.current;
     const rr = rnd.current;
-    if (!(mesh && d && s && rr) || d.count === 0 || reduced) {
+    // NB: don't bail on `reduced` here — the drag-to-turn rotation below must
+    // still run. Reduced motion is honoured by `sway` being off and the
+    // particle fling being gated, not by killing the whole loop.
+    if (!(mesh && d && s && rr) || d.count === 0) {
       return;
     }
     const dt = Math.min(delta, 0.04);
@@ -360,7 +363,7 @@ function PortraitCloud({
     // skewed per-dot (most drift, a few fly far) so it reads organic, not a
     // uniform expansion; a faster turn throws harder. Springs pull them home.
     const throwSpeed = Math.hypot(dr.vx, dr.vy);
-    const flinging = dr.active && throwSpeed > 1.2;
+    const flinging = !reduced && dr.active && throwSpeed > 1.2;
     const power = Math.min(throwSpeed / 52, 1.7);
     const dirX = dr.vx * 0.013;
     const dirY = -dr.vy * 0.013;
@@ -370,8 +373,9 @@ function PortraitCloud({
       awake.current = true;
     }
 
-    // run the per-dot loop only while the dots are still displaced
-    if (!awake.current) {
+    // run the per-dot fling loop only while dots are displaced — and never
+    // under reduced motion (the head still turns rigidly via mesh.rotation).
+    if (reduced || !awake.current) {
       return;
     }
 
@@ -486,16 +490,19 @@ export function VoxelPortrait({
   });
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (reduced) {
-      return;
-    }
+    // drag-to-turn is user-initiated, so it works even under reduced motion
+    // (only the autonomous sway/fling are suppressed there).
     const d = drag.current;
     d.active = true;
     d.lastX = e.clientX;
     d.lastY = e.clientY;
     d.vx = 0;
     d.vy = 0;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // some browsers throw if the pointer is already gone — safe to ignore
+    }
   };
   const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
