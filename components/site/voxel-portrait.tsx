@@ -240,6 +240,10 @@ type DragState = {
   active: boolean;
   lastX: number;
   lastY: number;
+  startX: number;
+  startY: number;
+  // touch gesture lock: undecided → turn (horizontal) or scroll (vertical)
+  mode: "none" | "turn" | "scroll";
   vx: number;
   vy: number;
   targetX: number;
@@ -363,7 +367,8 @@ function PortraitCloud({
     // skewed per-dot (most drift, a few fly far) so it reads organic, not a
     // uniform expansion; a faster turn throws harder. Springs pull them home.
     const throwSpeed = Math.hypot(dr.vx, dr.vy);
-    const flinging = !reduced && dr.active && throwSpeed > 1.2;
+    const flinging =
+      !reduced && dr.active && dr.mode !== "scroll" && throwSpeed > 1.2;
     const power = Math.min(throwSpeed / 52, 1.7);
     const dirX = dr.vx * 0.013;
     const dirY = -dr.vy * 0.013;
@@ -481,6 +486,9 @@ export function VoxelPortrait({
     active: false,
     lastX: 0,
     lastY: 0,
+    startX: 0,
+    startY: 0,
+    mode: "none",
     vx: 0,
     vy: 0,
     targetX: 0,
@@ -494,14 +502,23 @@ export function VoxelPortrait({
     // (only the autonomous sway/fling are suppressed there).
     const d = drag.current;
     d.active = true;
+    d.mode = "none";
     d.lastX = e.clientX;
     d.lastY = e.clientY;
+    d.startX = e.clientX;
+    d.startY = e.clientY;
     d.vx = 0;
     d.vy = 0;
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      // some browsers throw if the pointer is already gone — safe to ignore
+    // Mouse/pen: capture so a drag that leaves the element keeps turning.
+    // Touch: do NOT capture — touch already has implicit capture, and an
+    // explicit setPointerCapture here makes iOS Safari cancel the gesture on
+    // the first move (which is exactly why the turn never fired on phones).
+    if (e.pointerType !== "touch") {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // some browsers throw if the pointer is already gone — safe to ignore
+      }
     }
   };
   const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -513,22 +530,51 @@ export function VoxelPortrait({
     const dy = e.clientY - d.lastY;
     d.lastX = e.clientX;
     d.lastY = e.clientY;
+
+    if (e.pointerType === "touch") {
+      // touch-action is none on the canvas, so the browser never scrolls or
+      // cancels the gesture — we own it. Lock to an axis once it clears a small
+      // threshold: horizontal turns the head, vertical scrolls the page (which
+      // we drive ourselves, since the browser no longer will).
+      if (d.mode === "none") {
+        const tx = e.clientX - d.startX;
+        const ty = e.clientY - d.startY;
+        if (Math.abs(tx) > 6 || Math.abs(ty) > 6) {
+          d.mode = Math.abs(tx) > Math.abs(ty) ? "turn" : "scroll";
+        }
+      }
+      if (d.mode === "scroll") {
+        d.vx = 0;
+        d.vy = 0;
+        window.scrollBy(0, -dy);
+        return;
+      }
+      if (d.mode === "turn") {
+        d.vx = dx;
+        d.vy = dy;
+        d.targetY = Math.max(-0.6, Math.min(0.6, d.targetY + dx * 0.006));
+      }
+      return;
+    }
+
+    // mouse / pen: free turn on both axes
     d.vx = dx;
     d.vy = dy;
     d.targetY = Math.max(-0.6, Math.min(0.6, d.targetY + dx * 0.005));
-    // touch keeps the vertical axis for page scroll (touch-action: pan-y), so
-    // only the horizontal drag turns the head; a mouse can also tilt it.
-    if (e.pointerType !== "touch") {
-      d.targetX = Math.max(-0.32, Math.min(0.32, d.targetX - dy * 0.004));
-    }
+    d.targetX = Math.max(-0.32, Math.min(0.32, d.targetX - dy * 0.004));
   };
   const onUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
     d.active = false;
+    d.mode = "none";
     d.targetX = 0;
     d.targetY = 0;
-    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-      e.currentTarget.releasePointerCapture(e.pointerId);
+    try {
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore — capture may never have been taken (touch)
     }
   };
 
@@ -536,12 +582,11 @@ export function VoxelPortrait({
     <div
       aria-label="Halftone dot portrait of Aaron Metzelaar"
       className={cn(
-        // pan-y = vertical swipes scroll the page, horizontal drags turn the
-        // portrait (a mouse drags on both axes). It MUST also be forced onto the
-        // R3F <canvas> via [&_canvas] — the canvas is the real touch target and
-        // defaults to touch-action:auto, so without this the browser treats a
-        // horizontal drag as a swallowed scroll and the turn never fires on touch.
-        "relative cursor-grab touch-pan-y [&_canvas]:touch-pan-y active:cursor-grabbing",
+        // touch-action:none on the canvas (the real touch target) so the
+        // browser never claims the gesture — with pan-y, mobile browsers cancel
+        // the touch on the first move and the turn never fires. We handle both
+        // axes in JS instead: horizontal turns, vertical scrolls the page.
+        "relative cursor-grab touch-none [&_canvas]:touch-none active:cursor-grabbing",
         className
       )}
       onPointerCancel={onUp}

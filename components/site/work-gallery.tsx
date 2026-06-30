@@ -84,7 +84,7 @@ function WorkList({ items }: { items: WorkItem[] }) {
             >
               <div className="relative">
                 <MediaFrame
-                  aspect={16 / 9}
+                  aspect={2 / 1}
                   className="w-full"
                   label={item.slug}
                   media={item.media}

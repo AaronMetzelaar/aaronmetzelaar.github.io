@@ -219,12 +219,34 @@ export function CreativeGallery({
                         minimal
                       />
                     )}
+
+                    {/* interactive: the other stills stay hidden and peek in
+                        from the bottom only while this tile is hovered */}
+                    {interactive && extras.length > 0 ? (
+                      <div
+                        aria-hidden="true"
+                        className={cn(
+                          "pointer-events-none absolute inset-x-2 bottom-2 grid grid-cols-2 gap-2 transition-all duration-500 ease-out",
+                          on
+                            ? "translate-y-0 opacity-100"
+                            : "translate-y-4 opacity-0"
+                        )}
+                      >
+                        {extras.map((g) => (
+                          <div
+                            className="h-28 border border-bg/20 bg-bg bg-center bg-cover shadow-[0_10px_30px_rgba(0,0,0,0.28)] sm:h-32"
+                            key={g.src}
+                            style={{ backgroundImage: `url(${g.src})` }}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
-                {/* a gallery tile's other stills, laid out beneath the hero —
-                    stays in the tile's own box at every width */}
-                {extras.length > 0 ? (
+                {/* touch / no-hover: the other stills laid out beneath the hero,
+                    since there's no hover to reveal them */}
+                {!interactive && extras.length > 0 ? (
                   <div className="mt-3 grid grid-cols-2 gap-3">
                     {extras.map((g) => (
                       <div

@@ -1,10 +1,10 @@
-import { PageDots } from "@/components/site/page-dots";
-import { FilingsRule, PullLink } from "@/components/site/pull-link";
 import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { CreativeShowcase } from "@/components/site/creative-showcase";
 import { Hero } from "@/components/site/hero";
+import { PageDots } from "@/components/site/page-dots";
 import { Preloader } from "@/components/site/preloader";
+import { FilingsRule, PullLink } from "@/components/site/pull-link";
 import { SectionDotEdges } from "@/components/site/section-dot-edges";
 import { SectionHeader } from "@/components/site/section-header";
 import { SiteNav } from "@/components/site/site-nav";
@@ -42,11 +42,7 @@ export default function Home() {
           className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
           id="about"
         >
-          <SectionHeader
-            index="01"
-            kicker="Profile"
-            title="About"
-          />
+          <SectionHeader index="01" kicker="Profile" title="About" />
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
             <Reveal>
               <p className="text-pretty text-[clamp(1.25rem,2.2vw,1.6rem)] leading-[1.45] tracking-[-0.01em]">
@@ -96,7 +92,7 @@ export default function Home() {
           <SectionHeader
             index="02"
             kicker="At MWS"
-            note={`${experienceMeta.role} · ${experienceMeta.period}`}
+            note="Web · Mobile · Tooling"
             title="Selected work"
           />
           <Reveal>
@@ -124,7 +120,7 @@ export default function Home() {
             into solid at the top and fade back out at the bottom. The nav
             inverts while the solid body is behind it. */}
         <section
-          className="relative isolate text-fg"
+          className="relative isolate mt-16 text-fg sm:mt-24"
           id="ai"
           style={darkSection}
         >

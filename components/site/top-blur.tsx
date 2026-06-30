@@ -1,21 +1,25 @@
-// A progressive backdrop blur behind the fixed nav: eight stacked layers with
-// increasing blur and offset gradient masks so the blur is strongest at the top
-// (behind the bar) and fades smoothly to nothing below — no hard edge, content
-// stays readable as it scrolls under. Pointer-transparent and purely decorative.
-const LAYERS = Array.from({ length: 8 }, (_, i) => {
-  const a = i * 12.5;
-  const clamp = (n: number) => Math.min(n, 100);
-  return {
-    blur: 0.0781 * 2 ** i,
-    mask: `linear-gradient(to top, rgba(0,0,0,0) ${a}%, rgba(0,0,0,1) ${clamp(a + 12.5)}%, rgba(0,0,0,1) ${clamp(a + 25)}%, rgba(0,0,0,0) ${clamp(a + 37.5)}%)`,
-  };
+// A progressive backdrop blur behind the fixed nav. Each layer blurs more than
+// the last and is masked to cover a shorter band measured FROM THE TOP, so every
+// layer is opaque at the top edge (strongest blur there) and they taper to
+// nothing lower down — no hard edge, content stays readable as it scrolls under.
+// Masking from the top is deliberate: it guarantees the top edge is always
+// covered, which fixes a Safari bug where a strip at the very top rendered
+// unblurred. Pointer-transparent and purely decorative.
+const N = 6;
+const LAYERS = Array.from({ length: N }, (_, i) => {
+  const blur = 0.5 * 2 ** i; // 0.5 → 16px
+  // each higher (blurrier) layer reaches less far down the band
+  const end = 100 - (i * 100) / N; // 100, 83, 66, 50, 33, 16 (% from top)
+  const solid = Math.max(0, end - 16);
+  const mask = `linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) ${solid}%, rgba(0,0,0,0) ${end}%)`;
+  return { blur, mask };
 });
 
 export function TopBlur() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-x-0 top-0 h-[clamp(88px,12vh,136px)]"
+      className="pointer-events-none fixed inset-x-0 top-0 h-[clamp(120px,20vh,190px)]"
     >
       {LAYERS.map((l) => (
         <div

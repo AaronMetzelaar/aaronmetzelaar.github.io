@@ -1,5 +1,5 @@
-import { HeroPortrait } from "@/components/site/hero-portrait";
 import { ScrambleText } from "@/components/motion/scramble-text";
+import { HeroPortrait } from "@/components/site/hero-portrait";
 import { site } from "@/content/site";
 
 /**
@@ -63,7 +63,9 @@ export function Hero() {
             {site.tagline}
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.7rem] uppercase tracking-[0.25em]">
-            <span className="text-muted-fg">{site.location} · MWS since 2023</span>
+            <span className="text-muted-fg">
+              Interfaces · AI tooling · Design systems · {site.location}
+            </span>
             {/* desktop-only: drag needs a pointer */}
             <span className="hidden items-center gap-2 text-accent lg:flex">
               <span aria-hidden="true">↳</span>
