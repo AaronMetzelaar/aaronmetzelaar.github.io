@@ -95,12 +95,13 @@ export default function CvPage() {
               {site.name}
             </h1>
             <p className="mt-5 max-w-xl text-muted-fg text-sm leading-relaxed">
-              For the past three years I&apos;ve worked as a frontend developer
-              at MWS, the marketplace for match-worn shirts and sports
-              memorabilia. I build the website and the mobile app, and I pay
-              close attention to how things feel to use. Lately I&apos;ve also
-              been building the tools the rest of the team relies on, like our
-              code review setup and shared coding standards.
+              I&apos;m a frontend engineer who cares about how a product feels
+              to use, and about the code that keeps it that way. I bring logic
+              and creativity in equal measure to turn rough ideas into something
+              genuinely good to use. Three years at MWS, the marketplace for
+              match-worn shirts and sports memorabilia, took me across the whole
+              customer journey and into the tooling my team relies on. Now
+              I&apos;m looking for a larger product to grow with.
             </p>
             <p className="mt-3 max-w-xl text-muted-fg text-sm leading-relaxed">
               Off the clock I play football, organize events for friends, and
@@ -118,8 +119,12 @@ export default function CvPage() {
               >
                 github.com/{site.socials.githubHandle}
               </PullLink>
+              {/* Portfolio link is redundant on the web CV (you're already on
+                  the site), so it's print-only — kept in the PDF export so a
+                  recruiter reading it can still reach the site. */}
               <PullLink
                 arrow="↗"
+                className="hidden print:inline-flex"
                 href={SITE_URL}
                 rel="noreferrer"
                 target="_blank"
