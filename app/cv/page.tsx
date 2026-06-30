@@ -129,7 +129,7 @@ export default function CvPage() {
                 rel="noreferrer"
                 target="_blank"
               >
-                Check out my portfolio!
+                Portfolio website
               </PullLink>
               <span className="text-[0.72rem] text-muted-fg uppercase tracking-[0.18em]">
                 {site.location}
