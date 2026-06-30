@@ -529,9 +529,12 @@ export function VoxelPortrait({
     <div
       aria-label="Halftone dot portrait of Aaron Metzelaar"
       className={cn(
-        // touch-pan-y: vertical swipes still scroll the page, horizontal drags
-        // turn the portrait. A mouse is unaffected and drags on both axes.
-        "relative cursor-grab touch-pan-y active:cursor-grabbing",
+        // pan-y = vertical swipes scroll the page, horizontal drags turn the
+        // portrait (a mouse drags on both axes). It MUST also be forced onto the
+        // R3F <canvas> via [&_canvas] — the canvas is the real touch target and
+        // defaults to touch-action:auto, so without this the browser treats a
+        // horizontal drag as a swallowed scroll and the turn never fires on touch.
+        "relative cursor-grab touch-pan-y [&_canvas]:touch-pan-y active:cursor-grabbing",
         className
       )}
       onPointerCancel={onUp}
@@ -545,7 +548,7 @@ export function VoxelPortrait({
         camera={{ position: [0, 0, camZ], fov: 32 }}
         dpr={[1, 2]}
         gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}
-        style={{ position: "absolute", inset: 0 }}
+        style={{ inset: 0, position: "absolute" }}
       >
         <ambientLight intensity={0.62} />
         <directionalLight intensity={1.05} position={[1.5, 1.5, 2.5]} />
