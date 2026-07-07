@@ -102,6 +102,22 @@
     -webkit-print-color-adjust: exact;
   }
 
+  /* The two-column CV layout is built with Tailwind `sm:` breakpoints, which
+     only fire at a viewport ≥ 640px. A phone prints from a narrower viewport,
+     so those columns never activate and the PDF captures the single-column
+     mobile layout — shifted and overflowing past one page. A PDF always lands
+     on A4, so pin the multi-column grids here regardless of device width. */
+  .cv-doc header {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+  .cv-doc section {
+    grid-template-columns: 8rem 1fr;
+  }
+  .cv-doc dl > div {
+    grid-template-columns: 7rem 1fr;
+  }
+
   /* Down-scale the web type scale to print sizes (these win over .text-* utils) */
   .cv-doc h1 {
     font-size: 26px;
