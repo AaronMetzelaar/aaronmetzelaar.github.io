@@ -4,14 +4,43 @@ import type { ReactNode } from "react";
 import { PageDots } from "@/components/site/page-dots";
 import { PrintCvButton } from "@/components/site/print-cv-button";
 import { PullLink } from "@/components/site/pull-link";
-import { experience, experienceMeta, site, thesis } from "@/content";
+import {
+  cvExperience,
+  cvProjects,
+  experienceMeta,
+  site,
+  thesis,
+} from "@/content";
 import { premiumTheme } from "@/lib/premium-theme";
 
 export const metadata = {
   title: "Aaron Metzelaar · CV",
   description:
-    "Frontend engineer with three years of production Vue 3, Nuxt 3, and TypeScript at MWS. Performance, accessibility, design systems, and the code-review tooling and standards a team builds on.",
+    "Software engineer with three years of production Vue, Nuxt, React Native, and TypeScript at MWS. Product engineering, AI tooling, localisation infrastructure, and payments.",
 };
+
+/*
+ * Visual system, tuned for skim > scan > read:
+ *
+ * Ink (three levels + one accent, nothing else):
+ *   - accent blue  = signposts only: section labels, dates, bullet dots,
+ *     the SKILLS micro-label, links. A skimmer follows blue down the page.
+ *   - bold near-black = the skim layer: name, role, area headings, project
+ *     names, metrics. Reading only bold text should tell the whole story.
+ *   - muted grey   = the read layer: prose and supporting detail.
+ *   Skill chips stay neutral (paper-grey fill) so keywords read as a quiet
+ *   band instead of competing with the blue signposts.
+ *
+ * Space (proximity: gaps inside a group are at most half the gap between
+ * groups, so blocks read as blocks without boxes or extra rules):
+ *   - 8px  between bullets            (space-y-2) — wrapped bullets need a
+ *     gap clearly wider than their own line height to read as separate items
+ *   - 8px  heading → its bullets      (mt-2)
+ *   - 10px bullets → skills row       (mt-2.5)
+ *   - 28px between experience areas   (space-y-7)
+ *   - 48px + ruled line between sections (mt-12 pt-8)
+ * The print stylesheet in globals.css maps this same scale to A4.
+ */
 
 // The deployed portfolio origin. Used to build absolute links (portfolio,
 // thesis PDF) so they resolve from a standalone PDF, which has no page to
@@ -20,58 +49,36 @@ export const metadata = {
 // annotations; the portfolio link is friendly text by choice.
 const SITE_URL = "https://aaronmetzelaar.github.io";
 
-// Keyword-grouped so a recruiter (or an ATS) can scan the stack fast. `primary`
-// groups (Frontend, Standards & DX) are the ones worth highlighting — they get
-// the accent treatment so the important categories lead the eye.
-const SKILLS: { group: string; items: string[]; primary?: boolean }[] = [
-  {
-    group: "Frontend",
-    primary: true,
-    items: [
-      "Vue 3",
-      "Nuxt 3",
-      "TypeScript",
-      "JavaScript",
-      "HTML / CSS",
-      "React Native",
-      "Tailwind",
-      "Three.js / WebGL",
-    ],
-  },
-  {
-    group: "Standards & DX",
-    primary: true,
-    items: [
-      "Code review",
-      "Testing (Vitest / Jest)",
-      "Documentation",
-      "Agent tooling (Claude Code, MCP)",
-    ],
-  },
-  {
-    group: "Craft",
-    items: [
-      "Performance",
-      "Accessibility",
-      "Design systems",
-      "Motion / interaction",
-    ],
-  },
-  {
-    group: "Languages",
-    items: ["Dutch (native)", "English (fluent)"],
-  },
-];
+// Recruiters scan for numbers before they read sentences. Any metric-looking
+// token (40%, 5% to 35%, 154,500+, 360°) gets lifted from the muted bullet
+// text into bold full-strength ink so the results register at a glance.
+const METRIC = /(\d[\d,.]*(?:\+|%|°)?(?:\s+to\s+\d[\d,.]*(?:\+|%|°)?)?)/g;
+
+function Metrics({ text }: { text: string }) {
+  return text.split(METRIC).map((part, i) =>
+    i % 2 === 1 ? (
+      // biome-ignore lint/suspicious/noArrayIndexKey: static text, order never changes
+      <strong className="font-semibold text-fg" key={i}>
+        {part}
+      </strong>
+    ) : (
+      part
+    )
+  );
+}
 
 export default function CvPage() {
   return (
     // `cv-doc` hooks the print stylesheet in globals.css, which scales type and
-    // collapses the web rhythm so the page prints as one full A4 sheet.
+    // collapses the web rhythm so the page prints within two A4 sheets.
     <main
       className="cv-doc relative min-h-screen overflow-hidden bg-bg font-terminal text-fg print:min-h-0 print:overflow-visible"
       style={premiumTheme}
     >
-      <PageDots className="print:hidden" />
+      {/* The site's dot texture carries into the PDF too — in print it turns
+          absolute (globals.css) so it spans both A4 pages instead of pinning
+          to the first viewport. */}
+      <PageDots className="cv-dots" />
       <div className="relative z-10 mx-auto max-w-4xl px-6 py-14 sm:px-10 sm:py-20 print:max-w-none print:p-0">
         {/* Web-only chrome: a back link and the PDF export. Neither belongs in
             the printed document, so the whole row drops out on print. */}
@@ -85,180 +92,164 @@ export default function CvPage() {
           <PrintCvButton className="text-[0.7rem] text-muted-fg uppercase tracking-[0.3em] transition-colors hover:text-accent" />
         </div>
 
-        {/* Masthead */}
-        <header className="mt-12 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-start">
-          <div>
-            <p className="text-accent text-xs uppercase tracking-[0.3em]">
-              Frontend Engineer · Vue / Nuxt · Performance &amp; code quality
-            </p>
-            <h1 className="mt-4 font-bold text-[clamp(2rem,6vw,3.25rem)] leading-[1.02] tracking-[-0.04em]">
-              {site.name}
-            </h1>
-            <p className="mt-5 max-w-xl text-muted-fg text-sm leading-relaxed">
-              I&apos;m a frontend engineer who cares about how a product feels
-              to use, and about the code that keeps it that way. I bring logic
-              and creativity in equal measure to turn rough ideas into something
-              genuinely good to use. Three years at MWS, the marketplace for
-              match-worn shirts and sports memorabilia, took me across the whole
-              customer journey and into the tooling my team relies on. Now
-              I&apos;m looking for a larger product to grow with.
-            </p>
-            <p className="mt-3 max-w-xl text-muted-fg text-sm leading-relaxed">
-              Off the clock I play football, organize events for friends, and
-              I&apos;m always up for a good specialty coffee.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
-              <PullLink arrow="→" href={`mailto:${site.email}`}>
-                {site.email}
-              </PullLink>
-              <PullLink
-                arrow="↗"
-                href={site.socials.github}
-                rel="noreferrer"
-                target="_blank"
-              >
-                github.com/{site.socials.githubHandle}
-              </PullLink>
-              {/* Portfolio link is redundant on the web CV (you're already on
-                  the site), so it's print-only — kept in the PDF export so a
-                  recruiter reading it can still reach the site. */}
-              <PullLink
-                arrow="↗"
-                className="hidden print:inline-flex"
-                href={SITE_URL}
-                rel="noreferrer"
-                target="_blank"
-              >
-                Portfolio website
-              </PullLink>
-              <span className="text-[0.72rem] text-muted-fg uppercase tracking-[0.18em]">
-                {site.location}
-              </span>
+        {/* Masthead: kicker and name span the full width; below them, the
+            intro block and the headshot share a grid so the photo tops out
+            at the first line of prose, not at the name. */}
+        <header className="mt-12">
+          <p className="text-accent text-xs uppercase tracking-[0.3em]">
+            Software Engineer
+          </p>
+          <h1 className="mt-4 font-bold text-[clamp(2rem,6vw,3.25rem)] leading-[1.02] tracking-[-0.04em]">
+            {site.name}
+          </h1>
+          <div className="cv-hero mt-5 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-start">
+            <div>
+              {/* The intro is context, not content — one type-size below body
+                  text so the eye lands on the name and slides to Experience
+                  instead of parking on a wall of prose. */}
+              <p className="cv-intro text-[0.8125rem] text-muted-fg leading-relaxed">
+                I&apos;m a software engineer who likes building things that feel
+                simple on the outside and solid underneath. My work combines
+                product thinking, frontend engineering, automation, and AI
+                tooling, with a focus on turning unclear ideas into practical
+                solutions people actually enjoy using. I&apos;m curious,
+                hands-on, and collaborative, and I enjoy helping teams work
+                smarter as much as I enjoy building the product itself.
+              </p>
+              <p className="cv-intro mt-3 text-[0.8125rem] text-muted-fg leading-relaxed">
+                Off the clock, I play football, organise events with friends,
+                and I&apos;m always up for a good specialty coffee.
+              </p>
+              <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
+                <PullLink arrow="→" href={`mailto:${site.email}`}>
+                  {site.email}
+                </PullLink>
+                <PullLink
+                  arrow="↗"
+                  href={site.socials.github}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  github.com/{site.socials.githubHandle}
+                </PullLink>
+                {/* Portfolio link is redundant on the web CV (you're already
+                    on the site), so it's print-only — kept in the PDF export
+                    so a recruiter reading it can still reach the site. */}
+                <PullLink
+                  arrow="↗"
+                  className="hidden print:inline-flex"
+                  href={SITE_URL}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Portfolio website
+                </PullLink>
+                {/* Languages are identity facts, not skills, so they live
+                    with the location instead of in a skills row. */}
+                <span className="text-[0.72rem] text-muted-fg uppercase tracking-[0.18em]">
+                  {site.location} · Dutch (native) · English (fluent)
+                </span>
+              </div>
             </div>
+            {/* A proper headshot, not a stamp: 4:5 portrait sized to roughly
+                the height of the text block beside it, so the header reads as
+                one unit instead of text plus a floating thumbnail. */}
+            <div
+              aria-label={`Portrait of ${site.name}`}
+              className="w-36 shrink-0 border border-border bg-bg bg-cover sm:w-44"
+              role="img"
+              style={{
+                aspectRatio: "4 / 5",
+                backgroundImage: "url(/me.jpg)",
+                backgroundPosition: "center 22%",
+              }}
+            />
           </div>
-          <div
-            aria-label={`Portrait of ${site.name}`}
-            className="w-28 shrink-0 border border-border bg-bg bg-cover sm:w-32"
-            role="img"
-            style={{
-              aspectRatio: "1",
-              backgroundImage: "url(/me.jpg)",
-              backgroundPosition: "center 22%",
-            }}
-          />
         </header>
 
-        {/* Experience — the most important category, so its label leads in accent */}
-        <Row accent label="Experience">
+        <Row label="Experience">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-            <h3 className="text-base tracking-tight">
+            <h3 className="font-semibold text-base tracking-tight">
               MatchWornShirt · {experienceMeta.role}
             </h3>
             <span className="text-[0.7rem] text-accent uppercase tracking-[0.18em]">
               {experienceMeta.period}
             </span>
           </div>
-          <p className="mt-1.5 text-muted-fg text-sm leading-relaxed">
-            I work across the whole frontend here: the public marketplace, the
-            internal admin tools, and the mobile app.
+          <p className="mt-2 text-muted-fg text-sm leading-relaxed">
+            Work across the public marketplace, mobile app, and internal admin
+            tools as a{" "}
+            <strong className="font-semibold text-fg">T-shaped engineer</strong>
+            : deep in frontend and product experience, with broad involvement
+            across backend-adjacent integrations, DevOps/CI workflows,
+            automation, internal AI tooling, and developer productivity.
           </p>
-          <ul className="mt-4 space-y-3">
-            {experience.map((item) => {
-              // The flagship marketplace item carries the strongest, most
-              // role-relevant evidence, so it gets its full highlight list;
-              // the rest stay one tight line each.
-              const lead = item.slug === "platform";
-              return (
-                <li className="flex gap-3 text-sm leading-snug" key={item.slug}>
-                  <span
-                    aria-hidden="true"
-                    className="mt-2 h-px w-3 shrink-0 bg-accent"
-                  />
-                  <span>
-                    <span className="text-fg">{item.title}</span>
-                    {lead ? (
-                      <ul className="mt-1.5 space-y-1 text-muted-fg">
-                        {item.highlights?.slice(0, 4).map((h) => (
-                          <li key={h}>{h}</li>
-                        ))}
-                      </ul>
-                    ) : (
+          {/* One role, five areas of ownership. Each area is a self-contained
+              skim unit: bold heading, dashed bullets, then a labelled keyword
+              row. The 28px between areas (vs 6px inside them) is what makes
+              them read as separate blocks. */}
+          <div className="mt-6 space-y-7">
+            {cvExperience.map((area) => (
+              <div className="break-inside-avoid" key={area.area}>
+                <h4 className="font-semibold text-fg text-sm tracking-tight">
+                  {area.area}
+                </h4>
+                <ul className="mt-2 space-y-2">
+                  {area.bullets.map((b) => (
+                    <li className="flex gap-3 text-sm leading-snug" key={b}>
+                      <span
+                        aria-hidden="true"
+                        className="cv-bullet mt-2 h-1 w-1 shrink-0 rounded-full bg-accent"
+                      />
                       <span className="text-muted-fg">
-                        : {item.highlights?.[0]}
+                        <Metrics text={b} />
                       </span>
-                    )}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-2.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1.5">
+                  <span className="font-semibold text-[0.65rem] text-accent uppercase tracking-[0.18em]">
+                    Skills
                   </span>
-                </li>
-              );
-            })}
-          </ul>
-        </Row>
-
-        {/* Engineering standards & DX — the team-enablement layer, also highlighted */}
-        <Row accent label="Engineering standards & DX">
-          <ul className="space-y-2.5 text-sm leading-snug">
-            <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="mt-2 h-px w-3 shrink-0 bg-accent"
-              />
-              <span className="text-muted-fg">
-                Built an automated code review system for the team. Separate
-                reviewers check each part of the code, and a final step runs
-                type-checking, linting, and tests (Vitest and Jest).
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="mt-2 h-px w-3 shrink-0 bg-accent"
-              />
-              <span className="text-muted-fg">
-                Wrote our shared coding guidelines and the everyday tools the
-                team builds with.
-              </span>
-            </li>
-          </ul>
-        </Row>
-
-        {/* Skills — above Education so the stack hits the eye first */}
-        <Row accent label="Skills">
-          <dl className="space-y-4">
-            {SKILLS.map((s) => (
-              <div
-                className="grid gap-x-6 gap-y-2 sm:grid-cols-[7rem_1fr]"
-                key={s.group}
-              >
-                <dt
-                  className={`text-[0.7rem] uppercase tracking-[0.2em] ${
-                    s.primary ? "font-semibold text-accent" : "text-muted-fg"
-                  }`}
-                >
-                  {s.group}
-                </dt>
-                <dd className="flex flex-wrap gap-2">
-                  {s.items.map((i) => (
+                  {area.skills.map((s) => (
                     <span
-                      className={`border px-2.5 py-1 text-[0.7rem] tracking-[0.04em] ${
-                        s.primary
-                          ? "border-accent/40 bg-accent/[0.06] text-fg"
-                          : "border-border text-muted-fg"
-                      }`}
-                      key={i}
+                      className="cv-chip border border-border bg-muted/60 px-2 py-0.5 text-[0.65rem] text-fg tracking-[0.04em]"
+                      key={s}
                     >
-                      {i}
+                      {s}
                     </span>
                   ))}
-                </dd>
+                </div>
               </div>
             ))}
-          </dl>
+          </div>
         </Row>
 
-        {/* Education */}
+        <Row label="Highlighted projects">
+          <ul className="space-y-3">
+            {cvProjects.map((p) => (
+              <li
+                className="flex gap-3 break-inside-avoid text-sm leading-snug"
+                key={p.name}
+              >
+                <span
+                  aria-hidden="true"
+                  className="cv-bullet mt-2 h-1 w-1 shrink-0 rounded-full bg-accent"
+                />
+                <span>
+                  <span className="font-semibold text-fg">{p.name}</span>
+                  <span className="text-muted-fg">
+                    : <Metrics text={p.result} />
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Row>
+
         <Row label="Education">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-            <h3 className="text-base tracking-tight">
+            <h3 className="font-semibold text-base tracking-tight">
               {site.education.degree}
             </h3>
             <span className="text-[0.7rem] text-accent uppercase tracking-[0.18em]">
@@ -271,7 +262,7 @@ export default function CvPage() {
             to track real objects.
           </p>
           {/* Links show their full URL so they survive a flattened PDF export. */}
-          <div className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
             {thesis.repo ? (
               <PullLink
                 arrow="↗"
@@ -306,25 +297,14 @@ export default function CvPage() {
 }
 
 /**
- * A hairline-ruled CV row: a left label gutter + content. `accent` lifts the
- * gutter label into the accent colour to flag an important category.
+ * A hairline-ruled CV row: a left label gutter + content. Every label gets the
+ * same accent treatment — one consistent signpost style, so the eye can walk
+ * the left rail down the document without re-deciding what each colour means.
  */
-function Row({
-  label,
-  accent,
-  children,
-}: {
-  label: string;
-  accent?: boolean;
-  children: ReactNode;
-}) {
+function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <section className="mt-12 grid gap-x-8 gap-y-4 border-border border-t pt-8 sm:grid-cols-[8rem_1fr]">
-      <h2
-        className={`text-[0.7rem] uppercase tracking-[0.28em] ${
-          accent ? "font-semibold text-accent" : "text-muted-fg"
-        }`}
-      >
+    <section className="mt-12 grid gap-x-6 gap-y-4 border-border border-t pt-8 sm:grid-cols-[7rem_1fr]">
+      <h2 className="font-semibold text-[0.7rem] text-accent uppercase tracking-[0.22em]">
         {label}
       </h2>
       <div>{children}</div>

@@ -83,12 +83,13 @@
 }
 
 /*
- * The /cv route (`.cv-doc`) is built to be saved as a one-page PDF via the
- * browser's native "Save as PDF". This block scales the type down and collapses
- * the airy web rhythm so the content fills exactly one A4 sheet. It's scoped to
- * `.cv-doc` and intentionally unlayered, so it overrides Tailwind's utilities
- * (which live in @layer utilities) without needing !important. Tune the .text-sm
- * size and the section margin to fit the page; the rest scales off the base.
+ * The /cv route (`.cv-doc`) is built to be saved as a two-page-max PDF via the
+ * browser's native "Save as PDF". This block maps the page's spacing scale
+ * (documented in app/cv/page.tsx) onto A4: the same between-group ≥ 2×
+ * within-group ratio, just denser. It's scoped to `.cv-doc` and intentionally
+ * unlayered, so it overrides Tailwind's utilities (which live in @layer
+ * utilities) without needing !important. Tune the .text-sm size and the
+ * section margin to fit; the rest scales off the base.
  */
 @media print {
   @page {
@@ -105,17 +106,34 @@
   /* The two-column CV layout is built with Tailwind `sm:` breakpoints, which
      only fire at a viewport ≥ 640px. A phone prints from a narrower viewport,
      so those columns never activate and the PDF captures the single-column
-     mobile layout — shifted and overflowing past one page. A PDF always lands
+     mobile layout — shifted and overflowing past the page. A PDF always lands
      on A4, so pin the multi-column grids here regardless of device width. */
-  .cv-doc header {
+  .cv-doc .cv-hero {
     grid-template-columns: 1fr auto;
     align-items: start;
   }
   .cv-doc section {
-    grid-template-columns: 8rem 1fr;
-  }
-  .cv-doc dl > div {
     grid-template-columns: 7rem 1fr;
+  }
+
+  /* The site's dot texture, carried into the PDF: `fixed` would pin it to the
+     first page's viewport, `absolute` lets it slice across both A4 sheets. */
+  .cv-doc .cv-dots {
+    position: absolute;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* The headshot: sized on screen to match the masthead text block, capped
+     here so it lands passport-sized on A4 instead of dominating the sheet. */
+  .cv-doc header [role="img"] {
+    width: 108px;
+  }
+
+  /* Keep skim units whole across the page break: an experience area or a
+     project line never splits mid-block. */
+  .cv-doc .break-inside-avoid {
+    break-inside: avoid;
   }
 
   /* Down-scale the web type scale to print sizes (these win over .text-* utils) */
@@ -129,28 +147,44 @@
     font-size: 11px;
     line-height: 1.45;
   }
+  /* Area headings sit a step above bullet text so the skim layer survives print */
+  .cv-doc h4 {
+    font-size: 11.5px;
+  }
+  /* The masthead intro stays one step below body text in print too */
+  .cv-doc .cv-intro {
+    font-size: 10.5px;
+  }
 
-  /* Collapse the airy web rhythm. Print spacing is roughly half the screen
-     values; it's listed per utility because Tailwind's spacing is rem-based and
-     can't be scaled in one shot without restyling <html> globally. */
+  /* Tighten the per-area skill chips — they wrap in the print column */
+  .cv-doc .cv-chip {
+    padding: 0.5px 4px;
+    font-size: 9px;
+  }
+  .cv-doc .gap-x-2\.5 {
+    column-gap: 5px;
+  }
+  .cv-doc .gap-y-1\.5 {
+    row-gap: 3px;
+  }
+
+  /* The spacing scale from page.tsx, mapped to print (~45% of screen values).
+     Listed per utility because Tailwind's spacing is rem-based and can't be
+     scaled in one shot without restyling <html> globally. */
   .cv-doc header {
     margin-top: 0;
   }
+  /* Sections separate at ~2× the area gap so the top-level hierarchy stays
+     legible at print density. */
   .cv-doc section {
-    margin-top: 11px;
-    padding-top: 9px;
-  }
-  /* Tighten the skill chips — they wrap several rows in the print column */
-  .cv-doc dd span {
-    padding-top: 1px;
-    padding-bottom: 1px;
-    font-size: 10px;
+    margin-top: 17px;
+    padding-top: 12px;
   }
   .cv-doc .mt-6 {
     margin-top: 10px;
   }
   .cv-doc .mt-5 {
-    margin-top: 9px;
+    margin-top: 8px;
   }
   .cv-doc .mt-4 {
     margin-top: 7px;
@@ -158,18 +192,32 @@
   .cv-doc .mt-3 {
     margin-top: 5px;
   }
+  .cv-doc .mt-2\.5 {
+    margin-top: 5px;
+  }
   .cv-doc .mt-2,
   .cv-doc .mt-1\.5 {
     margin-top: 3px;
   }
-  .cv-doc .space-y-4 > * + * {
-    margin-top: 7px;
+  .cv-doc .space-y-7 > * + * {
+    margin-top: 13px;
   }
-  .cv-doc .space-y-3 > * + *,
-  .cv-doc .space-y-2\.5 > * + * {
+  .cv-doc .space-y-3 > * + * {
+    margin-top: 6px;
+  }
+  /* Bullet lists: the 4px gap plus the line box keeps item separation clearly
+     wider than the wrapped-line spacing inside a single bullet. */
+  .cv-doc .space-y-2 > * + * {
     margin-top: 4px;
   }
-  .cv-doc .space-y-1 > * + * {
-    margin-top: 2px;
+
+  /* The dot markers use mt-2 for optical alignment on screen, which the
+     spacing collapse above would squash to 3px and push the dot to the top of
+     the line. Re-pin them to the centre of the first print line instead:
+     11px text × 1.45 line height ≈ 16px line box, centre 8px, minus half the
+     4px dot = 6px. Declared after the mt-* rules so it wins at equal
+     specificity. */
+  .cv-doc .cv-bullet {
+    margin-top: 6px;
   }
 }

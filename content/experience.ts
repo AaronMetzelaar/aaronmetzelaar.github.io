@@ -3,11 +3,134 @@ import type { WorkItem } from "./types";
 export const experienceMeta = {
   company: "MWS",
   companyUrl: "https://mws.com",
-  role: "Frontend Developer",
-  period: "Since 2023",
+  role: "Frontend Engineer",
+  period: "2023 – Present",
   summary:
     "MWS is the marketplace for authenticated match-worn shirts and sports memorabilia. I work across its frontend; the builds below are mine end to end.",
 };
+
+/**
+ * The CV's Experience section: one role, told as themed areas of ownership
+ * rather than a flat bullet list. Each area carries its own keyword row so a
+ * recruiter (or an ATS) can scan the stack per theme. Only /cv renders this;
+ * the homepage keeps using `experience` below.
+ */
+export const cvExperience: {
+  area: string;
+  bullets: string[];
+  skills: string[];
+}[] = [
+  {
+    area: "Frontend & product engineering",
+    bullets: [
+      "Built and maintained customer-facing and internal features across web, mobile app, and admin tooling",
+      "Improved frontend maintainability through shared composables, reusable implementation patterns, refactoring, and documentation",
+      "Designed product-critical workflows across CMS-driven content, operational tooling, translation flows, and cross-platform frontend logic",
+      "Delivered solutions through cross-functional collaboration with product, design, marketing, support, and engineering",
+    ],
+    skills: [
+      "Vue",
+      "Nuxt",
+      "React Native",
+      "TypeScript",
+      "Tailwind",
+      "Component architecture",
+      "Design systems",
+      "Responsive UI",
+      "Cross-platform frontend",
+    ],
+  },
+  {
+    area: "AI tooling & developer productivity",
+    bullets: [
+      "Designed and maintained the internal AI agent ecosystem for frontend and mobile engineering",
+      "Built reusable AI-assisted workflows for codebase context, advanced reviews, worktrees, documentation, and engineering automation",
+      "Improved engineering consistency across quality, documentation, reviews, and internal processes",
+    ],
+    skills: [
+      "Developer productivity",
+      "AI enablement",
+      "LLM tooling",
+      "Engineering automation",
+      "DX strategy",
+      "Workflow design",
+      "Engineering standards",
+    ],
+  },
+  {
+    area: "Localisation & content infrastructure",
+    bullets: [
+      "Revived a deadlocked translation project and turned it into a scalable multilingual publishing system",
+      "Replaced a blocked backend-first approach with a practical localisation strategy across CMS content, UI copy, validation, and release workflows",
+      "Reduced manual translation overhead and release risk with cleaner content structures, automated checks, and developer-friendly workflows",
+      "Enabled reliable publishing across 12 languages for multiple products",
+    ],
+    skills: [
+      "Architecture & solution design",
+      "CMS integrations",
+      "Internationalisation",
+      "Automation",
+      "CI/CD",
+      "Storyblok",
+      "Crowdin",
+    ],
+  },
+  {
+    area: "Payments, checkout & business impact",
+    bullets: [
+      "Introduced Klarna across web and app, establishing reusable payment logic for company products",
+      "Improved checkout visibility and consistency, reducing unpaid orders by 40%",
+      "Validated placement decisions through A/B testing, ad hoc analysis, and product research, prioritising high-impact implementation over unnecessary scope",
+    ],
+    skills: [
+      "Payment integrations",
+      "Checkout optimisation",
+      "Klarna",
+      "Conversion-focused UX",
+      "A/B testing",
+      "Data-informed decisions",
+    ],
+  },
+  {
+    area: "Engineering quality & team enablement",
+    bullets: [
+      "Top reviewer and contributor across web, app, and admin codebases",
+      "Improved developer experience by standardising workflows, AI workflow guidance, documentation, and reusable engineering practices",
+      "Coached engineers through presentations and hands-on sessions on code quality, workflow adoption, and safe tool usage",
+    ],
+    skills: [
+      "Code reviews",
+      "Developer experience",
+      "Technical coaching",
+      "AI-assisted engineering",
+      "Knowledge transfer",
+    ],
+  },
+];
+
+/** Highlighted, metric-led projects for the CV. Rendered on /cv only. */
+export const cvProjects: { name: string; result: string }[] = [
+  {
+    name: "Internal AI agent ecosystem",
+    result:
+      "Increased AI co-authored PR adoption from 5% to 35% by turning AI usage into structured team workflows",
+  },
+  {
+    name: "Klarna payment integration",
+    result:
+      "Introduced Klarna across web and app, contributing to 40% fewer unpaid orders and an 8% higher bid placement rate",
+  },
+  {
+    name: "Translation & localisation workflow",
+    result:
+      "Revived a stalled translation project and scaled publishing across 12 languages, 154,500+ CMS words, and 11,500+ strings",
+  },
+  {
+    name: "Frontend architecture",
+    result:
+      "Designed reusable frontend solutions for complex product experiences, including shared 360° image logic, contributing to 60% higher user engagement",
+  },
+];
 
 export const experience: WorkItem[] = [
   {
