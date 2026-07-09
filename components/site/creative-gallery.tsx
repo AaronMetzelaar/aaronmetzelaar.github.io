@@ -16,8 +16,8 @@ import { cn } from "@/lib/utils";
 // page-blur focus is a wide-desktop, fine-pointer affordance; narrower screens
 // get the same content laid out statically (no lean, no blur). A gallery tile
 // (the posters/social one) shows its extra stills as a tidy grid beneath the
-// hero at every width — kept in the tile's own box, never floated across the
-// section, so it can't land disconnected or shrink to nothing on small screens.
+// hero, never over it — open on hover where interactive, always open
+// otherwise — so the primary image is never covered or cropped.
 const PULL = 0.09;
 const MAX = 22;
 const EASE = 0.12;
@@ -219,46 +219,35 @@ export function CreativeGallery({
                         minimal
                       />
                     )}
+                  </div>
 
-                    {/* interactive: the other stills stay hidden and peek in
-                        from the bottom only while this tile is hovered */}
-                    {interactive && extras.length > 0 ? (
-                      <div
-                        aria-hidden="true"
-                        className={cn(
-                          "pointer-events-none absolute inset-x-2 bottom-2 grid grid-cols-2 gap-2 transition-all duration-500 ease-out",
-                          on
-                            ? "translate-y-0 opacity-100"
-                            : "translate-y-4 opacity-0"
-                        )}
-                      >
+                  {/* the other stills: always beneath the hero, never over it.
+                      interactive reveals them on hover (grid-rows 0fr -> 1fr,
+                      the standard CSS trick for animating to auto height);
+                      touch/no-hover just leaves them open. */}
+                  {extras.length > 0 ? (
+                    <div
+                      className={cn(
+                        "grid overflow-hidden transition-[grid-template-rows] duration-500 ease-out",
+                        interactive && !on
+                          ? "grid-rows-[0fr]"
+                          : "grid-rows-[1fr]"
+                      )}
+                    >
+                      <div className="grid grid-cols-2 gap-3 overflow-hidden pt-3">
                         {extras.map((g) => (
                           <div
-                            className="h-28 border border-bg/20 bg-bg bg-center bg-cover shadow-[0_10px_30px_rgba(0,0,0,0.28)] sm:h-32"
+                            aria-label={g.alt}
+                            className="aspect-[4/5] border border-border bg-bg bg-center bg-cover"
                             key={g.src}
+                            role="img"
                             style={{ backgroundImage: `url(${g.src})` }}
                           />
                         ))}
                       </div>
-                    ) : null}
-                  </div>
+                    </div>
+                  ) : null}
                 </div>
-
-                {/* touch / no-hover: the other stills laid out beneath the hero,
-                    since there's no hover to reveal them */}
-                {!interactive && extras.length > 0 ? (
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    {extras.map((g) => (
-                      <div
-                        aria-label={g.alt}
-                        className="aspect-[4/5] border border-border bg-bg bg-center bg-cover"
-                        key={g.src}
-                        role="img"
-                        style={{ backgroundImage: `url(${g.src})` }}
-                      />
-                    ))}
-                  </div>
-                ) : null}
 
                 <figcaption className="relative z-10 mt-4">
                   <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
