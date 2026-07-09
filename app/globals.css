@@ -116,14 +116,6 @@
     grid-template-columns: 7rem 1fr;
   }
 
-  /* The site's dot texture, carried into the PDF: `fixed` would pin it to the
-     first page's viewport, `absolute` lets it slice across both A4 sheets. */
-  .cv-doc .cv-dots {
-    position: absolute;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-  }
-
   /* The headshot: sized on screen to match the masthead text block, capped
      here so it lands passport-sized on A4 instead of dominating the sheet. */
   .cv-doc header [role="img"] {

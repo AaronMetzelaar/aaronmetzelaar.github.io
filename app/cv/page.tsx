@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { PageDots } from "@/components/site/page-dots";
 import { PrintCvButton } from "@/components/site/print-cv-button";
 import { PullLink } from "@/components/site/pull-link";
 import {
@@ -75,10 +74,6 @@ export default function CvPage() {
       className="cv-doc relative min-h-screen overflow-hidden bg-bg font-terminal text-fg print:min-h-0 print:overflow-visible"
       style={premiumTheme}
     >
-      {/* The site's dot texture carries into the PDF too — in print it turns
-          absolute (globals.css) so it spans both A4 pages instead of pinning
-          to the first viewport. */}
-      <PageDots className="cv-dots" />
       <div className="relative z-10 mx-auto max-w-4xl px-6 py-14 sm:px-10 sm:py-20 print:max-w-none print:p-0">
         {/* Web-only chrome: a back link and the PDF export. Neither belongs in
             the printed document, so the whole row drops out on print. */}
@@ -179,7 +174,7 @@ export default function CvPage() {
           <p className="mt-2 text-muted-fg text-sm leading-relaxed">
             Work across the public marketplace, mobile app, and internal admin
             tools as a{" "}
-            <strong className="font-semibold text-fg">T-shaped engineer</strong>
+            <strong className="font-semibold text-fg">T‑shaped engineer</strong>
             : deep in frontend and product experience, with broad involvement
             across backend-adjacent integrations, DevOps/CI workflows,
             automation, internal AI tooling, and developer productivity.

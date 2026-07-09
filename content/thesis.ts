@@ -10,7 +10,7 @@ export const thesis: WorkItem = {
   org: "University of Amsterdam",
   period: "BSc Computer Science · 2024",
   summary:
-    "A modular Mixed Reality framework in Unity that turns any surface into an interactive space: a camera and projector track real objects and give them a digital double. The reusable parts are detailed below.",
+    "Designed and built a modular Mixed Reality framework in Unity for projection-based interaction with real physical objects. The framework used camera-based object detection, calibration, and projection mapping to connect physical objects with responsive digital experiences, demonstrated through an interactive RGB colour-mixing prototype.",
   highlights: [
     "Modular MR framework: calibration, object init, and detection as reusable parts",
     "Camera + projector pipeline that tracks tangible objects in real time",
