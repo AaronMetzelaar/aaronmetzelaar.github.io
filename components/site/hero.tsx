@@ -26,9 +26,20 @@ export function Hero() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-bg lg:hidden"
         />
-        {/* touch hint, pinned in the band; desktop has its own in the meta row */}
+        {/* touch hint, pinned in the band; desktop gets its own over the
+            portrait side (below), where the drag actually happens */}
         <span className="pointer-events-none absolute bottom-3 left-6 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em] sm:left-10 lg:hidden">
-          <span aria-hidden="true">↔</span>
+          <span aria-hidden="true" className="nudge-x">
+            ↔
+          </span>
+          Drag to turn
+        </span>
+        {/* desktop hint: anchored to the portrait itself instead of the text
+            column, with a beckoning arrow — the label alone was easy to miss */}
+        <span className="pointer-events-none absolute right-10 bottom-10 hidden items-center gap-2.5 text-[0.68rem] text-accent uppercase tracking-[0.25em] lg:flex">
+          <span aria-hidden="true" className="nudge-x">
+            ↔
+          </span>
           Drag to turn
         </span>
       </div>
@@ -66,11 +77,6 @@ export function Hero() {
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.7rem] uppercase tracking-[0.25em]">
             <span className="text-muted-fg">
               Interfaces · AI tooling · Design systems · {site.location}
-            </span>
-            {/* desktop-only: drag needs a pointer */}
-            <span className="hidden items-center gap-2 text-accent lg:flex">
-              <span aria-hidden="true">↳</span>
-              Drag to turn
             </span>
           </div>
         </div>

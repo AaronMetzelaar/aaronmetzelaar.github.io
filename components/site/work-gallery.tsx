@@ -35,6 +35,23 @@ function usePointerFine() {
   return fine;
 }
 
+// The collage's scattered placement (and the z-index that lifts the hovered
+// figure above the page-blur overlay) only exists from Tailwind's `sm`
+// breakpoint up — below it the figures stack statically, z-index stops
+// applying, and the blur overlay would cover the hovered image too. Gate the
+// collage to the same 640px the sm: classes fire at.
+function useWide() {
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    setWide(mq.matches);
+    const onChange = () => setWide(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return wide;
+}
+
 /**
  * Selected Work. Two presentations from one data set:
  *  - Fine pointer (desktop): a scattered image collage. Each image leans toward
@@ -47,10 +64,11 @@ function usePointerFine() {
 export function WorkGallery({ items }: { items: WorkItem[] }) {
   const reduced = !!useReducedMotion();
   const fine = usePointerFine();
+  const wide = useWide();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
-  const interactive = mounted && fine && !reduced;
+  const interactive = mounted && fine && wide && !reduced;
 
   if (!interactive) {
     return <WorkList items={items} />;
@@ -229,6 +247,14 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
 
   return (
     <div className="relative block aspect-[5/6]">
+      {/* the collage responds to hover, not click — say so up front, in the
+          page's micro-caps voice, so the interaction isn't a secret */}
+      <p className="-top-6 pointer-events-none absolute right-0 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em]">
+        <span aria-hidden="true" className="nudge-x">
+          ↔
+        </span>
+        Hover an image to focus
+      </p>
       {/* focus: blur the whole page behind the hovered image so only it stays sharp */}
       {active !== null ? (
         <div

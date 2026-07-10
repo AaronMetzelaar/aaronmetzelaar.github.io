@@ -148,6 +148,16 @@ export function CreativeGallery({
     // the cursor keeps the tiles leaning across a generous area instead of
     // snapping back the moment it leaves a tight box
     <div className="relative -mx-6 px-6 py-14 sm:-mx-10 sm:px-10 sm:py-20">
+      {/* same hover-to-focus hint as Selected Work — only where the tiles are
+          actually interactive (wide + fine pointer) */}
+      {interactive ? (
+        <p className="pointer-events-none absolute top-8 right-6 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em] sm:right-10">
+          <span aria-hidden="true" className="nudge-x">
+            ↔
+          </span>
+          Hover a tile to focus
+        </p>
+      ) : null}
       {/* focus: blur the whole page behind the hovered tile (header, other
           tiles, everything) so only the focused work stays sharp */}
       {interactive && active !== null ? (

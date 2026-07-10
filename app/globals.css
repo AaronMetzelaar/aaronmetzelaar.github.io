@@ -72,12 +72,33 @@
   animation: blink 1.05s step-end infinite;
 }
 
+/* Gentle side-to-side beckon for interaction-hint arrows ("drag to turn",
+   "hover to focus") — motion says "this moves" better than the label alone. */
+@keyframes nudge-x {
+  0%,
+  100% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+.nudge-x {
+  display: inline-block;
+  animation: nudge-x 1.7s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
   .cursor-blink {
+    animation: none;
+  }
+
+  .nudge-x {
     animation: none;
   }
 }
