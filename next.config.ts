@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Static export for GitHub Pages. Served at the root of a user page
-  // (aaronmetzelaar.github.io), so no basePath — the hardcoded /asset paths
+  // Static export for GitHub Pages. Served at the domain root
+  // (aaronmetzelaar.nl), so no basePath — the hardcoded /asset paths
   // (portrait, videos, social stills) keep resolving.
   output: "export",
   images: { unoptimized: true },

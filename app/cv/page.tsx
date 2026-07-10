@@ -47,7 +47,7 @@ export const metadata = {
 // resolve a relative URL against. The GitHub and thesis-repo links still show
 // their full URL so they survive a flattened PDF export that drops link
 // annotations; the portfolio link is friendly text by choice.
-const SITE_URL = "https://aaronmetzelaar.github.io";
+const SITE_URL = "https://aaronmetzelaar.nl";
 
 // Degree focus areas, shown as the same chip row the experience areas use.
 const COURSEWORK = [
