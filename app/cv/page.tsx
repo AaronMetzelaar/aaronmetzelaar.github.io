@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { PageDots } from "@/components/site/page-dots";
 import { PrintCvButton } from "@/components/site/print-cv-button";
 import { PullLink } from "@/components/site/pull-link";
 import {
@@ -48,6 +49,16 @@ export const metadata = {
 // annotations; the portfolio link is friendly text by choice.
 const SITE_URL = "https://aaronmetzelaar.github.io";
 
+// Degree focus areas, shown as the same chip row the experience areas use.
+const COURSEWORK = [
+  "Computer Vision",
+  "Software Architecture",
+  "Game Engine Dev",
+  "Mixed/Extended Reality",
+  "Real-time Interactive Systems",
+  "HCI",
+];
+
 // Recruiters scan for numbers before they read sentences. Any metric-looking
 // token (40%, 5% to 35%, 154,500+, 360°) gets lifted from the muted bullet
 // text into bold full-strength ink so the results register at a glance.
@@ -74,6 +85,9 @@ export default function CvPage() {
       className="cv-doc relative min-h-screen overflow-hidden bg-bg font-terminal text-fg print:min-h-0 print:overflow-visible"
       style={premiumTheme}
     >
+      {/* The site's dot texture is web-only: on paper it reads as noise, so
+          the print stylesheet drops it. */}
+      <PageDots className="cv-dots" />
       <div className="relative z-10 mx-auto max-w-4xl px-6 py-14 sm:px-10 sm:py-20 print:max-w-none print:p-0">
         {/* Web-only chrome: a back link and the PDF export. Neither belongs in
             the printed document, so the whole row drops out on print. */}
@@ -99,9 +113,9 @@ export default function CvPage() {
           </h1>
           <div className="cv-hero mt-5 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-start">
             <div>
-              {/* The intro is context, not content — one type-size below body
-                  text so the eye lands on the name and slides to Experience
-                  instead of parking on a wall of prose. */}
+              {/* The intro is context, not content — one paragraph, one
+                  type-size below body text, so the eye lands on the name and
+                  slides to Experience instead of parking on a wall of prose. */}
               <p className="cv-intro text-[0.8125rem] text-muted-fg leading-relaxed">
                 I&apos;m a software engineer who likes building things that feel
                 simple on the outside and solid underneath. My work combines
@@ -109,13 +123,13 @@ export default function CvPage() {
                 tooling, with a focus on turning unclear ideas into practical
                 solutions people actually enjoy using. I&apos;m curious,
                 hands-on, and collaborative, and I enjoy helping teams work
-                smarter as much as I enjoy building the product itself.
+                smarter as much as I enjoy building the product itself. Off the
+                clock, I play football, organise events with friends, and
+                I&apos;m always up for a good specialty coffee.
               </p>
-              <p className="cv-intro mt-3 text-[0.8125rem] text-muted-fg leading-relaxed">
-                Off the clock, I play football, organise events with friends,
-                and I&apos;m always up for a good specialty coffee.
-              </p>
-              <div className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm">
+              {/* One compact strip: contact, location, languages. Identity
+                  facts share a line instead of each renting their own row. */}
+              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[0.8125rem]">
                 <PullLink arrow="→" href={`mailto:${site.email}`}>
                   {site.email}
                 </PullLink>
@@ -139,9 +153,7 @@ export default function CvPage() {
                 >
                   Portfolio website
                 </PullLink>
-                {/* Languages are identity facts, not skills, so they live
-                    with the location instead of in a skills row. */}
-                <span className="text-[0.72rem] text-muted-fg uppercase tracking-[0.18em]">
+                <span className="text-[0.7rem] text-muted-fg uppercase tracking-[0.12em]">
                   {site.location} · Dutch (native) · English (fluent)
                 </span>
               </div>
@@ -256,6 +268,19 @@ export default function CvPage() {
             Reality framework I built in Unity that uses a camera and projector
             to track real objects.
           </p>
+          <div className="mt-2.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1.5">
+            <span className="font-semibold text-[0.65rem] text-accent uppercase tracking-[0.18em]">
+              Skills
+            </span>
+            {COURSEWORK.map((c) => (
+              <span
+                className="cv-chip border border-border bg-muted/60 px-2 py-0.5 text-[0.65rem] text-fg tracking-[0.04em]"
+                key={c}
+              >
+                {c}
+              </span>
+            ))}
+          </div>
           {/* Links show their full URL so they survive a flattened PDF export. */}
           <div className="mt-2.5 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
             {thesis.repo ? (

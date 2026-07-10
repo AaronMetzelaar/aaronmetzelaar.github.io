@@ -112,14 +112,26 @@
     grid-template-columns: 1fr auto;
     align-items: start;
   }
+  /* On paper the label gutter is a luxury the page can't afford: it taxes
+     every line ~25% of its width, wrapping bullets onto extra lines and
+     stretching the document past two sheets on stricter browser print
+     engines. Stack each section label above its content instead — the blue
+     signpost survives, the width comes back. */
   .cv-doc section {
-    grid-template-columns: 7rem 1fr;
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+
+  /* The dot texture is a screen mood, not a print one — on paper it muddies
+     the whitespace the layout depends on. */
+  .cv-doc .cv-dots {
+    display: none;
   }
 
   /* The headshot: sized on screen to match the masthead text block, capped
      here so it lands passport-sized on A4 instead of dominating the sheet. */
   .cv-doc header [role="img"] {
-    width: 108px;
+    width: 124px;
   }
 
   /* Keep skim units whole across the page break: an experience area or a
@@ -137,7 +149,7 @@
   }
   .cv-doc .text-sm {
     font-size: 11px;
-    line-height: 1.45;
+    line-height: 1.5;
   }
   /* Area headings sit a step above bullet text so the skim layer survives print */
   .cv-doc h4 {
@@ -150,14 +162,14 @@
 
   /* Tighten the per-area skill chips — they wrap in the print column */
   .cv-doc .cv-chip {
-    padding: 0.5px 4px;
+    padding: 1px 5px;
     font-size: 9px;
   }
   .cv-doc .gap-x-2\.5 {
     column-gap: 5px;
   }
   .cv-doc .gap-y-1\.5 {
-    row-gap: 3px;
+    row-gap: 4px;
   }
 
   /* The spacing scale from page.tsx, mapped to print (~45% of screen values).
@@ -169,38 +181,38 @@
   /* Sections separate at ~2× the area gap so the top-level hierarchy stays
      legible at print density. */
   .cv-doc section {
-    margin-top: 17px;
-    padding-top: 12px;
+    margin-top: 26px;
+    padding-top: 16px;
   }
   .cv-doc .mt-6 {
-    margin-top: 10px;
+    margin-top: 12px;
   }
   .cv-doc .mt-5 {
-    margin-top: 8px;
+    margin-top: 10px;
   }
   .cv-doc .mt-4 {
-    margin-top: 7px;
+    margin-top: 8px;
   }
   .cv-doc .mt-3 {
-    margin-top: 5px;
+    margin-top: 6px;
   }
   .cv-doc .mt-2\.5 {
-    margin-top: 5px;
+    margin-top: 6px;
   }
   .cv-doc .mt-2,
   .cv-doc .mt-1\.5 {
-    margin-top: 3px;
+    margin-top: 4px;
   }
   .cv-doc .space-y-7 > * + * {
-    margin-top: 13px;
+    margin-top: 17px;
   }
   .cv-doc .space-y-3 > * + * {
-    margin-top: 6px;
+    margin-top: 8px;
   }
   /* Bullet lists: the 4px gap plus the line box keeps item separation clearly
      wider than the wrapped-line spacing inside a single bullet. */
   .cv-doc .space-y-2 > * + * {
-    margin-top: 4px;
+    margin-top: 5px;
   }
 
   /* The dot markers use mt-2 for optical alignment on screen, which the
