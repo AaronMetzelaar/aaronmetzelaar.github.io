@@ -264,13 +264,15 @@ export default function CvPage() {
             </span>
           </div>
           <p className="mt-2 text-muted-fg text-sm leading-relaxed">
-            Thesis: <span className="text-fg">{thesis.title}</span>. A Mixed
-            Reality framework I built in Unity that uses a camera and projector
-            to track real objects.
+            Thesis: <span className="text-fg">{thesis.title}</span>. A modular
+            Mixed Reality framework built in Unity (C#): real-time
+            computer-vision tracking of physical objects through a camera and
+            projector pipeline, with calibration and projection mapping that
+            connect them to responsive spatial interfaces.
           </p>
           <div className="mt-2.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1.5">
             <span className="font-semibold text-[0.65rem] text-accent uppercase tracking-[0.18em]">
-              Skills
+              Domains
             </span>
             {COURSEWORK.map((c) => (
               <span
