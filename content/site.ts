@@ -1,10 +1,7 @@
 export const site = {
   name: "Aaron Metzelaar",
   initials: "AM",
-  roleLine: "Frontend developer × AI / agentic engineer",
-  tagline: "I build the interface, and the AI tooling my team ships it with.",
-  // A line Aaron loves: the range that resists a single job title.
-  beyondLine: "The part that doesn't fit in a job title yet.",
+  roleLine: "Software Engineer",
   location: "Netherlands",
   email: "aaronmetzelaar@gmail.com",
   socials: {
@@ -29,8 +26,8 @@ export const site = {
 };
 
 export const about = [
-  "I work at the seam between design and engineering, where a good interface stops feeling like software. The same instinct keeps pulling me up a layer, toward the systems my whole team builds on.",
-  "I care about intuitive interfaces, interactions that feel effortless, and tools that get out of the way.",
+  "I'm a software engineer who likes building things that feel simple on the outside and solid underneath. I work across product and frontend engineering, and increasingly on the internal AI tooling my team builds with.",
+  "I like turning unclear ideas into practical solutions people actually enjoy using, and helping the team work smarter along the way.",
 ];
 
 // A short trajectory rendered as a vertical ledger in About: each rung is a
@@ -39,11 +36,11 @@ export const about = [
 export const trajectory = [
   {
     k: "Interface",
-    v: "The products collectors use: MWS on web and in the app.",
+    v: "The products collectors use: the MWS marketplace on web and in the app.",
   },
   {
     k: "System",
-    v: "The agentic dev setup underneath it: skills, hooks, reviewers.",
+    v: "The internal AI tooling underneath it: skills, hooks, and reviewers.",
   },
-  { k: "Leverage", v: "Tooling the whole team now builds with, every day." },
+  { k: "Leverage", v: "Tooling the whole team now builds with every day." },
 ];

@@ -36,9 +36,9 @@ const hankenGrotesk = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Aaron Metzelaar — Frontend Developer",
+  title: "Aaron Metzelaar · Software Engineer",
   description:
-    "Frontend developer with an AI / agentic edge. Three years shipping web and mobile at MatchWornShirt.",
+    "Software engineer with three years shipping production web and mobile at MatchWornShirt: frontend, product engineering, and internal AI tooling.",
 };
 
 export default function RootLayout({

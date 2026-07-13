@@ -136,8 +136,8 @@ export default function Home() {
               divider={false}
               index="03"
               kicker="AI · Agentic"
-              lead="The interface is the easy part. The real value is the system agents run inside: context, skills, reviewers, and hooks that turn raw output into shippable work."
-              note="One layer up"
+              lead="The internal AI tooling my team builds with: the context, skills, reviewers, and hooks that turn AI output into work we can actually ship."
+              note="Developer productivity"
               title="Harness engineering"
             />
             <Reveal className="mt-10">
@@ -246,8 +246,8 @@ export default function Home() {
               Get in touch.
             </h2>
             <p className="mt-7 max-w-md font-display text-[clamp(1.1rem,2.1vw,1.45rem)] text-muted-fg italic leading-relaxed">
-              Open to frontend, AI, and design-engineering roles, and the
-              occasional build on the side.
+              Open to software engineering roles across frontend, product, and
+              AI tooling, and the occasional side build.
             </p>
             <div className="mt-12 flex flex-col gap-7">
               <div>
