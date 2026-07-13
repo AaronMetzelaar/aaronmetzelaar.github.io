@@ -136,7 +136,7 @@ export function SiteNav() {
                 hover, so it reads as a button and stands clear of the muted
                 text links */}
             <a
-              className="-my-2 inline-flex items-center gap-1.5 border border-accent px-3 py-1.5 text-accent transition-colors hover:bg-accent hover:text-bg"
+              className="-my-2 inline-flex items-center gap-1.5 border border-accent px-3 py-1.5 text-accent transition-[color,background-color,transform] active:scale-[0.97] hover:bg-accent hover:text-bg"
               href="/cv"
             >
               CV
@@ -150,7 +150,7 @@ export function SiteNav() {
           aria-controls="section-menu"
           aria-expanded={open}
           aria-label={triggerAria}
-          className="pointer-events-auto flex min-h-11 items-center gap-2 text-[0.7rem] uppercase tracking-[0.2em] text-muted-fg lg:hidden"
+          className="pointer-events-auto flex min-h-11 items-center gap-2 text-[0.7rem] uppercase tracking-[0.2em] text-muted-fg transition-transform active:scale-[0.97] lg:hidden"
           onClick={() => setOpen((o) => !o)}
           type="button"
         >
@@ -208,7 +208,7 @@ export function SiteNav() {
               {/* primary CTA: a filled accent button, clearly set apart from
                   the section links above it */}
               <a
-                className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-accent text-sm uppercase tracking-[0.2em] text-accent-fg"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-accent text-sm uppercase tracking-[0.2em] text-accent-fg transition-transform active:scale-[0.97]"
                 href="/cv"
                 onClick={() => setOpen(false)}
               >

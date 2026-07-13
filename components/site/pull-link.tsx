@@ -65,7 +65,7 @@ export function PullLink({
   return (
     <a
       className={cn(
-        "group inline-flex items-center gap-2.5 text-sm tracking-tight",
+        "group inline-flex items-center gap-2.5 text-sm tracking-tight transition-transform active:scale-[0.97]",
         className
       )}
       href={href}

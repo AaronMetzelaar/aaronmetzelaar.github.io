@@ -359,18 +359,26 @@ function Node({
 }) {
   const lit = state === "active" || state === "conn";
   const isHook = node.layer === "hook";
+  // Mouse hover only tracks intent on devices that actually have a hover-
+  // capable pointer — otherwise a tap's synthetic mouseenter with no matching
+  // leave would leave a node stuck lit on touch. Keyboard focus is untouched.
+  const onMouseHover = (id: string | null) => {
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      onHover(id);
+    }
+  };
   // The dot is anchored exactly on the connection point (pt) so curves, dot,
   // and its hover halo all coincide; the label hangs centered just below it.
   return (
     <button
       className={cn(
-        "-translate-x-1/2 -translate-y-1/2 absolute flex items-center justify-center transition-opacity duration-200",
+        "-translate-x-1/2 -translate-y-1/2 absolute flex items-center justify-center transition-[opacity,transform] duration-200 active:scale-[0.97] motion-reduce:transition-none",
         state === "dim" && "opacity-25"
       )}
       onClick={() => onSelect(node.id)}
       onFocus={() => onHover(node.id)}
-      onMouseEnter={() => onHover(node.id)}
-      onMouseLeave={() => onHover(null)}
+      onMouseEnter={() => onMouseHover(node.id)}
+      onMouseLeave={() => onMouseHover(null)}
       style={{ left: `${pt.x}%`, top: `${pt.y}%` }}
       type="button"
     >
@@ -383,7 +391,7 @@ function Node({
       <span
         aria-hidden="true"
         className={cn(
-          "rounded-full border transition-all",
+          "rounded-full border transition-[height,width,background-color,border-color,box-shadow] motion-reduce:transition-none",
           isHook ? "border-accent bg-bg" : "border-accent bg-accent",
           state === "active"
             ? "h-3 w-3 ring-4 ring-accent/15"
@@ -474,7 +482,7 @@ function DetailPanel({
             {conns.map((c) => (
               <li key={c.id}>
                 <button
-                  className="group inline-flex items-center gap-2 text-left text-accent text-sm"
+                  className="group inline-flex items-center gap-2 text-left text-accent text-sm transition-transform active:scale-[0.97]"
                   onClick={() => onSelect(c.id)}
                   type="button"
                 >
