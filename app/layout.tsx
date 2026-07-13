@@ -6,6 +6,7 @@ import {
   Hanken_Grotesk,
   JetBrains_Mono,
 } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,7 +52,14 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       lang="en"
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        {children}
+        <Script
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          type="module"
+          data-cf-beacon='{"token": "b58ab02562f6416cb504d8ea7d4cbd46"}'
+        />
+      </body>
     </html>
   );
 }
