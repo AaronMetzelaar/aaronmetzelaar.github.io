@@ -75,18 +75,57 @@
 /* Gentle side-to-side beckon for interaction-hint arrows ("drag to turn",
    "hover to focus") — motion says "this moves" better than the label alone. */
 @keyframes nudge-x {
-  0%,
-  100% {
-    transform: translateX(-3px);
+  0% {
+    transform: translateX(0);
   }
-  50% {
-    transform: translateX(3px);
+  15% {
+    transform: translateX(-4px);
+  }
+  35% {
+    transform: translateX(4px);
+  }
+  50%,
+  100% {
+    transform: translateX(0);
   }
 }
 
+/* One left-right sweep in the first half, then a ~1s rest before it repeats
+   (2s total) — the beckon plays on a pause, not constantly. */
 .nudge-x {
   display: inline-block;
-  animation: nudge-x 1.7s ease-in-out infinite;
+  animation: nudge-x 2s ease-in-out infinite;
+}
+
+/* The two clickable words in the intro (per @writenicecode). Quiet gray at
+   rest; on hover the word bolds (weight axis — monospace, so no layout shift)
+   and turns accent while its icon springs to its active state. Only the hovered
+   word animates. The enter transition lives on :hover; the base rule holds the
+   quicker exit, so releasing reverses fast and fades back to gray. */
+.intro-link {
+  color: var(--muted-fg);
+  font-variation-settings: "wght" 400;
+  transition:
+    color 0.14s ease,
+    font-variation-settings 0.14s ease;
+}
+
+.intro-link:hover,
+.intro-link:focus-visible {
+  color: var(--accent);
+  font-variation-settings: "wght" 700;
+  transition:
+    color 0.26s ease,
+    font-variation-settings 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Inline icon before each word — inherits the link's color (currentColor), so
+   it fades gray→accent with the word. The shape animation itself is driven by
+   motion in intro-link.tsx (pqoqubbw/icons), triggered by the link's hover. */
+.intro-icon {
+  display: inline-flex;
+  margin-right: 0.3em;
+  vertical-align: -0.18em;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -100,6 +139,12 @@
 
   .nudge-x {
     animation: none;
+  }
+
+  .intro-link,
+  .intro-link:hover,
+  .intro-link:focus-visible {
+    transition: none;
   }
 }
 

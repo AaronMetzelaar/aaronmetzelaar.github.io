@@ -1,5 +1,6 @@
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { HeroPortrait } from "@/components/site/hero-portrait";
+import { IntroLink } from "@/components/site/intro-link";
 import { site } from "@/content/site";
 
 /**
@@ -69,13 +70,11 @@ export function Hero() {
             </span>
           </h1>
           <p className="mt-8 max-w-md text-[1.05rem] text-muted-fg leading-relaxed">
-            {site.tagline}
+            I make <IntroLink href="#work" icon="cursor" label="interfaces" />{" "}
+            people enjoy using, and build the{" "}
+            <IntroLink href="#ai" icon="workflow" label="AI tooling" /> my team ships
+            them with.
           </p>
-          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.7rem] uppercase tracking-[0.25em]">
-            <span className="text-muted-fg">
-              Interfaces · AI tooling · Design systems · {site.location}
-            </span>
-          </div>
         </div>
         <div aria-hidden="true" className="hidden lg:order-2 lg:block" />
       </div>
