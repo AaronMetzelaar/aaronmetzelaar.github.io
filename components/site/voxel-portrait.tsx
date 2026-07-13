@@ -25,6 +25,11 @@ const Z_AMP = 0.95; // relief depth — felt as parallax on tilt/sway
 const DOT_MIN = 0.26; // dot radius range as a fraction of spacing
 const DOT_MAX = 1.12; // dark dots overlap → solid ink (no lattice gaps)
 const GRID_ANGLE = 0.52; // ~30° rotated grid → no axis-aligned squares
+// Below this fraction of the cutout's height the dots thin out in a scattered
+// order, so the photo's hard-cropped torso edge dissolves into sparse dots
+// instead of ending on a flat line.
+const DISSOLVE_START = 0.85;
+const DISSOLVE_SOFT = 0.35; // width of the per-dot survive→vanish ramp
 
 export type CloudData = {
   count: number;
@@ -216,8 +221,19 @@ export function sample(
       const dn = (dv - dMin) / dRange;
       const Z = (dn ** 1.25 - 0.5) * Z_AMP;
 
+      // scatter-dissolve the bottom of the cutout: nearing the crop edge,
+      // progressively more dots shrink to nothing, in a per-dot random order so
+      // it reads as thinning speckle, not a uniform fade.
+      let feather = 1;
+      const vn = (sy - t) / bh; // 0 = top of cutout, 1 = bottom (crop edge)
+      if (vn > DISSOLVE_START) {
+        const surv = 1 - (vn - DISSOLVE_START) / (1 - DISSOLVE_START);
+        const rr = noise(sx * 12.9898 + sy * 78.233);
+        feather = Math.max(0, Math.min(1, (surv - rr) / DISSOLVE_SOFT + 0.5));
+      }
+
       P.push(X, Y, Z);
-      S.push(spacing * (DOT_MIN + (DOT_MAX - DOT_MIN) * dark));
+      S.push(spacing * (DOT_MIN + (DOT_MAX - DOT_MIN) * dark) * feather);
       const [cr, cg, cb] = tone(0.18 + 0.82 * lum);
       C.push(cr, cg, cb);
       D.push(dark);
