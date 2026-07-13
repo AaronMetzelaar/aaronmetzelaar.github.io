@@ -232,7 +232,7 @@ export const experience: WorkItem[] = [
       poster: "/work/mobile-poster.jpg",
       alt: "The MWS mobile app: browsing live auctions of match-worn shirts, with current bids.",
       width: 540,
-      height: 1170,
+      height: 1098,
     },
   },
 ];
