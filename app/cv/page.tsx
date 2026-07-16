@@ -144,10 +144,13 @@ export default function CvPage() {
                 {/* Portfolio link is redundant on the web CV (you're already
                     on the site), so it's print-only — kept in the PDF export
                     so a recruiter reading it can still reach the site. */}
+                {/* /from/cv instead of a ?ref= query: Cloudflare Web
+                    Analytics strips query strings but reports paths, so this
+                    is how PDF traffic shows up in the dashboard */}
                 <PullLink
                   arrow="↗"
                   className="hidden print:inline-flex"
-                  href={SITE_URL}
+                  href={`${SITE_URL}/from/cv`}
                   rel="noreferrer"
                   target="_blank"
                 >
