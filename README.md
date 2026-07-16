@@ -34,4 +34,4 @@ Push to `main`. The [deploy workflow](.github/workflows/deploy.yml) builds the s
 
 ## License
 
-The code is [MIT licensed](LICENSE). Personal content is not: photographs, written copy, the CV, and the thesis PDF remain all rights reserved.
+The source code is [MIT licensed](LICENSE). The license covers the code only; personal content is not included: photographs, written copy, the CV, and the thesis PDF remain all rights reserved.
