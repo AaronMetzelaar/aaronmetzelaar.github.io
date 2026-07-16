@@ -31,3 +31,7 @@ Useful scripts: `pnpm check` (lint + format via ultracite), `pnpm typecheck`, `p
 ## Deploying
 
 Push to `main`. The [deploy workflow](.github/workflows/deploy.yml) builds the static export and publishes it to GitHub Pages at [aaronmetzelaar.nl](https://aaronmetzelaar.nl).
+
+## License
+
+The code is [MIT licensed](LICENSE). Personal content is not: photographs, written copy, the CV, and the thesis PDF remain all rights reserved.
