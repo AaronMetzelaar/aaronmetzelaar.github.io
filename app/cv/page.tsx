@@ -190,9 +190,9 @@ export default function CvPage() {
             Work across the public marketplace, mobile app, and internal admin
             tools as a{" "}
             <strong className="font-semibold text-fg">T‑shaped engineer</strong>
-            : deep in frontend and product experience, with broad involvement
-            across backend-adjacent integrations, DevOps/CI workflows,
-            automation, internal AI tooling, and developer productivity.
+            , combining frontend and product expertise with broader
+            contributions across AI-assisted workflows, integrations,
+            automation, CI/CD, and developer productivity.
           </p>
           {/* One role, five areas of ownership. Each area is a self-contained
               skim unit: bold heading, dashed bullets, then a labelled keyword

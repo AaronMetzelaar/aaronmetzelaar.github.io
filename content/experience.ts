@@ -24,7 +24,7 @@ export const cvExperience: {
     area: "Frontend & product engineering",
     bullets: [
       "Built and maintained customer-facing and internal features across web, mobile app, and admin tooling",
-      "Designed and implemented interactive spatial interfaces using real-time input, visual feedback, and reusable interaction patterns",
+      "Designed interactive and spatial interfaces using real-time input, visual feedback, and reusable patterns to create intuitive user experiences",
       "Improved frontend maintainability through shared composables, reusable implementation patterns, refactoring, and documentation",
       "Designed product-critical workflows across CMS-driven content, operational tooling, translation flows, and cross-platform frontend logic",
       "Delivered solutions through cross-functional collaboration with product, design, marketing, support, and engineering",
@@ -47,17 +47,18 @@ export const cvExperience: {
     area: "AI tooling & developer productivity",
     bullets: [
       "Designed and maintained the internal AI agent ecosystem for frontend and mobile engineering",
-      "Built reusable AI-assisted workflows for codebase context, advanced reviews, worktrees, documentation, and engineering automation",
-      "Improved engineering consistency across quality, documentation, reviews, and internal processes",
+      "Built reusable agent workflows for codebase context, specialist reviews, documentation, worktrees, and engineering automation",
+      "Standardised team-wide AI adoption through shared tooling, guidance, and quality controls",
+      "Increased AI co-authored PR adoption from 5% to 35% in four months",
     ],
     skills: [
-      "Developer productivity",
-      "AI enablement",
+      "AI agents",
+      "Agentic workflows",
       "LLM tooling",
-      "Engineering automation",
-      "DX strategy",
-      "Workflow design",
-      "Engineering standards",
+      "Prompt and context design",
+      "Workflow automation",
+      "Developer experience",
+      "AI enablement",
     ],
   },
   {
@@ -99,7 +100,7 @@ export const cvExperience: {
     bullets: [
       "Top reviewer and contributor across web, app, and admin codebases",
       "Improved developer experience by standardising workflows, AI workflow guidance, documentation, and reusable engineering practices",
-      "Coached engineers through presentations and hands-on sessions on code quality, workflow adoption, and safe tool usage",
+      "Coached engineers through presentations and hands-on sessions on AI-assisted development, code quality, workflow adoption, and responsible tool usage",
     ],
     skills: [
       "Code reviews",
@@ -107,6 +108,7 @@ export const cvExperience: {
       "Technical coaching",
       "AI-assisted engineering",
       "Knowledge transfer",
+      "Technical communication",
     ],
   },
 ];
@@ -116,22 +118,22 @@ export const cvProjects: { name: string; result: string }[] = [
   {
     name: "Internal AI agent ecosystem",
     result:
-      "Increased AI co-authored PR adoption from 5% to 35% by turning AI usage into structured team workflows",
-  },
-  {
-    name: "Klarna payment integration",
-    result:
-      "Introduced Klarna across web and app, contributing to 40% fewer unpaid orders and an 8% higher bid placement rate",
+      "Increased AI co-authored PR adoption from 5% to 35% by turning individual experimentation into structured team workflows",
   },
   {
     name: "Translation & localisation workflow",
     result:
-      "Revived a stalled translation project and scaled publishing across 12 languages, 154,500+ CMS words, and 11,500+ strings",
+      "Revived a stalled translation project and scaled multilingual publishing across 12 languages, 154,500+ CMS words, and 11,500+ strings",
   },
   {
-    name: "Frontend architecture",
+    name: "Interactive frontend architecture",
     result:
-      "Designed reusable frontend solutions for complex product experiences, including shared 360° image logic, contributing to 60% higher user engagement",
+      "Designed reusable spatial and 360° interaction patterns, contributing to 60% higher user engagement",
+  },
+  {
+    name: "Mixed Reality framework",
+    result:
+      "Built a modular Unity framework combining computer vision, physical-object tracking, and responsive projected interfaces",
   },
 ];
 
