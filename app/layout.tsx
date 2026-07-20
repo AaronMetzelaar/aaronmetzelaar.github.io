@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import {
-  Fraunces,
-  Geist,
-  Geist_Mono,
-  Hanken_Grotesk,
-  JetBrains_Mono,
-} from "next/font/google";
+import { Fraunces, Geist, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -28,11 +17,6 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   style: ["normal", "italic"],
-});
-
-const hankenGrotesk = Hanken_Grotesk({
-  variable: "--font-hanken",
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -48,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} ${fraunces.variable} ${hankenGrotesk.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${jetbrainsMono.variable} ${fraunces.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
       lang="en"
     >

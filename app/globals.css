@@ -10,10 +10,9 @@
   --color-accent-fg: var(--accent-fg);
 
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-jetbrains-mono);
   --font-terminal: var(--font-jetbrains-mono);
   --font-display: var(--font-fraunces);
-  --font-grotesk: var(--font-hanken);
 }
 
 /*
