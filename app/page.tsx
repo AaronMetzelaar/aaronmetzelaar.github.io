@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
+import { Contributions } from "@/components/site/contributions";
 import { CreativeShowcase } from "@/components/site/creative-showcase";
 import { Hero } from "@/components/site/hero";
 import { PageDots } from "@/components/site/page-dots";
@@ -276,6 +277,9 @@ export default function Home() {
                   github.com/{site.socials.githubHandle}
                 </PullLink>
               </div>
+            </div>
+            <div className="mt-12">
+              <Contributions />
             </div>
             <div className="mt-12">
               <PullLink arrow="→" href="/cv">
