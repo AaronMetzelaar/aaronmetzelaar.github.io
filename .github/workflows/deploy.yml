@@ -8,6 +8,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # The contribution graph is fetched at build time, so it's only as fresh as
+  # the last deploy. Rebuild daily to keep it current between pushes.
+  # ponytail: GitHub pauses cron after 60 days with no commits — a push resumes it.
+  schedule:
+    - cron: "0 6 * * *"
 
 permissions:
   contents: read
