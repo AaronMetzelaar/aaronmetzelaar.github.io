@@ -133,14 +133,22 @@ export function CreativeGallery({
     };
   }, [interactive]);
 
-  const enter = (i: number) => {
+  // Video tiles run autonomously (CoordinatedVideo owns its own media-bus
+  // hover, same as Selected Work — plays in view, pauses when another piece is
+  // hovered). Only the image-only tiles need the gallery to claim the bus, so
+  // the hovered video isn't clobbered by a second broadcast for the same tile.
+  const enter = (i: number, isVideo: boolean) => {
     setActive(i);
     setPlays((p) => p.map((v, idx) => (idx === i ? v + 1 : v)));
-    setHoveredMedia(`${baseId}-${i}`);
+    if (!isVideo) {
+      setHoveredMedia(`${baseId}-${i}`);
+    }
   };
-  const leave = (i: number) => {
+  const leave = (i: number, isVideo: boolean) => {
     setActive(null);
-    clearHoveredMedia(`${baseId}-${i}`);
+    if (!isVideo) {
+      clearHoveredMedia(`${baseId}-${i}`);
+    }
   };
 
   return (
@@ -201,15 +209,14 @@ export function CreativeGallery({
                     "origin-center transition-transform duration-500 ease-out",
                     on && "scale-[1.04]"
                   )}
-                  onPointerEnter={interactive ? () => enter(i) : undefined}
-                  onPointerLeave={interactive ? () => leave(i) : undefined}
+                  onPointerEnter={interactive ? () => enter(i, !!video) : undefined}
+                  onPointerLeave={interactive ? () => leave(i, !!video) : undefined}
                 >
                   <div className="relative aspect-[4/5] w-full">
                     {video ? (
                       <div className="absolute inset-0 overflow-hidden border border-border">
                         <CoordinatedVideo
                           alt={video.alt}
-                          play={on}
                           poster={video.poster}
                           src={video.src}
                         />
