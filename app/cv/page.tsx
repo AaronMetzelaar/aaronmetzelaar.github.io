@@ -16,7 +16,7 @@ import { premiumTheme } from "@/lib/premium-theme";
 export const metadata = {
   title: "Aaron Metzelaar · CV",
   description:
-    "Software engineer with three years of production Vue, Nuxt, React Native, and TypeScript at MWS. Product engineering, AI tooling, localisation infrastructure, and payments.",
+    "Software engineer with three years of production Vue, Nuxt, React Native, and TypeScript at MWS, plus server-side, SQL, and cloud work. Product engineering, AI tooling, localisation infrastructure, and payments.",
 };
 
 /*
@@ -190,9 +190,9 @@ export default function CvPage() {
             Work across the public marketplace, mobile app, and internal admin
             tools as a{" "}
             <strong className="font-semibold text-fg">T‑shaped engineer</strong>
-            , combining frontend and product expertise with broader
-            contributions across AI-assisted workflows, integrations,
-            automation, CI/CD, and developer productivity.
+            : frontend and product at the core, reaching across the stack into
+            server-side Node, Python, and C#, SQL, and Docker, AWS, and CI/CD
+            for delivery. AI-assisted tooling runs through all of it.
           </p>
           {/* One role, five areas of ownership. Each area is a self-contained
               skim unit: bold heading, dashed bullets, then a labelled keyword
