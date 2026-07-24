@@ -21,6 +21,26 @@ export const cvExperience: {
   skills: string[];
 }[] = [
   {
+    area: "AI tooling & developer productivity",
+    bullets: [
+      "Designed and maintained the internal AI agent ecosystem for frontend and mobile engineering",
+      "Built MCP servers, agent skills, and reusable workflows for codebase context, specialist code review, documentation, worktrees, and engineering automation",
+      "Standardised team-wide AI adoption through shared tooling, guidance, and quality controls",
+      "Increased AI co-authored PR adoption from 5% to 35% in four months",
+    ],
+    skills: [
+      "AI agents",
+      "Agentic workflows",
+      "MCP servers",
+      "Agent skills",
+      "LLM tooling",
+      "Prompt and context design",
+      "Workflow automation",
+      "Developer experience",
+      "AI enablement",
+    ],
+  },
+  {
     area: "Frontend & product engineering",
     bullets: [
       "Built and maintained customer-facing and internal features across web, mobile app, and admin tooling",
@@ -34,6 +54,9 @@ export const cvExperience: {
       "Nuxt",
       "React Native",
       "TypeScript",
+      "JavaScript",
+      "HTML",
+      "CSS",
       "Tailwind",
       "WebGL / Three.js",
       "Interactive spatial interfaces",
@@ -41,24 +64,6 @@ export const cvExperience: {
       "Component architecture",
       "Design systems",
       "Cross-platform frontend",
-    ],
-  },
-  {
-    area: "AI tooling & developer productivity",
-    bullets: [
-      "Designed and maintained the internal AI agent ecosystem for frontend and mobile engineering",
-      "Built reusable agent workflows for codebase context, specialist reviews, documentation, worktrees, and engineering automation",
-      "Standardised team-wide AI adoption through shared tooling, guidance, and quality controls",
-      "Increased AI co-authored PR adoption from 5% to 35% in four months",
-    ],
-    skills: [
-      "AI agents",
-      "Agentic workflows",
-      "LLM tooling",
-      "Prompt and context design",
-      "Workflow automation",
-      "Developer experience",
-      "AI enablement",
     ],
   },
   {
