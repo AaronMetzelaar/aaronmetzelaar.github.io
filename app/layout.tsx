@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Geist, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,10 +20,33 @@ const fraunces = Fraunces({
   style: ["normal", "italic"],
 });
 
+const TITLE = "Aaron Metzelaar · Software Engineer";
+const DESCRIPTION =
+  "Software engineer with three years shipping production web and mobile at MatchWornShirt: frontend, product engineering, and internal AI tooling.";
+
 export const metadata: Metadata = {
-  title: "Aaron Metzelaar · Software Engineer",
-  description:
-    "Software engineer with three years shipping production web and mobile at MatchWornShirt: frontend, product engineering, and internal AI tooling.",
+  // Absolute base for og:image and canonical. Without it, the share card
+  // resolves to a relative path and every scraper (LinkedIn, Slack, iMessage)
+  // silently drops the image.
+  metadataBase: new URL("https://aaronmetzelaar.nl"),
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "Aaron Metzelaar",
+    title: TITLE,
+    description: DESCRIPTION,
+    locale: "en_NL",
+  },
+  // og:image is picked up automatically from app/opengraph-image.tsx; X falls
+  // back to it when twitter:image is absent.
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

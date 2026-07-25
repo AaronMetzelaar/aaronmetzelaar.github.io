@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+# /from/* are attribution beacons that redirect straight home; nothing to index.
+Disallow: /from/
+
+Sitemap: https://aaronmetzelaar.nl/sitemap.xml
