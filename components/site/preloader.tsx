@@ -76,6 +76,42 @@ export function Preloader() {
     window.setTimeout(() => setVisible(false), ASSEMBLE_MS + REVEAL_MS + 60);
   }, []);
 
+  /**
+   * Bail out of the whole boot sequence. The full entrance is ~4s of held
+   * scroll, which is a fine price the first time and an insult on the second, so
+   * any deliberate input (tap, key, scroll) cuts straight to the page rather
+   * than playing the assemble.
+   */
+  const skip = useCallback(() => {
+    if (revealing.current) {
+      return;
+    }
+    revealing.current = true;
+    triggerReveal();
+    setFading(true);
+    window.setTimeout(() => setVisible(false), REVEAL_MS);
+  }, []);
+
+  useEffect(() => {
+    if (!visible) {
+      return;
+    }
+    const onKey = (e: KeyboardEvent) => {
+      // let devtools/refresh shortcuts through; any plain keypress skips
+      if (!(e.metaKey || e.ctrlKey || e.altKey)) {
+        skip();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("wheel", skip, { passive: true });
+    window.addEventListener("touchmove", skip, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("wheel", skip);
+      window.removeEventListener("touchmove", skip);
+    };
+  }, [visible, skip]);
+
   // lock scroll while the overlay is up
   useEffect(() => {
     if (!visible) {
@@ -156,6 +192,7 @@ export function Preloader() {
     <div
       aria-hidden="true"
       className="fixed inset-0 z-[100] bg-bg"
+      onPointerDown={skip}
       style={{
         opacity: fading ? 0 : 1,
         transition: `opacity ${REVEAL_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,

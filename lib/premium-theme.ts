@@ -13,7 +13,7 @@ export const premiumTheme = {
   "--bg": "#ffffff",
   "--fg": "#0a0a0b",
   "--muted": "#f3f3ef",
-  "--muted-fg": "#73737a",
+  "--muted-fg": "#6c6c74", // keep in sync with :root in globals.css
   "--border": "#e7e7e1",
   "--accent": PREMIUM_BLUE,
   "--accent-fg": "#ffffff",

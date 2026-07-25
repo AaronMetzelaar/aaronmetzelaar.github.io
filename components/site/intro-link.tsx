@@ -1,6 +1,11 @@
 "use client";
 
-import { motion, useAnimation, type Variants } from "motion/react";
+import {
+  motion,
+  useAnimation,
+  useReducedMotion,
+  type Variants,
+} from "motion/react";
 import type { CSSProperties, HTMLAttributes } from "react";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
@@ -73,10 +78,30 @@ const CursorIcon = forwardRef<IconHandle, IconProps>(
             d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"
             variants={CURSOR_VARIANTS}
           />
-          <motion.path animate={clickControls} custom={{ x: 1, y: -1 }} d="M14 4.1 12 6" variants={CLICK_VARIANTS} />
-          <motion.path animate={clickControls} custom={{ x: -1, y: 0 }} d="m5.1 8-2.9-.8" variants={CLICK_VARIANTS} />
-          <motion.path animate={clickControls} custom={{ x: -1, y: 1 }} d="m6 12-1.9 2" variants={CLICK_VARIANTS} />
-          <motion.path animate={clickControls} custom={{ x: 0, y: -1 }} d="M7.2 2.2 8 5.1" variants={CLICK_VARIANTS} />
+          <motion.path
+            animate={clickControls}
+            custom={{ x: 1, y: -1 }}
+            d="M14 4.1 12 6"
+            variants={CLICK_VARIANTS}
+          />
+          <motion.path
+            animate={clickControls}
+            custom={{ x: -1, y: 0 }}
+            d="m5.1 8-2.9-.8"
+            variants={CLICK_VARIANTS}
+          />
+          <motion.path
+            animate={clickControls}
+            custom={{ x: -1, y: 1 }}
+            d="m6 12-1.9 2"
+            variants={CLICK_VARIANTS}
+          />
+          <motion.path
+            animate={clickControls}
+            custom={{ x: 0, y: -1 }}
+            d="M7.2 2.2 8 5.1"
+            variants={CLICK_VARIANTS}
+          />
         </svg>
       </span>
     );
@@ -183,8 +208,16 @@ export function IntroLink({
   icon: keyof typeof ICONS;
 }) {
   const ref = useRef<IconHandle>(null);
+  // The workflow icon's node pulse repeats forever while hovered. Reduced motion
+  // means the glyph stays at rest; the colour and weight shift still carry the
+  // hover state.
+  const reduced = useReducedMotion();
   const Icon = ICONS[icon];
-  const start = () => ref.current?.startAnimation();
+  const start = () => {
+    if (!reduced) {
+      ref.current?.startAnimation();
+    }
+  };
   const stop = () => ref.current?.stopAnimation();
 
   return (

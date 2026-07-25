@@ -65,7 +65,12 @@ export function PullLink({
   return (
     <a
       className={cn(
-        "group inline-flex items-center gap-2.5 text-sm tracking-tight transition-transform active:scale-[0.97]",
+        // The visible link is ~20px tall, under the 24px WCAG 2.5.8 floor and
+        // well under a 44px thumb. The ::before pad grows the hit area to 44px
+        // without adding a pixel of layout, so the rhythm of the rows it sits in
+        // is untouched.
+        "group relative inline-flex items-center gap-2.5 text-sm tracking-tight transition-transform active:scale-[0.97]",
+        "before:absolute before:inset-x-0 before:-inset-y-3 before:content-['']",
         className
       )}
       href={href}
@@ -141,7 +146,10 @@ export function FilingsRule({
       // shares the same origin as `mx` (cursor x measured from this row's left),
       // so the lean tracks the cursor instead of an ancestor-offset position.
       // `py-4` gives the row a taller cursor target than the 1px dots alone.
-      className={cn("relative flex items-center justify-between py-4", className)}
+      className={cn(
+        "relative flex items-center justify-between py-4",
+        className
+      )}
       onPointerLeave={() => mx.set(-9999)}
       onPointerMove={onMove}
       ref={ref}

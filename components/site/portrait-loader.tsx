@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 import { cn } from "@/lib/utils";
+
 import { type CloudData, loadImg, noise, sample } from "./voxel-portrait";
 
 // A loading state made of the portrait's OWN dots. While the page loads, the
@@ -17,7 +18,13 @@ import { type CloudData, loadImg, noise, sample } from "./voxel-portrait";
 // pick from (see CFG below) — 1/2/3 clumps, tail length and looseness vary.
 export type LoaderVariant = "meteor" | "twin" | "triad" | "comet" | "cloud";
 
-type Placed = { x: number; y: number; z: number; present: number; scale: number };
+type Placed = {
+  x: number;
+  y: number;
+  z: number;
+  present: number;
+  scale: number;
+};
 
 const TAU = Math.PI * 2;
 const ASSEMBLE_DUR = 1.5; // convergence length (s)
@@ -225,14 +232,26 @@ function LoaderCloud({
     const o = obj.current;
     for (let i = 0; i < d.count; i++) {
       const i3 = i * 3;
-      orbitClump(f, i / d.count, rr[i3], rr[i3 + 1], rr[i3 + 2], prog, spin, reach, cfg);
+      orbitClump(
+        f,
+        i / d.count,
+        rr[i3],
+        rr[i3 + 1],
+        rr[i3 + 2],
+        prog,
+        spin,
+        reach,
+        cfg
+      );
       const loadScale = d.scl[i] * f.scale * easeOutCubic(f.present);
       if (assembling) {
         const hx = d.pos[i3];
         const hy = d.pos[i3 + 1];
         const hz = d.pos[i3 + 2];
         const stag = rr[i3] * STAGGER;
-        const e = easeOutCubic(Math.max(0, Math.min(1, (te - stag) / ASSEMBLE_DUR)));
+        const e = easeOutCubic(
+          Math.max(0, Math.min(1, (te - stag) / ASSEMBLE_DUR))
+        );
         o.position.set(
           f.x + (hx - f.x) * e,
           f.y + (hy - f.y) * e,

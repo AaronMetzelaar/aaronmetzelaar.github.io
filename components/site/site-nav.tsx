@@ -107,8 +107,10 @@ export function SiteNav() {
     >
       <TopBlur />
       <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-5 sm:px-10">
+        {/* -my-3/py-3 so the 20px wordmark clears a 44px tap target without
+            changing the bar's height */}
         <a
-          className="pointer-events-auto text-fg text-sm tracking-[0.2em] transition-colors hover:text-accent"
+          className="-my-3 pointer-events-auto py-3 text-fg text-sm tracking-[0.2em] transition-colors hover:text-accent"
           href="#top"
         >
           {site.initials}

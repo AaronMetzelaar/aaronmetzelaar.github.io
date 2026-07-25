@@ -26,7 +26,11 @@
   --bg: #ffffff;
   --fg: #0a0a0b;
   --muted: #f3f3ef;
-  --muted-fg: #73737a;
+  /* 5.20:1 on the white canvas and 4.68:1 on --muted. Was #73737a, which
+     computed to 4.71:1 on paper but measured 4.50:1 in-browser where the hero
+     subtext sits over the portrait canvas: exactly on the AA line, with nothing
+     left for the dot texture underneath. */
+  --muted-fg: #6c6c74;
   --border: #e7e7e1;
   --accent: #1b34ff;
   --accent-fg: #ffffff;
@@ -54,21 +58,6 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-}
-
-@keyframes blink {
-  0%,
-  49% {
-    opacity: 1;
-  }
-  50%,
-  100% {
-    opacity: 0;
-  }
-}
-
-.cursor-blink {
-  animation: blink 1.05s step-end infinite;
 }
 
 /* Gentle side-to-side beckon for interaction-hint arrows ("drag to turn",
@@ -130,10 +119,6 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
-  }
-
-  .cursor-blink {
-    animation: none;
   }
 
   .nudge-x {

@@ -11,7 +11,12 @@ type RevealProps = {
 };
 
 /** Fade/slide a block into view on scroll. Static when reduced-motion is on. */
-export function Reveal({ children, delay = 0, y = 14, className }: RevealProps) {
+export function Reveal({
+  children,
+  delay = 0,
+  y = 14,
+  className,
+}: RevealProps) {
   const reduced = useReducedMotion();
 
   if (reduced) {

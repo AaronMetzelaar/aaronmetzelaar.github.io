@@ -2,20 +2,16 @@
   "name": "portfolio",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.15.1",
-  "engines": {
-    "node": ">=20.9"
-  },
   "scripts": {
     "build": "next build",
     "check": "ultracite check",
     "dev": "next dev",
     "fix": "ultracite fix",
+    "format:check": "oxfmt --check .",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "clsx": "^2.1.1",
     "motion": "^12.40.0",
@@ -36,5 +32,9 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "ultracite": "7.2.4"
-  }
+  },
+  "engines": {
+    "node": ">=20.9"
+  },
+  "packageManager": "pnpm@10.15.1"
 }

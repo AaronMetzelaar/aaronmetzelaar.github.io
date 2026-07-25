@@ -8,9 +8,13 @@ import { useEffect, useState } from "react";
 // nothing lower down — no hard edge. Masking from the top also guarantees the
 // top edge is always covered, which fixes a Safari bug where a strip at the very
 // top rendered unblurred. Pointer-transparent and purely decorative.
-const N = 6;
+// ponytail: 3 layers, not 6. Each one is a full-width fixed backdrop-filter, and
+// stacking six of them was the single most expensive paint on the page for a
+// gradient the eye reads identically at three. Blur steps 2x harder per layer to
+// land on the same 16px ceiling.
+const N = 3;
 const LAYERS = Array.from({ length: N }, (_, i) => {
-  const blur = 0.5 * 2 ** i; // 0.5 → 16px
+  const blur = 1 * 4 ** i; // 1 → 16px
   // each higher (blurrier) layer reaches less far down the band
   const end = 100 - (i * 100) / N; // 100, 83, 66, 50, 33, 16 (% from top)
   const solid = Math.max(0, end - 16);

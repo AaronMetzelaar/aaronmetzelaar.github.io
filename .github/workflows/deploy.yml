@@ -43,6 +43,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Gate the deploy. Without these, format and type drift lands on the live
+      # site silently, which is how the repo ended up with nine unformatted
+      # files on main.
+      #
+      # This runs oxfmt and tsc rather than `pnpm check`, because `check` also
+      # runs oxlint and oxlint's config is currently broken: ultracite 7.2.4's
+      # preset sets `import/no-unresolved`, a rule oxlint 1.67 no longer has, so
+      # the lint half aborts before it reads a single file. Fixing that means
+      # migrating to ultracite 7.9's oxlint.config.ts format. Add `pnpm check`
+      # here once that's done.
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Build static export
         run: pnpm build
 
