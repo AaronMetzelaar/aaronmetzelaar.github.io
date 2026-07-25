@@ -8,6 +8,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Rebuild daily so the build-time GitHub contribution graph stays current
+  # between pushes. ponytail: GitHub delays scheduled runs under load and
+  # auto-disables this cron after 60 days of repo inactivity — if it silently
+  # stops, push any commit or run it manually to re-arm.
+  schedule:
+    - cron: "0 6 * * *"
 
 permissions:
   contents: read
