@@ -1,23 +1,22 @@
 "use client";
 
 import { useReducedMotion } from "motion/react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CoordinatedVideo } from "@/components/media/coordinated-video";
 import { MediaFrame } from "@/components/media/media-frame";
 import { ScrambleText } from "@/components/motion/scramble-text";
+import { WorkList } from "@/components/site/work-list";
 import type { WorkItem } from "@/content/types";
-import { clearHoveredMedia, setHoveredMedia } from "@/lib/media-bus";
 import { cn } from "@/lib/utils";
 
 // Same interaction language as the Selected Work gallery — each tile leans
 // toward the cursor, hovering one enlarges it and brings it forward while the
 // rest blur, and the caption reveals + scramble-decodes on hover. That lean +
-// page-blur focus is a wide-desktop, fine-pointer affordance; narrower screens
-// get the same content laid out statically (no lean, no blur). A gallery tile
-// (the posters/social one) shows its extra stills as a tidy grid beneath the
-// hero, never over it — open on hover where interactive, always open
-// otherwise — so the primary image is never covered or cropped.
+// page-blur focus is a wide-desktop, fine-pointer affordance; touch / narrow /
+// reduced-motion falls back to the same tappable card stack Selected Work uses.
+// A gallery tile (the posters/social one) shows its extra stills as a tidy grid
+// beneath the hero, never over it, so the primary image is never covered.
 const PULL = 0.09;
 const MAX = 22;
 const EASE = 0.12;
@@ -64,7 +63,6 @@ export function CreativeGallery({
   const [mounted, setMounted] = useState(false);
   const [active, setActive] = useState<number | null>(null);
   const [plays, setPlays] = useState(() => items.map(() => 0));
-  const baseId = useId();
 
   useEffect(() => setMounted(true), []);
   const interactive = mounted && fine && wide && !reduced;
@@ -136,31 +134,27 @@ export function CreativeGallery({
   const enter = (i: number) => {
     setActive(i);
     setPlays((p) => p.map((v, idx) => (idx === i ? v + 1 : v)));
-    setHoveredMedia(`${baseId}-${i}`);
   };
-  const leave = (i: number) => {
-    setActive(null);
-    clearHoveredMedia(`${baseId}-${i}`);
-  };
+
+  if (!interactive) {
+    return <WorkList items={items} />;
+  }
 
   return (
     // the lean stage is wider (to the section edges) + taller than the tiles, so
     // the cursor keeps the tiles leaning across a generous area instead of
     // snapping back the moment it leaves a tight box
     <div className="relative -mx-6 px-6 py-14 sm:-mx-10 sm:px-10 sm:py-20">
-      {/* same hover-to-focus hint as Selected Work — only where the tiles are
-          actually interactive (wide + fine pointer) */}
-      {interactive ? (
-        <p className="pointer-events-none absolute top-8 right-6 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em] sm:right-10">
-          <span aria-hidden="true" className="nudge-x">
-            ↔
-          </span>
-          Hover a tile to focus
-        </p>
-      ) : null}
+      {/* same hover-to-focus hint as Selected Work */}
+      <p className="pointer-events-none absolute top-8 right-6 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em] sm:right-10">
+        <span aria-hidden="true" className="nudge-x">
+          ↔
+        </span>
+        Hover a tile to focus
+      </p>
       {/* focus: blur the whole page behind the hovered tile (header, other
           tiles, everything) so only the focused work stays sharp */}
-      {interactive && active !== null ? (
+      {active !== null ? (
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 z-40 bg-bg/10 backdrop-blur-[3px]"
@@ -176,8 +170,8 @@ export function CreativeGallery({
         )}
       >
         {items.map((item, i) => {
-          const dim = interactive && active !== null && active !== i;
-          const on = interactive && active === i;
+          const dim = active !== null && active !== i;
+          const on = active === i;
           const video = item.media?.kind === "video" ? item.media : null;
           const hero = item.gallery?.[0];
           const extras = item.gallery?.slice(1) ?? [];
@@ -201,15 +195,16 @@ export function CreativeGallery({
                     "origin-center transition-transform duration-500 ease-out",
                     on && "scale-[1.04]"
                   )}
-                  onPointerEnter={interactive ? () => enter(i) : undefined}
-                  onPointerLeave={interactive ? () => leave(i) : undefined}
+                  onPointerEnter={() => enter(i)}
+                  onPointerLeave={() => setActive(null)}
                 >
                   <div className="relative aspect-[4/5] w-full">
                     {video ? (
                       <div className="absolute inset-0 overflow-hidden border border-border">
+                        {/* autonomous, like the Selected Work clips: plays
+                            whenever it's in view, hover doesn't gate it */}
                         <CoordinatedVideo
                           alt={video.alt}
-                          play={on}
                           poster={video.poster}
                           src={video.src}
                         />
@@ -231,17 +226,14 @@ export function CreativeGallery({
                     )}
                   </div>
 
-                  {/* the other stills: always beneath the hero, never over it.
-                      interactive reveals them on hover (grid-rows 0fr -> 1fr,
-                      the standard CSS trick for animating to auto height);
-                      touch/no-hover just leaves them open. */}
+                  {/* the other stills: always beneath the hero, never over it,
+                      revealed on hover (grid-rows 0fr -> 1fr, the standard CSS
+                      trick for animating to auto height) */}
                   {extras.length > 0 ? (
                     <div
                       className={cn(
                         "grid overflow-hidden transition-[grid-template-rows] duration-500 ease-out",
-                        interactive && !on
-                          ? "grid-rows-[0fr]"
-                          : "grid-rows-[1fr]"
+                        on ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                       )}
                     >
                       <div className="grid grid-cols-2 gap-3 overflow-hidden pt-3">
@@ -266,10 +258,7 @@ export function CreativeGallery({
                   </p>
                   <div
                     className={cn(
-                      "flex flex-col gap-2 pt-3 transition-opacity duration-300",
-                      interactive
-                        ? "absolute inset-x-0 top-full opacity-0"
-                        : "opacity-100",
+                      "absolute inset-x-0 top-full flex flex-col gap-2 pt-3 opacity-0 transition-opacity duration-300",
                       on && "opacity-100"
                     )}
                   >

@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { MediaFrame } from "@/components/media/media-frame";
 import { ScrambleText } from "@/components/motion/scramble-text";
+import { WorkList } from "@/components/site/work-list";
 import type { WorkItem } from "@/content/types";
 import { cn } from "@/lib/utils";
 
@@ -74,115 +75,6 @@ export function WorkGallery({ items }: { items: WorkItem[] }) {
     return <WorkList items={items} />;
   }
   return <WorkCollage items={items} />;
-}
-
-// ── Mobile / touch: tappable cards that expand to reveal what was built ──
-function WorkList({ items }: { items: WorkItem[] }) {
-  // start collapsed: each card reads at a glance (image + title + one line),
-  // and the "More" toggle invites the tap that reveals what was built.
-  const [open, setOpen] = useState<number | null>(null);
-
-  return (
-    <ul className="flex flex-col gap-4">
-      {items.map((item, i) => {
-        const isOpen = open === i;
-        return (
-          <li
-            className={cn(
-              "overflow-hidden border bg-bg transition-colors duration-300",
-              isOpen ? "border-accent/60" : "border-border"
-            )}
-            key={item.slug}
-          >
-            <button
-              aria-expanded={isOpen}
-              className="group block w-full text-left transition-[transform] duration-200 active:scale-[0.995]"
-              onClick={() => setOpen((c) => (c === i ? null : i))}
-              type="button"
-            >
-              <div className="relative">
-                <MediaFrame
-                  aspect={2 / 1}
-                  className="w-full"
-                  label={item.slug}
-                  media={item.media}
-                  minimal
-                />
-                <span
-                  className="absolute top-3 left-3 font-terminal text-[0.62rem] text-accent uppercase tracking-[0.25em] tabular-nums"
-                  aria-hidden="true"
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-              </div>
-
-              <div className="flex items-start justify-between gap-4 px-4 py-4">
-                <div className="min-w-0">
-                  <p className="font-terminal text-[0.82rem] text-accent uppercase tracking-[0.22em]">
-                    {item.title.toUpperCase()}
-                  </p>
-                  {item.tagline ? (
-                    <p className="mt-1.5 text-pretty text-muted-fg text-sm leading-relaxed">
-                      {item.tagline}
-                    </p>
-                  ) : null}
-                </div>
-                {/* affordance: a labelled toggle so it's clearly tappable */}
-                <span className="mt-0.5 flex shrink-0 items-center gap-1.5 font-terminal text-[0.6rem] text-muted-fg uppercase tracking-[0.16em]">
-                  {isOpen ? "Less" : "More"}
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "text-accent transition-transform duration-300",
-                      isOpen && "rotate-180"
-                    )}
-                  >
-                    ⌄
-                  </span>
-                </span>
-              </div>
-            </button>
-
-            {isOpen ? (
-              <div className="px-4 pb-5">
-                <p className="text-muted-fg text-sm leading-relaxed">
-                  {item.summary}
-                </p>
-                {item.highlights && item.highlights.length > 0 ? (
-                  <ul className="mt-4 space-y-2.5 border-border border-t pt-4">
-                    {item.highlights.map((h, hi) => (
-                      <li className="flex gap-3 text-sm leading-snug" key={h}>
-                        <span
-                          aria-hidden="true"
-                          className="font-terminal text-[0.7rem] text-accent tabular-nums"
-                        >
-                          {String(hi + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-fg/80">{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
-                  {item.tags.map((t) => (
-                    <li
-                      className="font-terminal text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
-                      key={t}
-                    >
-                      <span aria-hidden="true" className="text-accent/55">
-                        →{" "}
-                      </span>
-                      {t}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </li>
-        );
-      })}
-    </ul>
-  );
 }
 
 // ── Desktop / fine pointer: the scattered, cursor-reactive collage ──
