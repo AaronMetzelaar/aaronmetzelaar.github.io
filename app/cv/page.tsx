@@ -88,7 +88,11 @@ export default function CvPage() {
       {/* The site's dot texture is web-only: on paper it reads as noise, so
           the print stylesheet drops it. */}
       <PageDots className="cv-dots" />
-      <div className="relative z-10 mx-auto max-w-4xl px-6 py-14 sm:px-10 sm:py-20 print:max-w-none print:p-0">
+      {/* 52rem, not max-w-4xl: at 4xl every bullet ran 81 characters per line,
+          past the 75ch ceiling where the eye starts losing its place on the
+          return sweep, and mono type pays that cost harder than proportional.
+          Print keeps its own grid via print:max-w-none. */}
+      <div className="relative z-10 mx-auto max-w-[52rem] px-6 py-14 sm:px-10 sm:py-20 print:max-w-none print:p-0">
         {/* Web-only chrome: a back link and the PDF export. Neither belongs in
             the printed document, so the whole row drops out on print. */}
         <div className="flex items-center justify-between gap-4 print:hidden">

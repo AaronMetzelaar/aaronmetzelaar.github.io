@@ -24,10 +24,7 @@ export function CreativeShowcase({ items }: { items: WorkItem[] }) {
       >
         <SectionHeader
           dividerCount={28}
-          index="05"
-          kicker="Beyond code"
           lead="Video, design, and social I make away from engineering, mostly for my student association."
-          note="Video · Design · Social"
           title="Creative work"
         />
       </div>

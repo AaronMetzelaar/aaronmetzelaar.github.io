@@ -1,7 +1,6 @@
 export const site = {
   name: "Aaron Metzelaar",
   initials: "AM",
-  roleLine: "Software Engineer",
   location: "Netherlands",
   email: "aaronmetzelaar@gmail.com",
   socials: {

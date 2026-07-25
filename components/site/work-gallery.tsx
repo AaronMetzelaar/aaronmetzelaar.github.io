@@ -195,7 +195,6 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
               {/* title UNDER the image, in accent; name scramble-decodes on hover */}
               <figcaption className="relative mt-4">
                 <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
-                  <span className="text-accent/55">({i + 1}) </span>
                   {item.title.toUpperCase()}
                 </p>
                 <div

@@ -253,7 +253,6 @@ export function CreativeGallery({
 
                 <figcaption className="relative z-10 mt-4">
                   <p className="text-[0.82rem] text-accent uppercase tracking-[0.22em]">
-                    <span className="text-accent/55">({i + 1}) </span>
                     {item.title.toUpperCase()}
                   </p>
                   <div

@@ -58,12 +58,6 @@ export function WorkList({ items }: { items: WorkItem[] }) {
                     style={{ backgroundImage: `url(${hero.src})` }}
                   />
                 )}
-                <span
-                  aria-hidden="true"
-                  className="absolute top-3 left-3 font-terminal text-[0.62rem] text-accent uppercase tracking-[0.25em] tabular-nums"
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
               </div>
 
               <div className="flex items-start justify-between gap-4 px-4 py-4">
@@ -100,15 +94,9 @@ export function WorkList({ items }: { items: WorkItem[] }) {
                 </p>
                 {item.highlights && item.highlights.length > 0 ? (
                   <ul className="mt-4 space-y-2.5 border-border border-t pt-4">
-                    {item.highlights.map((h, hi) => (
-                      <li className="flex gap-3 text-sm leading-snug" key={h}>
-                        <span
-                          aria-hidden="true"
-                          className="font-terminal text-[0.7rem] text-accent tabular-nums"
-                        >
-                          {String(hi + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-fg/80">{h}</span>
+                    {item.highlights.map((h) => (
+                      <li className="text-fg/80 text-sm leading-snug" key={h}>
+                        {h}
                       </li>
                     ))}
                   </ul>

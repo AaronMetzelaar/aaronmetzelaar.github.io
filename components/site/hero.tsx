@@ -1,7 +1,6 @@
 import { ScrambleText } from "@/components/motion/scramble-text";
 import { HeroPortrait } from "@/components/site/hero-portrait";
 import { IntroLink } from "@/components/site/intro-link";
-import { site } from "@/content/site";
 
 /**
  * Dot-portrait hero — the page's one choreographed arrival. The name decodes
@@ -44,10 +43,11 @@ export function Hero() {
 
       <div className="pointer-events-none relative z-10 mx-auto grid w-full max-w-6xl flex-1 items-center gap-12 px-6 pb-20 sm:px-10 lg:min-h-screen lg:grid-cols-[1fr_0.9fr] lg:py-24 lg:pb-24">
         <div className="lg:order-1">
-          <p className="text-accent text-xs uppercase tracking-[0.3em]">
-            {site.roleLine}
-          </p>
-          <h1 className="mt-6 font-bold text-[clamp(2.75rem,8vw,6rem)] leading-[0.9] tracking-[-0.05em]">
+          {/* The tracked-caps role line above an oversized name is the default
+              hero of every generated landing page. The sentence under the name
+              says the same thing in the site's own voice, and the title tag
+              carries it for search, so the eyebrow was pure signature. */}
+          <h1 className="font-bold text-[clamp(2.75rem,8vw,6rem)] leading-[0.9] tracking-[-0.05em]">
             <ScrambleText
               className="block"
               durationMs={1100}
@@ -63,8 +63,13 @@ export function Hero() {
                 text="Metzelaar"
                 waitForReveal
               />
-              {/* low, terminal-style underscore caret — not a full-height bar */}
-              <span aria-hidden="true" className="cursor-blink text-accent">
+              {/* Low, terminal-style underscore caret, not a full-height bar.
+                  It used to blink. A caret blinking where nothing is typeable
+                  borrows the dev-tool look as decoration, and it was the one
+                  animation on the page running forever for no reason. The mark
+                  stays (it carries into the 404 and the share card); the blink
+                  is gone. */}
+              <span aria-hidden="true" className="text-accent">
                 _
               </span>
             </span>
@@ -72,19 +77,26 @@ export function Hero() {
           <p className="mt-8 max-w-md text-[1.05rem] text-muted-fg leading-relaxed">
             I make <IntroLink href="#work" icon="cursor" label="interfaces" />{" "}
             people enjoy using, and build the{" "}
-            <IntroLink href="#ai" icon="workflow" label="AI tooling" /> my team ships
-            them with.
+            <IntroLink href="#ai" icon="workflow" label="AI tooling" /> my team
+            ships them with.
           </p>
         </div>
         <div aria-hidden="true" className="hidden lg:order-2 lg:block" />
       </div>
 
+      {/* Was a bare "Scroll" label. A visitor looking at a hero already knows
+          how to scroll; what they don't have is an invitation. Same position,
+          same rule, but it now names a destination and clears a 44px tap
+          target. */}
       <a
-        className="pointer-events-auto absolute inset-x-0 bottom-6 z-10 mx-auto flex max-w-6xl items-center gap-2 px-6 text-[0.7rem] text-muted-fg uppercase tracking-[0.3em] sm:px-10"
-        href="#about"
+        className="group pointer-events-auto absolute inset-x-0 bottom-4 z-10 mx-auto flex max-w-6xl items-center gap-3 px-6 py-3.5 text-[0.7rem] text-accent uppercase tracking-[0.3em] sm:px-10"
+        href="#work"
       >
-        <span aria-hidden="true" className="h-px w-8 bg-current" />
-        Scroll
+        <span
+          aria-hidden="true"
+          className="h-px w-8 bg-current transition-[width] duration-300 group-hover:w-12"
+        />
+        See the work
       </a>
     </section>
   );

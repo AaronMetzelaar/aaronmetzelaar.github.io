@@ -22,8 +22,6 @@ import {
 import { layers } from "@/content/architecture";
 import { darkSection, premiumTheme } from "@/lib/premium-theme";
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
 export default function Home() {
   return (
     <main
@@ -43,7 +41,7 @@ export default function Home() {
           className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
           id="about"
         >
-          <SectionHeader index="01" kicker="Profile" title="About" />
+          <SectionHeader title="About" />
           <div className="mt-12 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
             <Reveal>
               <p className="text-pretty text-[clamp(1.25rem,2.2vw,1.6rem)] leading-[1.45] tracking-[-0.01em]">
@@ -69,12 +67,7 @@ export default function Home() {
                       aria-hidden="true"
                       className="-translate-x-1/2 absolute top-[0.45rem] left-0 h-1.5 w-1.5 rounded-full bg-accent"
                     />
-                    <p className="text-sm uppercase tracking-[0.2em]">
-                      <span className="text-accent tabular-nums">
-                        {pad(i + 1)}
-                      </span>
-                      <span className="ml-3">{t.k}</span>
-                    </p>
+                    <p className="text-sm uppercase tracking-[0.2em]">{t.k}</p>
                     <p className="mt-2 max-w-sm text-muted-fg text-sm leading-relaxed">
                       {t.v}
                     </p>
@@ -90,12 +83,7 @@ export default function Home() {
           className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
           id="work"
         >
-          <SectionHeader
-            index="02"
-            kicker="At MWS"
-            note="Web · Mobile · Tooling"
-            title="Selected work"
-          />
+          <SectionHeader title="Selected work" />
           <Reveal>
             <div className="mt-10 flex flex-col gap-5 pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-12">
               <p className="max-w-2xl text-muted-fg leading-relaxed">
@@ -125,8 +113,19 @@ export default function Home() {
           id="ai"
           style={darkSection}
         >
-          {/* solid body — also the SSR fallback so content reads before the
-              canvas paints; the dotted edges overlay the top/bottom 200px */}
+          {/* Solid body — also the SSR fallback so content reads before the
+              canvas paints; the dotted edges overlay the top/bottom 600px.
+
+              Note for future audits: because this fill is a positioned SIBLING
+              of the text rather than an ancestor of it, every contrast checker
+              (the impeccable detector, axe, Lighthouse) walks up from the text,
+              never finds it, and reports this section's light-on-dark type as
+              light-on-WHITE. Those failures are not real. Measured against the
+              actual painted #0a0a0b: body #b6b6c0 is 9.84:1 and accent #5e76ff
+              is 5.19:1, both comfortably past AA. Moving the fill onto the
+              section would fix the tooling but requires inverting the dot-ramp
+              canvases to paint white-over-dark, which changes a signature
+              effect; not worth it for a checker's benefit. */}
           <div
             aria-hidden="true"
             className="absolute inset-x-0 top-[600px] bottom-[600px] bg-bg"
@@ -135,21 +134,15 @@ export default function Home() {
           <div className="relative mx-auto max-w-6xl px-6 py-[39rem] sm:px-10">
             <SectionHeader
               divider={false}
-              index="03"
-              kicker="AI · Agentic"
               lead="The internal AI tooling my team builds with: the context, skills, reviewers, and hooks that turn AI output into work we can actually ship."
-              note="Developer productivity"
               title="Harness engineering"
             />
             <Reveal className="mt-10">
               <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-                {layers.map((l, i) => (
+                {layers.map((l) => (
                   <div key={l.id}>
                     <p className="text-[0.7rem] uppercase tracking-[0.25em]">
-                      <span className="text-accent tabular-nums">
-                        {pad(i + 1)}
-                      </span>
-                      <span className="ml-3">{l.label}</span>
+                      {l.label}
                     </p>
                     <p className="mt-3 text-muted-fg text-sm leading-relaxed">
                       {l.blurb}
@@ -172,8 +165,6 @@ export default function Home() {
           <SectionHeader
             density="record"
             divider={false}
-            index="04"
-            kicker="Research"
             meta={[
               { k: "Programme", v: "BSc Computer Science" },
               { k: "Institution", v: thesis.org ?? "" },
@@ -211,16 +202,13 @@ export default function Home() {
                   ) : null}
                 </div>
               </div>
-              <ol className="space-y-4 lg:pt-1">
-                {thesis.highlights?.map((h, i) => (
-                  <li className="flex gap-4 text-sm leading-snug" key={h}>
-                    <span className="text-accent text-xs tabular-nums">
-                      {pad(i + 1)}
-                    </span>
-                    <span className="text-fg/80">{h}</span>
+              <ul className="space-y-4 lg:pt-1">
+                {thesis.highlights?.map((h) => (
+                  <li className="text-fg/80 text-sm leading-snug" key={h}>
+                    {h}
                   </li>
                 ))}
-              </ol>
+              </ul>
             </article>
           </Reveal>
         </section>
@@ -240,10 +228,8 @@ export default function Home() {
         >
           <FilingsRule className="mb-12" count={56} />
           <Reveal>
-            <p className="text-[0.7rem] text-accent uppercase tracking-[0.3em]">
-              Contact
-            </p>
-            <h2 className="mt-6 text-[clamp(2.25rem,7vw,5rem)] leading-[0.92] tracking-[-0.04em]">
+            {/* no "CONTACT" eyebrow: the headline is already the label */}
+            <h2 className="text-[clamp(2.25rem,7vw,5rem)] leading-[0.92] tracking-[-0.04em]">
               Get in touch.
             </h2>
             <p className="mt-7 max-w-md font-display text-[clamp(1.1rem,2.1vw,1.45rem)] text-muted-fg italic leading-relaxed">

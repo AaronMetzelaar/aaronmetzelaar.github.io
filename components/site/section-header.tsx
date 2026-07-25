@@ -1,24 +1,27 @@
-import { FilingsRule } from "@/components/site/pull-link";
 import { Reveal } from "@/components/motion/reveal";
+import { FilingsRule } from "@/components/site/pull-link";
 import { cn } from "@/lib/utils";
 
 type Meta = { k: string; v: string };
 
 /**
- * A numbered section header in the "dossier" language. One component, two
- * densities so the page reads as one running document whose entries differ in
- * KIND rather than as six different layouts:
+ * A section header in the "dossier" language. One component, two densities so
+ * the page reads as one running document whose entries differ in KIND rather
+ * than as six different layouts:
  *  - "default"   — a big editorial noun title (Work, Creative)
  *  - "record"    — a small record label + a mono label/value spec table (Thesis)
- * The eyebrow (index + kicker + note) and the cursor-reactive dot divider stay
- * identical across all three so they cohere; `dividerCount` varies the divider
- * length as a rhythm signal (short before quiet sections, full before heavy).
+ * The cursor-reactive dot divider stays identical across both so they cohere;
+ * `dividerCount` varies the divider length as a rhythm signal (short before
+ * quiet sections, full before heavy).
+ *
+ * This used to carry an eyebrow: an ordinal, a kicker, and a right-aligned note,
+ * on every section. Six sections' worth of `01 · PROFILE` made the label layer
+ * as loud as the work, and the ordinals numbered a sequence nobody needs to
+ * count. The title carries the section now; its position on the page carries the
+ * order.
  */
 export function SectionHeader({
-  index,
-  kicker,
   title,
-  note,
   className,
   density = "default",
   dividerCount = 56,
@@ -26,10 +29,7 @@ export function SectionHeader({
   meta,
   lead,
 }: {
-  index: string;
-  kicker: string;
   title: string;
-  note?: string;
   className?: string;
   density?: "default" | "record";
   dividerCount?: number;
@@ -43,25 +43,14 @@ export function SectionHeader({
     <div className={cn("font-terminal", className)}>
       {divider ? <FilingsRule className="mb-8" count={dividerCount} /> : null}
       <Reveal>
-        <div className="flex items-baseline justify-between gap-6">
-          <p className="text-[0.7rem] uppercase tracking-[0.3em]">
-            <span className="text-accent tabular-nums">{index}</span>
-            <span className="ml-3 text-muted-fg">{kicker}</span>
-          </p>
-          {note ? (
-            <p className="hidden max-w-[18rem] text-right text-[0.7rem] text-muted-fg uppercase leading-relaxed tracking-[0.18em] sm:block">
-              {note}
-            </p>
-          ) : null}
-        </div>
-
         {density === "record" ? (
-          <div className="mt-5">
+          <div>
             <h2 className="max-w-2xl text-pretty text-[clamp(1.2rem,2.4vw,1.65rem)] leading-[1.2] tracking-[-0.01em]">
               {title}
             </h2>
             {meta && meta.length > 0 ? (
-              <dl className="mt-6 grid gap-x-12 border-border border-t sm:grid-cols-2">
+              // one rule between rows, not a rule above AND below every row
+              <dl className="mt-6 grid gap-x-12 sm:grid-cols-2">
                 {meta.map((m) => (
                   <div
                     className="flex items-baseline justify-between gap-6 border-border border-b py-2.5"
@@ -77,7 +66,7 @@ export function SectionHeader({
             ) : null}
           </div>
         ) : (
-          <h2 className="mt-5 text-[clamp(2rem,5.5vw,3.5rem)] leading-[0.98] tracking-[-0.03em]">
+          <h2 className="text-[clamp(2rem,5.5vw,3.5rem)] leading-[0.98] tracking-[-0.03em]">
             {title}
           </h2>
         )}
