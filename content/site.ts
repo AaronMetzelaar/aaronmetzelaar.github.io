@@ -17,7 +17,9 @@ export const site = {
   nav: [
     { label: "About", href: "#about" },
     { label: "Work", href: "#work" },
-    { label: "AI & Agentic", href: "#ai" },
+    // Matches the section's own heading ("Harness engineering") so a click and
+    // its destination read as the same thing, while keeping the AI keyword.
+    { label: "AI harness", href: "#ai" },
     { label: "Thesis", href: "#thesis" },
     { label: "Creative", href: "#creative" },
     { label: "Contact", href: "#contact" },

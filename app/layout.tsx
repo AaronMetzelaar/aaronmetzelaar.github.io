@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist, JetBrains_Mono } from "next/font/google";
+import { Fraunces, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
+// Two faces, both of which actually paint. A third (Geist) used to load as the
+// body family and was overridden by `font-terminal` on every route root, so it
+// preloaded ~40kB and rendered nothing. Fraunces is requested italic-only for
+// the same reason: the one element using it is the italic contact line.
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
@@ -17,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  style: ["italic"],
 });
 
 const TITLE = "Aaron Metzelaar · Software Engineer";
@@ -56,7 +55,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className={`${geistSans.variable} ${jetbrainsMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${jetbrainsMono.variable} ${fraunces.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
       lang="en"
     >

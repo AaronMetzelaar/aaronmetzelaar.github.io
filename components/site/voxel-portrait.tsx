@@ -43,8 +43,8 @@ export function loadImg(src: string) {
   return new Promise<HTMLImageElement>((res, rej) => {
     const im = new Image();
     im.crossOrigin = "anonymous";
-    im.onload = () => res(im);
-    im.onerror = rej;
+    im.addEventListener("load", () => res(im), { once: true });
+    im.addEventListener("error", rej, { once: true });
     im.src = src;
   });
 }

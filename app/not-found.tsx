@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { premiumTheme } from "@/lib/premium-theme";
 
@@ -32,13 +33,13 @@ export default function NotFound() {
           The link you followed points somewhere that no longer exists. The work
           is all still on the homepage.
         </p>
-        <a
+        <Link
           className="mt-10 inline-flex items-center gap-3 py-2 text-accent uppercase tracking-[0.2em] transition-opacity hover:opacity-70"
           href="/"
         >
           <span aria-hidden="true">→</span>
           Back to the homepage
-        </a>
+        </Link>
       </div>
     </main>
   );

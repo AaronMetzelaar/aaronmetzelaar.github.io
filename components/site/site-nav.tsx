@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { SECTION_RAMP } from "@/components/site/section-dot-edges";
@@ -136,14 +137,16 @@ export function SiteNav() {
           <li>
             {/* CV is the primary CTA — an outlined accent button that fills on
                 hover, so it reads as a button and stands clear of the muted
-                text links */}
-            <a
+                text links. next/link, not a bare anchor: a full document load
+                here resets the module-level reveal flag, so the trip back home
+                replayed the whole boot sequence. */}
+            <Link
               className="-my-2 inline-flex items-center gap-1.5 border border-accent px-3 py-1.5 text-accent transition-[color,background-color,transform] active:scale-[0.97] hover:bg-accent hover:text-bg"
               href="/cv"
             >
               CV
               <span aria-hidden="true">↗</span>
-            </a>
+            </Link>
           </li>
         </ul>
 
@@ -209,14 +212,14 @@ export function SiteNav() {
             <li className="mt-2 mb-2">
               {/* primary CTA: a filled accent button, clearly set apart from
                   the section links above it */}
-              <a
+              <Link
                 className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-accent text-sm uppercase tracking-[0.2em] text-accent-fg transition-transform active:scale-[0.97]"
                 href="/cv"
                 onClick={() => setOpen(false)}
               >
                 Read the CV
                 <span aria-hidden="true">↗</span>
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

@@ -1,13 +1,15 @@
 /**
- * The real AI / agentic development system Aaron set up in a production monorepo,
- * as a data model the schema page renders. The horizontal axis is the
+ * The AI / agentic development system Aaron set up in a production monorepo,
+ * described as a data model the map renders. The horizontal axis is the
  * development lifecycle (`stages`); every `node` lands in the stage(s) where it
  * acts. Layers stack the system: the context that grounds every agent, the
  * skills that run the work, the stack-specific reviewers, and the hooks that
  * fire automatically. `deps` draws the connections between them.
  *
- * Sourced from the monorepo's .claude config — settings.json hooks,
- * .agents/skills, .agents/agents reviewers, and the layered AGENTS.md files.
+ * Deliberately pitched at the level of shape, not implementation: each node says what
+ * it does, never where it lives. An earlier version carried a `source` field with
+ * repo paths and trigger config, which published an employer's internal layout
+ * for no reader benefit.
  */
 
 export const stages = [
@@ -60,8 +62,6 @@ export type ArchNode = {
   /** Lifecycle stages it spans (contiguous). */
   stages: Stage[];
   detail: string;
-  /** Where it lives in the repo. */
-  source?: string;
   /** Ids this node connects to (calls, spawns, or reads). */
   deps?: string[];
 };
@@ -75,7 +75,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Context", "Plan", "Build", "Review", "Ship"],
     detail:
       "Monorepo-wide house rules: the `task` runner as the single entry point, branch and commit conventions, and shipping through the project's own skills. Nested AGENTS.md files override it locally; nearest file wins.",
-    source: "/AGENTS.md · /CLAUDE.md",
   },
   {
     id: "ctx-area",
@@ -84,7 +83,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Context", "Build", "Review"],
     detail:
       "Every app and service carries its own AGENTS.md: the conventions, patterns, and pitfalls for that part of the stack. Agents read the nearest one, so each change is judged by the right local rules.",
-    source: "nested AGENTS.md, one per area",
   },
 
   // ── Skills ───────────────────────────────────────────────
@@ -96,7 +94,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Ship"],
     detail:
       "Stages only the relevant files, branches off main when needed, and writes a conventional-commit message, never a blind git add -A.",
-    source: ".agents/skills/commit",
     deps: ["ctx-root"],
   },
   {
@@ -107,7 +104,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Ship"],
     detail:
       "The full ship: commit, push with tracking, and open a GitHub PR with a structured body (references, change list, demo steps) after pre-flighting the gh CLI and auth.",
-    source: ".agents/skills/pr",
     deps: ["skill-commit", "ctx-root"],
   },
   {
@@ -118,7 +114,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Review"],
     detail:
       "Runs a full review pipeline and adds the stack reviewers to the persona pool, picked by what the change touches. Findings flow through one merge/dedup pass into a single structured report.",
-    source: ".agents/skills/review",
     deps: ["rev-stack"],
   },
   {
@@ -129,7 +124,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Operate"],
     detail:
       "An admin loop that audits authored PRs, commits, and reviews over a period, links each to its ticket (e.g. Linear), estimates the hours, and writes the summary back to a sheet.",
-    source: ".agents/skills/report",
   },
   {
     id: "skill-context",
@@ -139,7 +133,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Operate"],
     detail:
       "Writes translator-ready context for the localization platform (e.g. Crowdin), disambiguating short words and ICU strings, and touching only the context field it owns.",
-    source: ".agents/skills/context-extraction",
   },
 
   // ── Reviewers (stack-specific personas) ──────────────────
@@ -151,7 +144,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Review"],
     detail:
       "A reviewer persona for each part of the stack. The review skill spawns only the ones a change touches and runs them in parallel; each checks its area against that area's rulebook, then findings merge into one report.",
-    source: ".agents/agents, one per area",
     deps: ["ctx-area"],
   },
 
@@ -163,16 +155,14 @@ export const archNodes: ArchNode[] = [
     stages: ["Context"],
     detail:
       "On session start (and on git worktree add, via post-checkout) copies .env and local secrets into a fresh worktree so codegen and tooling work immediately. One shared script, two triggers.",
-    source: "SessionStart · .githooks/post-checkout",
   },
   {
     id: "hook-csharpier",
     layer: "hook",
-    name: "Format C#",
+    name: "Format on write",
     stages: ["Build"],
     detail:
-      "A PostToolUse hook runs the formatter the moment a file is edited or written (e.g. CSharpier on .cs files), so formatting never reaches review.",
-    source: "settings.json · PostToolUse Edit/Write(*.cs)",
+      "A hook runs the language's formatter the moment a file is edited or written, so formatting never reaches review.",
   },
   {
     id: "hook-deps",
@@ -180,8 +170,7 @@ export const archNodes: ArchNode[] = [
     name: "Sync frontend deps",
     stages: ["Build"],
     detail:
-      "After any edit, if a frontend's package.json or lockfile changed, it runs npm install there to keep dependencies in sync automatically.",
-    source: "settings.json · PostToolUse",
+      "After any edit, if a frontend's package.json or lockfile changed, it installs there to keep dependencies in sync automatically.",
   },
   {
     id: "hook-verify",
@@ -190,7 +179,6 @@ export const archNodes: ArchNode[] = [
     stages: ["Test"],
     detail:
       "At session end, Stop hooks run across changed modules: typecheck, lint, and unit tests (e.g. Vitest, Jest), plus a pass that prunes unused imports.",
-    source: "settings.json · Stop",
   },
   {
     id: "hook-telemetry",
@@ -199,6 +187,5 @@ export const archNodes: ArchNode[] = [
     stages: ["Operate"],
     detail:
       "Fires an analytics event (e.g. Mixpanel) whenever a skill is invoked, caught at both the Skill tool and the slash-command path, to track adoption without blocking the call.",
-    source: "settings.json · PreToolUse · UserPromptSubmit",
   },
 ];

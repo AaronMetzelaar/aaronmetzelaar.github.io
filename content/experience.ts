@@ -14,32 +14,15 @@ export const experienceMeta = {
  * rather than a flat bullet list. Each area carries its own keyword row so a
  * recruiter (or an ATS) can scan the stack per theme. Only /cv renders this;
  * the homepage keeps using `experience` below.
+ *
+ * Order matches the homepage's: interfaces first, AI tooling as the edge on top
+ * of them. The two documents used to disagree about which one leads.
  */
 export const cvExperience: {
   area: string;
   bullets: string[];
   skills: string[];
 }[] = [
-  {
-    area: "AI tooling & developer productivity",
-    bullets: [
-      "Designed and maintained the internal AI agent ecosystem for frontend and mobile engineering",
-      "Built MCP servers, agent skills, and reusable workflows for codebase context, specialist code review, documentation, worktrees, and engineering automation",
-      "Standardised team-wide AI adoption through shared tooling, guidance, and quality controls",
-      "Increased AI co-authored PR adoption from 5% to 35% in four months",
-    ],
-    skills: [
-      "AI agents",
-      "Agentic workflows",
-      "MCP servers",
-      "Agent skills",
-      "LLM tooling",
-      "Prompt and context design",
-      "Workflow automation",
-      "Developer experience",
-      "AI enablement",
-    ],
-  },
   {
     area: "Frontend & product engineering",
     bullets: [
@@ -64,6 +47,26 @@ export const cvExperience: {
       "Component architecture",
       "Design systems",
       "Cross-platform frontend",
+    ],
+  },
+  {
+    area: "AI tooling & developer productivity",
+    bullets: [
+      "Designed and maintained the internal AI agent ecosystem for frontend and mobile engineering",
+      "Built MCP servers, agent skills, and reusable workflows for codebase context, specialist code review, documentation, worktrees, and engineering automation",
+      "Standardised team-wide AI adoption through shared tooling, guidance, and quality controls",
+      "Increased AI co-authored PR adoption from 5% to 35% in four months",
+    ],
+    skills: [
+      "AI agents",
+      "Agentic workflows",
+      "MCP servers",
+      "Agent skills",
+      "LLM tooling",
+      "Prompt and context design",
+      "Workflow automation",
+      "Developer experience",
+      "AI enablement",
     ],
   },
   {

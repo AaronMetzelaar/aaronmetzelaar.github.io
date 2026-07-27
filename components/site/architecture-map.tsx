@@ -245,7 +245,7 @@ function MobileMap({
         {stages.map((s, i) => {
           const nodes = archNodes
             .filter((n) => firstStage(n) === i)
-            .sort((a, b) => layerRank(a) - layerRank(b));
+            .toSorted((a, b) => layerRank(a) - layerRank(b));
           if (nodes.length === 0) {
             return null;
           }
@@ -463,15 +463,6 @@ function DetailPanel({
       <p className="mt-5 text-muted-fg text-sm leading-relaxed">
         {node.detail}
       </p>
-
-      {node.source ? (
-        <p className="mt-6 break-words text-[0.7rem] text-muted-fg tracking-[0.04em]">
-          <span className="text-fg/45 uppercase tracking-[0.16em]">
-            Lives in{" "}
-          </span>
-          {node.source}
-        </p>
-      ) : null}
 
       {conns.length > 0 ? (
         <div className="mt-5 border-border border-t pt-4">

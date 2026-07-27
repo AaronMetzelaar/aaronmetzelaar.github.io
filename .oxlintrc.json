@@ -1,12 +1,24 @@
 {
+  // Own config, no preset. This file used to extend ultracite's oxlint presets;
+  // the pinned 7.2.4 preset set `import/no-unresolved`, a rule oxlint 1.67
+  // dropped, so the whole lint step aborted on a config parse error and lint
+  // silently ran on zero files for months. Anything here is readable and ours.
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "extends": [
-    "./node_modules/ultracite/config/oxlint/core/.oxlintrc.json",
-    "./node_modules/ultracite/config/oxlint/react/.oxlintrc.json",
-    "./node_modules/ultracite/config/oxlint/next/.oxlintrc.json"
-  ],
-  "ignorePatterns": [".agents"],
+  "plugins": ["react", "typescript", "unicorn", "nextjs", "jsx-a11y"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "off"
+  },
   "rules": {
-    "max-statements": "off"
-  }
+    // React 19's automatic JSX runtime: no React import is needed in scope.
+    "react/react-in-jsx-scope": "off",
+    // `images: { unoptimized: true }` — a static export has no image optimizer,
+    // so next/image would add a wrapper and no benefit.
+    "nextjs/no-img-element": "off",
+    // The `role="img"` elements are canvases and background-image boxes that
+    // carry an aria-label; there is no <img> to swap them for.
+    "jsx-a11y/prefer-tag-over-role": "off"
+  },
+  "ignorePatterns": [".agents", "out", ".next"]
 }

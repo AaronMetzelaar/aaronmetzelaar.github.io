@@ -61,7 +61,7 @@ export default function Home() {
                 Interface to system
               </p>
               <ol className="mt-7 border-border border-l">
-                {trajectory.map((t, i) => (
+                {trajectory.map((t) => (
                   <li className="relative pb-8 pl-7 last:pb-0" key={t.k}>
                     <span
                       aria-hidden="true"
@@ -134,7 +134,7 @@ export default function Home() {
           <div className="relative mx-auto max-w-6xl px-6 py-[39rem] sm:px-10">
             <SectionHeader
               divider={false}
-              lead="The internal AI tooling my team builds with: the context, skills, reviewers, and hooks that turn AI output into work we can actually ship."
+              lead="The internal AI tooling my team builds with: the context, skills, reviewers, and hooks that turn AI output into work we can actually ship. I designed it and rolled it out, taking AI co-authored pull requests from 5% to 35% of the team's output in four months."
               title="Harness engineering"
             />
             <Reveal className="mt-10">
@@ -279,8 +279,10 @@ export default function Home() {
           <span className="text-[0.7rem] text-muted-fg uppercase tracking-[0.25em]">
             {site.name}
           </span>
+          {/* Build-time year: the deploy workflow rebuilds daily, so this stays
+              current without anyone remembering to change it in January. */}
           <span className="text-[0.7rem] text-muted-fg uppercase tracking-[0.25em]">
-            {site.location} · ©2026
+            {site.location} · ©{new Date().getFullYear()}
           </span>
         </footer>
       </div>

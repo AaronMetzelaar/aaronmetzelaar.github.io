@@ -1,3 +1,8 @@
+// oxlint-disable jsx-a11y/mouse-events-have-key-events -- the grid is marked
+// decorative below and holds nothing focusable, so there is no keyboard state
+// to mirror: the day tooltip is a pointer nicety and the year's total is stated
+// as text next to the graph, where a screen reader reads it in one sentence
+// instead of tabbing through 365 cells.
 "use client";
 
 import { useReducedMotion } from "motion/react";
@@ -106,7 +111,9 @@ export function GithubGraph({
       onPointerMove={onMove}
       ref={wrapRef}
     >
-      <div className="overflow-x-auto px-0.5 pb-0.5">
+      {/* Decorative: 365 bare divs are noise to a screen reader, and the number
+          they add up to is stated in text right below the graph. */}
+      <div aria-hidden="true" className="overflow-x-auto px-0.5 pb-0.5">
         <div className="min-w-[560px]">
           {/* month strip — one slot per week, label only where a month begins */}
           <div className="mb-1.5 flex gap-[3px]">

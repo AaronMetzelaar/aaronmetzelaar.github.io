@@ -2,7 +2,7 @@
 
 Personal portfolio and CV, live at **[aaronmetzelaar.nl](https://aaronmetzelaar.nl)**.
 
-One palette, one typeface, one accent colour. White canvas, near-black ink, deep blue, JetBrains Mono. Everything else is restraint.
+One palette, one typeface, one accent colour. White canvas, near-black ink, deep blue, JetBrains Mono, and a single italic Fraunces line where the page changes its voice. Everything else is restraint.
 
 ## Stack
 

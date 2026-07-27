@@ -18,7 +18,11 @@ import { isRevealed, triggerReveal } from "@/lib/page-reveal";
 // hero. One dot language, one continuous motion — no second system.
 // Formation chosen from the explored takes — see portrait-loader's CFG.
 const LOADER_VARIANT: LoaderVariant = "comet";
-const MIN_MS = 1600; // dwell: the ring fills as assets load
+// The visitor this site is for is skimming, often on a phone, and every ms here
+// is time they can't read. The dwell is the shortest that still reads as a beat
+// rather than a flash, and the whole sequence runs once per browser session.
+const MIN_MS = 600; // dwell: the ring fills as assets load
+const SEEN_KEY = "am:booted";
 const ASSEMBLE_MS = 1700; // ring -> portrait convergence shown on the overlay
 const REVEAL_MS = 650; // final dissolve onto the resting hero
 const CAP_MS = 7000; // safety: reveal even if an asset hangs
@@ -39,8 +43,8 @@ const LOW_RES_MEDIA = [...experience, ...creativeWork]
 function preloadImg(src: string) {
   return new Promise<void>((resolve) => {
     const im = new Image();
-    im.onload = () => resolve();
-    im.onerror = () => resolve();
+    im.addEventListener("load", () => resolve(), { once: true });
+    im.addEventListener("error", () => resolve(), { once: true });
     im.src = src;
   });
 }
@@ -112,17 +116,28 @@ export function Preloader() {
     };
   }, [visible, skip]);
 
-  // lock scroll while the overlay is up
+  // Boot once per browser session. The module-level reveal flag only survives
+  // client navigation, so a refresh or a return from an external link used to
+  // replay the whole sequence. Checked in an effect rather than in the initial
+  // state so the server and the first client render still agree.
   useEffect(() => {
-    if (!visible) {
-      return;
+    // sessionStorage throws when storage is blocked; the boot just replays then.
+    try {
+      if (sessionStorage.getItem(SEEN_KEY)) {
+        revealing.current = true;
+        triggerReveal();
+        setVisible(false);
+        return;
+      }
+      sessionStorage.setItem(SEEN_KEY, "1");
+    } catch {
+      // no-op
     }
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [visible]);
+  }, []);
+
+  // Deliberately no scroll lock. Holding the page still while the overlay plays
+  // makes the site feel broken to anyone who lands and immediately scrolls, and
+  // a scroll gesture already cuts the sequence short (see `skip`).
 
   // fill the ring up to ~99% over the dwell; beginReveal snaps it to 100
   useEffect(() => {
@@ -224,7 +239,7 @@ export function Preloader() {
       >
         <div className="text-center font-terminal">
           <p className="text-[0.62rem] text-muted-fg uppercase tracking-[0.4em]">
-            Laden
+            Loading
           </p>
           <p className="mt-2 font-bold text-[clamp(2.2rem,7vw,3.2rem)] text-accent leading-none tabular-nums">
             {Math.round(progress)}
