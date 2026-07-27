@@ -134,6 +134,13 @@ export function CreativeGallery({
   const enter = (i: number) => {
     setActive(i);
     setPlays((p) => p.map((v, idx) => (idx === i ? v + 1 : v)));
+    // Scrolling away from a hovered tile fires no pointerleave, so the focus
+    // used to latch: the page-wide blur overlay and the blurred section header
+    // (which holds this section's dot divider) stayed for the rest of the visit.
+    window.addEventListener("scroll", () => setActive(null), {
+      once: true,
+      passive: true,
+    });
   };
 
   if (!interactive) {

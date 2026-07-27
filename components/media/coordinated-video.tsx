@@ -106,6 +106,16 @@ export function CoordinatedVideo({
     }
   }, [warm]);
 
+  // Drop the hover claim if this clip goes away while holding it — a gallery
+  // swapping layouts (collage <-> card stack) used to leave the bus pointing at
+  // an id that no longer exists, which pauses every remaining clip forever.
+  useEffect(
+    () => () => {
+      clearHoveredMedia(id);
+    },
+    [id]
+  );
+
   // play/pause to match the resolved state
   useEffect(() => {
     const el = ref.current;

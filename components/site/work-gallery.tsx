@@ -145,13 +145,29 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
     setPlays((p) => p.map((v, idx) => (idx === i ? v + 1 : v)));
   };
 
+  // A hovered tile stops being hovered when the page scrolls under a stationary
+  // cursor, and the browser never says so (no pointerleave until the next
+  // pointer move). Left alone, the page-wide blur overlay stays up for the rest
+  // of the visit and everything behind it, dot dividers included, reads as
+  // out of focus. Pointer-driven focus therefore expires on the next scroll;
+  // keyboard focus does not, because tabbing scrolls the page itself.
+  const expireOnScroll = () => {
+    window.addEventListener("scroll", () => setActive(null), {
+      once: true,
+      passive: true,
+    });
+  };
+
   // Same focus state, three ways in. Hover belongs to fine pointers; tap belongs
   // to coarse ones (and toggles, so a second tap dismisses); keyboard focus
   // works on both, which is the part that didn't exist before.
   const focusProps = (i: number) =>
     fine
       ? {
-          onPointerEnter: () => enter(i),
+          onPointerEnter: () => {
+            enter(i);
+            expireOnScroll();
+          },
           onPointerLeave: () => setActive(null),
         }
       : {
@@ -205,6 +221,9 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
                   on && "scale-[1.05]"
                 )}
                 onBlur={() => setActive(null)}
+                // Any focus, mouse or keyboard: a click can't latch the blur on,
+                // because reaching the tile with a pointer already armed the
+                // scroll expiry above.
                 onFocus={() => enter(i)}
                 type="button"
                 {...focusProps(i)}
