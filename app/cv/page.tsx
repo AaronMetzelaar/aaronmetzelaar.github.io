@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { SHARE_CARD } from "@/app/layout";
 import { PageDots } from "@/components/site/page-dots";
 import { PrintCvButton } from "@/components/site/print-cv-button";
 import { PullLink } from "@/components/site/pull-link";
@@ -13,10 +15,33 @@ import {
 } from "@/content";
 import { premiumTheme } from "@/lib/premium-theme";
 
-export const metadata = {
-  title: "Aaron Metzelaar · CV",
-  description:
-    "Software engineer with three years of production Vue, Nuxt, React Native, and TypeScript at MWS, plus server-side, SQL, and cloud work. Product engineering, AI tooling, localisation infrastructure, and payments.",
+const CV_TITLE = "Aaron Metzelaar · CV";
+const CV_DESCRIPTION =
+  "Software engineer with three years of production Vue, Nuxt, React Native, and TypeScript at MWS, plus server-side, SQL, and cloud work. Product engineering, AI tooling, localisation infrastructure, and payments.";
+
+// The og:* block is spelled out because metadata is inherited, not merged per
+// field: with only `title` and `description` set here, a shared /cv link showed
+// the homepage's og:title, og:description and og:url — so the link printed on
+// applications announced itself as the homepage.
+export const metadata: Metadata = {
+  title: CV_TITLE,
+  description: CV_DESCRIPTION,
+  alternates: { canonical: "/cv" },
+  openGraph: {
+    type: "profile",
+    url: "/cv",
+    siteName: site.name,
+    title: CV_TITLE,
+    description: CV_DESCRIPTION,
+    locale: "en_NL",
+    images: [SHARE_CARD],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: CV_TITLE,
+    description: CV_DESCRIPTION,
+    images: [SHARE_CARD],
+  },
 };
 
 /*
