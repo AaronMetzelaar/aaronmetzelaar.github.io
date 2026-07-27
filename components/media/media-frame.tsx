@@ -18,6 +18,12 @@ type MediaFrameProps = {
   sizes?: string;
   /** Clean, ornament-free placeholder for refined/premium layouts. */
   minimal?: boolean;
+  /**
+   * Controlled playback for video media: the clip plays iff `play` (and in view),
+   * and never fetches until then. Omit for the autonomous behaviour (plays in
+   * view unless another piece of media is hovered).
+   */
+  play?: boolean;
 };
 
 const DEFAULT_SIZES = "(max-width: 768px) 100vw, 640px";
@@ -34,6 +40,7 @@ export function MediaFrame({
   priority,
   sizes = DEFAULT_SIZES,
   minimal,
+  play,
 }: MediaFrameProps) {
   if (!media) {
     return (
@@ -66,7 +73,9 @@ export function MediaFrame({
     );
   }
 
-  return <LazyVideo className={className} media={media} ratio={ratio} />;
+  return (
+    <LazyVideo className={className} media={media} play={play} ratio={ratio} />
+  );
 }
 
 function MediaPlaceholder({
@@ -149,10 +158,12 @@ function LazyVideo({
   media,
   ratio,
   className,
+  play,
 }: {
   media: Extract<MediaItem, { kind: "video" }>;
   ratio: number;
   className?: string;
+  play?: boolean;
 }) {
   // playback (in-view + hover coordination + reduced-motion poster) lives in
   // CoordinatedVideo; this just sets the box.
@@ -161,7 +172,12 @@ function LazyVideo({
       className={cn("relative overflow-hidden", className)}
       style={{ aspectRatio: String(ratio) }}
     >
-      <CoordinatedVideo alt={media.alt} poster={media.poster} src={media.src} />
+      <CoordinatedVideo
+        alt={media.alt}
+        play={play}
+        poster={media.poster}
+        src={media.src}
+      />
     </div>
   );
 }

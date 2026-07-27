@@ -26,10 +26,13 @@ function usePointerFine() {
 }
 
 /**
- * A link with an underline that wipes in on hover and an arrow glyph that
- * drifts toward the cursor and snaps back — the "pull" of the page in one
- * control. Wraps an anchor; pass the props you'd give an <a>. Still under
- * reduced motion / touch.
+ * A link that reads as a link before you touch it: a quiet hairline underline at
+ * rest, which fills to accent on hover while the arrow glyph drifts toward the
+ * cursor and snaps back — the "pull" of the page in one control. The underline
+ * used to be `scale-x-0` until hover, which meant that on any touch device
+ * (where hover never fires) the email address, the GitHub link, and the CV link
+ * were plain text with a glyph beside them. Wraps an anchor; pass the props
+ * you'd give an <a>. The drift is still under reduced motion / touch.
  */
 export function PullLink({
   children,
@@ -84,9 +87,15 @@ export function PullLink({
     >
       <span className="relative">
         {children}
+        {/* rest state: a hairline in ink, always there */}
         <span
           aria-hidden="true"
-          className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-500 ease-out group-hover:scale-x-100"
+          className="absolute -bottom-1 left-0 h-px w-full bg-fg/30"
+        />
+        {/* hover/focus: accent wipes across it left to right */}
+        <span
+          aria-hidden="true"
+          className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-500 ease-out group-focus-visible:scale-x-100 group-hover:scale-x-100"
         />
       </span>
       <motion.span

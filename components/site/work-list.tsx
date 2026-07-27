@@ -8,10 +8,18 @@ import { cn } from "@/lib/utils";
 
 /**
  * Touch / reduced-motion presentation for a set of work items: a stack of
- * tappable cards. Each one reads at a glance — number, title, one-line tagline —
- * and expands on tap to show what was built. Clear affordance so it's obviously
- * interactive. Shared by Selected Work and Creative work so both sections behave
- * the same on mobile.
+ * tappable cards. Each one reads at a glance — title, one-line tagline, the tag
+ * row — and expands on tap for what was built. This is the touch interface, not
+ * a fallback: everything the desktop collage reveals on hover is reachable here
+ * by tap, which is why the tags sit outside the expanded block and the card
+ * carries a visible pressed state.
+ *
+ * Video is opt-in. A collapsed card shows its poster with a PLAY affordance and
+ * fetches nothing; opening the card starts the clip and collapsing it stops.
+ * Autoplaying every tile in view cost a phone visitor ~10MB of video across a
+ * single scroll of the page.
+ *
+ * Shared by Selected Work and Creative so both behave the same on touch.
  */
 export function WorkList({ items }: { items: WorkItem[] }) {
   // start collapsed: each card reads at a glance (image + title + one line),
@@ -37,7 +45,7 @@ export function WorkList({ items }: { items: WorkItem[] }) {
           >
             <button
               aria-expanded={isOpen}
-              className="group block w-full text-left transition-[transform] duration-200 active:scale-[0.995]"
+              className="group block w-full text-left transition-[transform,opacity] duration-200 active:scale-[0.99] active:opacity-90"
               onClick={() => setOpen((c) => (c === i ? null : i))}
               type="button"
             >
@@ -49,6 +57,7 @@ export function WorkList({ items }: { items: WorkItem[] }) {
                     label={item.slug}
                     media={item.media}
                     minimal
+                    play={isOpen}
                   />
                 ) : (
                   <div
@@ -58,6 +67,25 @@ export function WorkList({ items }: { items: WorkItem[] }) {
                     style={{ backgroundImage: `url(${hero.src})` }}
                   />
                 )}
+                {/* says what the tap gets you: a still that becomes a clip.
+                    Hidden once it's playing — the motion is its own signal. */}
+                {item.media?.kind === "video" && !isOpen ? (
+                  <span className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-2 bg-bg/85 px-2.5 py-1.5 font-terminal text-[0.6rem] text-fg uppercase tracking-[0.2em]">
+                    <span aria-hidden="true" className="text-accent">
+                      ▶
+                    </span>
+                    Play
+                  </span>
+                ) : null}
+                {/* the extra stills exist; say how many so the tap has a promise */}
+                {extras.length > 0 && !isOpen ? (
+                  <span className="pointer-events-none absolute bottom-3 left-3 bg-bg/85 px-2.5 py-1.5 font-terminal text-[0.6rem] text-fg uppercase tracking-[0.2em]">
+                    <span aria-hidden="true" className="text-accent">
+                      +{extras.length}{" "}
+                    </span>
+                    more
+                  </span>
+                ) : null}
               </div>
 
               <div className="flex items-start justify-between gap-4 px-4 py-4">
@@ -70,6 +98,22 @@ export function WorkList({ items }: { items: WorkItem[] }) {
                       {item.tagline}
                     </p>
                   ) : null}
+                  {/* the tag row reads before the tap, not after it: on the
+                      desktop collage these are hover-revealed, and a phone has
+                      no hover to reveal them with */}
+                  <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
+                    {item.tags.map((t) => (
+                      <li
+                        className="font-terminal text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
+                        key={t}
+                      >
+                        <span aria-hidden="true" className="text-accent/55">
+                          →{" "}
+                        </span>
+                        {t}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
                 {/* affordance: a labelled toggle so it's clearly tappable */}
                 <span className="mt-0.5 flex shrink-0 items-center gap-1.5 font-terminal text-[0.6rem] text-muted-fg uppercase tracking-[0.16em]">
@@ -114,19 +158,6 @@ export function WorkList({ items }: { items: WorkItem[] }) {
                     ))}
                   </div>
                 ) : null}
-                <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
-                  {item.tags.map((t) => (
-                    <li
-                      className="font-terminal text-[0.6rem] text-muted-fg uppercase tracking-[0.2em]"
-                      key={t}
-                    >
-                      <span aria-hidden="true" className="text-accent/55">
-                        →{" "}
-                      </span>
-                      {t}
-                    </li>
-                  ))}
-                </ul>
               </div>
             ) : null}
           </li>

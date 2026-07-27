@@ -76,9 +76,13 @@ export function CoordinatedVideo({
   // clips from fetching). By the time it's asked to play, frames are buffered,
   // so the poster overlay lifts almost immediately instead of stalling on a
   // network fetch.
+  //
+  // Controlled clips that aren't playing never warm: on touch, where playback is
+  // opt-in (a card has to be opened), scrolling the page used to pull ~10MB of
+  // video nobody asked to watch.
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduced) {
+    if (!el || reduced || (!autonomous && !play)) {
       return;
     }
     const io = new IntersectionObserver(
@@ -92,7 +96,7 @@ export function CoordinatedVideo({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [reduced]);
+  }, [reduced, autonomous, play]);
 
   // Kick off the actual fetch once warmed. `load()` is a method call, not a
   // React-tracked attribute, so it's safe to run imperatively post-hydration.

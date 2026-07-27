@@ -89,12 +89,21 @@
    rest; on hover the word bolds (weight axis — monospace, so no layout shift)
    and turns accent while its icon springs to its active state. Only the hovered
    word animates. The enter transition lives on :hover; the base rule holds the
-   quicker exit, so releasing reverses fast and fades back to gray. */
+   quicker exit, so releasing reverses fast and fades back to gray.
+
+   The underline is at rest, not on hover: grey words with a small icon inside an
+   already-grey paragraph didn't read as links at all on a phone, where the
+   hover state never arrives. */
 .intro-link {
   color: var(--muted-fg);
   font-variation-settings: "wght" 400;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--fg) 30%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
   transition:
     color 0.14s ease,
+    text-decoration-color 0.14s ease,
     font-variation-settings 0.14s ease;
 }
 
@@ -102,8 +111,10 @@
 .intro-link:focus-visible {
   color: var(--accent);
   font-variation-settings: "wght" 700;
+  text-decoration-color: var(--accent);
   transition:
     color 0.26s ease,
+    text-decoration-color 0.26s ease,
     font-variation-settings 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

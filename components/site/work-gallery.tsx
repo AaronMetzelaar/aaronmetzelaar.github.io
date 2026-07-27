@@ -55,30 +55,34 @@ function useWide() {
 
 /**
  * Selected Work. Two presentations from one data set:
- *  - Fine pointer (desktop): a scattered image collage. Each image leans toward
- *    the cursor; hovering one enlarges it and blurs the rest, and its tagline +
- *    tags reveal beneath.
- *  - Touch / reduced motion (mobile): a stack of tappable cards. Each one reads
- *    at a glance — number, title, one-line tagline — and expands on tap to show
- *    what was built. Clear affordance so it's obviously interactive.
+ *  - 640px and up: a scattered image collage. Each image leans toward the cursor
+ *    (fine pointers only); focusing one — by hover, by tap, or by keyboard —
+ *    enlarges it, blurs the rest, and reveals its tagline + tags beneath.
+ *  - Phones / reduced motion: a stack of tappable cards (WorkList), which shows
+ *    strictly more per item and needs no pointer at all.
+ *
+ * The collage used to require a fine pointer, so a tablet fell back to the card
+ * stack, and its tiles were plain <figure>s with pointer handlers: no tab stop,
+ * so a keyboard visitor got four titles and could never reach a tagline. The
+ * tile is a real button now and every input can drive the same focus state.
  */
 export function WorkGallery({ items }: { items: WorkItem[] }) {
   const reduced = !!useReducedMotion();
-  const fine = usePointerFine();
   const wide = useWide();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
-  const interactive = mounted && fine && wide && !reduced;
 
-  if (!interactive) {
+  if (!(mounted && wide) || reduced) {
     return <WorkList items={items} />;
   }
   return <WorkCollage items={items} />;
 }
 
-// ── Desktop / fine pointer: the scattered, cursor-reactive collage ──
+// ── 640px and up: the scattered collage. Cursor-reactive on a fine pointer,
+//    tap-to-focus on a coarse one, focusable either way ──
 function WorkCollage({ items }: { items: WorkItem[] }) {
+  const fine = usePointerFine();
   const [active, setActive] = useState<number | null>(null);
   const [plays, setPlays] = useState(() => items.map(() => 0));
 
@@ -91,6 +95,10 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
   // box. Read all rects, then write all transforms (no thrash); base centre =
   // rect centre minus the lean already applied, so it never feeds back.
   useEffect(() => {
+    // No cursor, no lean — and no reason to hold a 60fps loop open for it.
+    if (!fine) {
+      return;
+    }
     const onPointer = (e: PointerEvent) => {
       pointer.current = { x: e.clientX, y: e.clientY };
     };
@@ -130,22 +138,35 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onPointer);
     };
-  }, []);
+  }, [fine]);
 
   const enter = (i: number) => {
     setActive(i);
     setPlays((p) => p.map((v, idx) => (idx === i ? v + 1 : v)));
   };
 
+  // Same focus state, three ways in. Hover belongs to fine pointers; tap belongs
+  // to coarse ones (and toggles, so a second tap dismisses); keyboard focus
+  // works on both, which is the part that didn't exist before.
+  const focusProps = (i: number) =>
+    fine
+      ? {
+          onPointerEnter: () => enter(i),
+          onPointerLeave: () => setActive(null),
+        }
+      : {
+          onClick: () => (active === i ? setActive(null) : enter(i)),
+        };
+
   return (
     <div className="relative block aspect-[5/6]">
-      {/* the collage responds to hover, not click — say so up front, in the
-          page's micro-caps voice, so the interaction isn't a secret */}
+      {/* name the gesture that actually works on this device, in the page's
+          micro-caps voice, so the interaction isn't a secret */}
       <p className="-top-6 pointer-events-none absolute right-0 flex items-center gap-2 text-[0.62rem] text-accent uppercase tracking-[0.25em]">
         <span aria-hidden="true" className="nudge-x">
           ↔
         </span>
-        Hover an image to focus
+        {fine ? "Hover an image to focus" : "Tap an image to focus"}
       </p>
       {/* focus: blur the whole page behind the hovered image so only it stays sharp */}
       {active !== null ? (
@@ -173,15 +194,20 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
                 cardRefs.current[i] = el;
               }}
             >
-              {/* the image is the only hover target for the zoom/blur — the
-                  title/tags live in the figcaption, so nothing is gated here */}
-              <div
+              {/* the image is the focus target for the zoom/blur. A button, not
+                  a div: it takes keyboard focus, announces its state, and gives
+                  a coarse pointer something real to tap. */}
+              <button
+                aria-expanded={on}
+                aria-label={item.title}
                 className={cn(
-                  "origin-center transition-transform duration-500 ease-out",
+                  "block w-full origin-center transition-transform duration-500 ease-out",
                   on && "scale-[1.05]"
                 )}
-                onPointerEnter={() => enter(i)}
-                onPointerLeave={() => setActive(null)}
+                onBlur={() => setActive(null)}
+                onFocus={() => enter(i)}
+                type="button"
+                {...focusProps(i)}
               >
                 <MediaFrame
                   aspect={4 / 3}
@@ -190,7 +216,7 @@ function WorkCollage({ items }: { items: WorkItem[] }) {
                   media={item.media}
                   minimal
                 />
-              </div>
+              </button>
 
               {/* title UNDER the image, in accent; name scramble-decodes on hover */}
               <figcaption className="relative mt-4">
