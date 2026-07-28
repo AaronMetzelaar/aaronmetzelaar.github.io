@@ -28,6 +28,8 @@ export function CoordinatedVideo({
   alt,
   className,
   play,
+  preload: preloadNow,
+  onStarted,
 }: {
   src: string;
   poster: string;
@@ -39,6 +41,15 @@ export function CoordinatedVideo({
    * plays in view unless another media is hovered, broadcasting its own hover.
    */
   play?: boolean;
+  /**
+   * Start fetching without playing. A controlled clip otherwise waits for `play`
+   * before it touches the network, so the first tap paid for the whole download
+   * and felt broken. Set this on hover or focus — intent, not sight — and the
+   * bytes are there by the time someone clicks.
+   */
+  preload?: boolean;
+  /** Fires when the first frame is painted, so a parent can drop its own affordance. */
+  onStarted?: () => void;
 }) {
   const id = useId();
   const ref = useRef<HTMLVideoElement>(null);
@@ -77,14 +88,26 @@ export function CoordinatedVideo({
   // so the poster overlay lifts almost immediately instead of stalling on a
   // network fetch.
   //
-  // Controlled clips that aren't playing never warm: on touch, where playback is
-  // opt-in (a card has to be opened), scrolling the page used to pull ~10MB of
-  // video nobody asked to watch.
+  // Controlled clips warm only once asked (`play`) or once the parent signals
+  // intent (`preload`, e.g. hover). Warming every controlled clip on sight is
+  // what used to pull ~10MB of video across a phone scroll for tiles nobody
+  // opened; waiting for the click alone is what made the first play feel broken.
   useEffect(() => {
     const el = ref.current;
-    if (!el || reduced || (!autonomous && !play)) {
+    if (!el || reduced) {
       return;
     }
+    // Asked for, by intent or by playing: fetch now. Whoever asked is looking at
+    // it, so there's nothing to wait for.
+    if (preloadNow || play) {
+      setWarm(true);
+      return;
+    }
+    // Controlled and not asked: stay cold.
+    if (!autonomous) {
+      return;
+    }
+    // Autonomous: fetch just before it arrives, so playback starts on sight.
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -96,7 +119,7 @@ export function CoordinatedVideo({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [reduced, autonomous, play]);
+  }, [reduced, autonomous, play, preloadNow]);
 
   // Kick off the actual fetch once warmed. `load()` is a method call, not a
   // React-tracked attribute, so it's safe to run imperatively post-hydration.
@@ -147,7 +170,10 @@ export function CoordinatedVideo({
         className={cn("h-full w-full object-cover", className)}
         loop
         muted
-        onPlaying={() => setStarted(true)}
+        onPlaying={() => {
+          setStarted(true);
+          onStarted?.();
+        }}
         onPointerEnter={autonomous ? () => setHoveredMedia(id) : undefined}
         onPointerLeave={autonomous ? () => clearHoveredMedia(id) : undefined}
         playsInline
