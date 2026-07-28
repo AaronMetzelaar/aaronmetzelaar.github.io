@@ -18,11 +18,10 @@ import { cn } from "@/lib/utils";
 /**
  * Creative work as one band: film first, then the poster series.
  *
- * The parallax happens INSIDE each frame. Every tile is a fixed window with the
- * image oversized within it, and scroll pans the image behind the window rather
- * than sliding the tile around the page. Tiles that drift as a whole only shift
- * the layout; a frame that holds still while its image moves reads as depth, and
- * it can't collide with its neighbours. The frames stay put, the pictures move.
+ * The motion happens INSIDE each frame: the frame is a fixed window and scroll
+ * drives the image within it, rather than sliding the tile around the page. Tiles
+ * that drift as a whole only shift the layout, and they threaten to collide with
+ * their neighbours on a narrow screen. The frames stay put; the pictures move.
  *
  * Sizing is set by the source material. The stills are 1440x1800 and can carry
  * width; the film is 540x960, so anything wider than ~270 CSS px upscales it on a
@@ -30,22 +29,18 @@ import { cn } from "@/lib/utils";
  * soft. It's the small element, on the left.
  */
 
-// Image height inside each frame, and the slack that leaves above and below.
-// PAN below is a percentage of the IMAGE's height, so the travel in frame terms
-// is pan * 1.28 — keep it clear of SLACK or an empty edge shows at the extremes.
-// At 128% the sides crop by 14%, and the "is een Ridder" line spans roughly 28%
-// to 72% of the poster, so the type survives the crop.
-// (The reference for this, bymonolog.com, does the same thing with a scale(1.15)
-// image inside an overflow:clip parent.)
-const OVERSIZE = "h-[128%]";
-const SLACK = "-top-[14%]";
-
-// Per-frame travel, in percent of image height. All one sign on purpose: every
-// image drifts DOWN as the page scrolls down, which is what "slower than the
-// page" looks like from inside a frame. Depth comes from the rates, biggest frame
-// travelling most. Opposing directions in adjacent frames just reads as sliding.
-// Max is 9, so 9 * 1.28 = 11.5% of the frame against 14% of slack.
-const PAN = [6, 9, 7, 6];
+// The motion is a scroll-linked scale anchored to the TOP of each frame, not a
+// vertical pan. Panning is geometrically incompatible with keeping the emblem:
+// to pan, the image must be taller than its frame, so the frame's top edge always
+// sits below the image's top edge, and the only offset that shows the emblem is
+// zero — i.e. no movement. (Panning sideways doesn't save it either: widening a
+// 4:5 image inside a 4:5 frame via object-cover crops it vertically again.)
+//
+// Scaling from `top center` pins the top edge. The crest and the "is een Ridder"
+// line stay put at every scroll position; the crop happens at the bottom, plus a
+// symmetric sliver off each side. Scale never goes below 1, so no frame can ever
+// show an empty edge — the failure mode a pan had to be measured against.
+const ZOOM = [1.06, 1.1, 1.08, 1.06];
 
 // Width and vertical offset per frame at lg+. Below that the band is a plain
 // two-column grid — a collage needs room a phone hasn't got.
@@ -74,10 +69,10 @@ export function CreativeStrip({ items }: { items: WorkItem[] }) {
   const video = film?.media?.kind === "video" ? film.media : null;
   const stills = items.flatMap((i) => i.gallery ?? []);
 
-  // frame 0 is the film; the stills follow it, so their LAYER/PAN index is i + 1
+  // frame 0 is the film; the stills follow it, so their LAYER/ZOOM index is i + 1
   const at = (i: number) => ({
     className: cn("min-w-0", LAYER[i % LAYER.length]),
-    pan: reduced ? 0 : PAN[i % PAN.length],
+    zoom: reduced ? 1 : ZOOM[i % ZOOM.length],
   });
 
   return (
@@ -95,12 +90,12 @@ export function CreativeStrip({ items }: { items: WorkItem[] }) {
         >
           {video ? (
             <div className={at(0).className}>
-              <Film pan={at(0).pan} progress={progress} video={video} />
+              <Film progress={progress} video={video} zoom={at(0).zoom} />
             </div>
           ) : null}
           {stills.map((still, i) => (
             <div className={at(i + 1).className} key={still.src}>
-              <Still pan={at(i + 1).pan} progress={progress} still={still} />
+              <Still progress={progress} still={still} zoom={at(i + 1).zoom} />
             </div>
           ))}
         </div>
@@ -125,21 +120,24 @@ export function CreativeStrip({ items }: { items: WorkItem[] }) {
   );
 }
 
-/** Travel for one frame's image, as a percentage of that image's own height. */
-function usePan(progress: MotionValue<number>, pan: number) {
-  return useTransform(progress, [0, 1], [`${-pan}%`, `${pan}%`]);
+/** 1 at the start of the band's pass, `zoom` at the end. Never below 1. */
+function useZoom(progress: MotionValue<number>, zoom: number) {
+  return useTransform(progress, [0, 1], [1, zoom]);
 }
+
+// Anchored to the top edge, so the image grows downward and the emblem never moves.
+const ANCHOR_TOP = { transformOrigin: "top center" };
 
 function Still({
   still,
-  pan,
+  zoom,
   progress,
 }: {
   still: { src: string; alt: string };
-  pan: number;
+  zoom: number;
   progress: MotionValue<number>;
 }) {
-  const y = usePan(progress, pan);
+  const scale = useZoom(progress, zoom);
   return (
     <div
       className="relative overflow-hidden border border-border"
@@ -147,14 +145,10 @@ function Still({
     >
       <motion.img
         alt={still.alt}
-        className={cn(
-          "absolute inset-x-0 w-full object-cover",
-          OVERSIZE,
-          SLACK
-        )}
+        className="absolute inset-0 h-full w-full object-cover"
         loading="lazy"
         src={still.src}
-        style={{ y }}
+        style={{ scale, ...ANCHOR_TOP }}
       />
     </div>
   );
@@ -164,18 +158,18 @@ function Still({
  * The film: a still until it's asked for. Hover or focus starts the fetch so the
  * click plays immediately; the label says "Loading" while the bytes are in
  * flight, because a poster sitting still after a tap reads as broken. The badge
- * is pinned to the frame, not to the panning image.
+ * sits outside the scaling layer, so it stays put while the picture grows.
  */
 function Film({
   video,
-  pan,
+  zoom,
   progress,
 }: {
   video: Extract<MediaItem, { kind: "video" }>;
-  pan: number;
+  zoom: number;
   progress: MotionValue<number>;
 }) {
-  const y = usePan(progress, pan);
+  const scale = useZoom(progress, zoom);
   const [playing, setPlaying] = useState(false);
   const [wanted, setWanted] = useState(false);
   const [started, setStarted] = useState(false);
@@ -191,10 +185,7 @@ function Film({
       style={{ aspectRatio: `${video.width} / ${video.height}` }}
       type="button"
     >
-      <motion.div
-        className={cn("absolute inset-x-0", OVERSIZE, SLACK)}
-        style={{ y }}
-      >
+      <motion.div className="absolute inset-0" style={{ scale, ...ANCHOR_TOP }}>
         <CoordinatedVideo
           alt={video.alt}
           onStarted={() => setStarted(true)}
