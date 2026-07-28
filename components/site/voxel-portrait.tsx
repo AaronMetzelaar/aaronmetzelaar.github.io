@@ -498,6 +498,11 @@ export function VoxelPortrait({
   camZ?: number; // camera distance (zoom)
 }) {
   const reduced = !!useReducedMotion();
+  const shell = useRef<HTMLDivElement>(null);
+  // The sway kept this scene rendering at 60fps for the whole visit, including
+  // the ~10,000px of page below the hero, where it competes with scrolling for
+  // frames and shows up as nothing but heat. Render only while it's on screen.
+  const [onScreen, setOnScreen] = useState(true);
   const drag = useRef<DragState>({
     active: false,
     lastX: 0,
@@ -512,6 +517,16 @@ export function VoxelPortrait({
     curX: 0,
     curY: 0,
   });
+
+  useEffect(() => {
+    const el = shell.current;
+    if (!el) {
+      return;
+    }
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     // drag-to-turn is user-initiated, so it works even under reduced motion
@@ -610,11 +625,13 @@ export function VoxelPortrait({
       onPointerLeave={onUp}
       onPointerMove={onMove}
       onPointerUp={onUp}
+      ref={shell}
       role="img"
     >
       <Canvas
         camera={{ position: [0, 0, camZ], fov: 32 }}
         dpr={[1, 2]}
+        frameloop={onScreen ? "always" : "never"}
         gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}
         style={{ inset: 0, position: "absolute" }}
       >

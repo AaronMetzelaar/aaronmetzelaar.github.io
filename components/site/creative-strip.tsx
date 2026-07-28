@@ -5,7 +5,6 @@ import {
   type MotionValue,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
 } from "motion/react";
 import { useRef, useState } from "react";
@@ -41,17 +40,12 @@ import { cn } from "@/lib/utils";
 const OVERSIZE = "h-[128%]";
 const SLACK = "-top-[14%]";
 
-// Per-frame travel, in percent of image height, signed. Different rates and
-// mixed directions: the same rate everywhere reads as one sheet sliding. Max
-// here is 9, so 9 * 1.28 = 11.5% of the frame against 14% of slack — a couple of
-// percent of headroom at every frame size rather than the 1px I first left.
-const PAN = [-7, 9, -8, 9];
-
-// Raw scroll position drives the pan one wheel-notch at a time, which reads as
-// steppy. A spring on the progress value smooths it into a drift that lags the
-// scroll slightly — the part of a Lenis-style page that actually sells the depth,
-// without taking over the page's scrolling to get it.
-const SMOOTH = { stiffness: 90, damping: 28, mass: 0.35, restDelta: 0.0005 };
+// Per-frame travel, in percent of image height. All one sign on purpose: every
+// image drifts DOWN as the page scrolls down, which is what "slower than the
+// page" looks like from inside a frame. Depth comes from the rates, biggest frame
+// travelling most. Opposing directions in adjacent frames just reads as sliding.
+// Max is 9, so 9 * 1.28 = 11.5% of the frame against 14% of slack.
+const PAN = [6, 9, 7, 6];
 
 // Width and vertical offset per frame at lg+. Below that the band is a plain
 // two-column grid — a collage needs room a phone hasn't got.
@@ -66,11 +60,15 @@ export function CreativeStrip({ items }: { items: WorkItem[] }) {
   const band = useRef<HTMLDivElement>(null);
   const reduced = !!useReducedMotion();
   // 0 as the band's top meets the viewport bottom, 1 as its bottom leaves the top
-  const { scrollYProgress } = useScroll({
+  // Driven straight off scroll position, no spring in between. A spring here
+  // decouples the pan from the input — it lags while you scroll and keeps moving
+  // after you stop, which feels mushy rather than smooth. Smooth-scroll libraries
+  // (Lenis) get their feel by smoothing the scroll position everything reads,
+  // not by damping one effect downstream of it.
+  const { scrollYProgress: progress } = useScroll({
     target: band,
     offset: ["start end", "end start"],
   });
-  const progress = useSpring(scrollYProgress, SMOOTH);
 
   const film = items.find((i) => i.media?.kind === "video");
   const video = film?.media?.kind === "video" ? film.media : null;
