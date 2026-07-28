@@ -1,7 +1,7 @@
 import { Reveal } from "@/components/motion/reveal";
 import { ArchitectureMap } from "@/components/site/architecture-map";
 import { Contributions } from "@/components/site/contributions";
-import { CreativeShowcase } from "@/components/site/creative-showcase";
+import { CreativeStrip } from "@/components/site/creative-strip";
 import { Hero } from "@/components/site/hero";
 import { PageDots } from "@/components/site/page-dots";
 import { Preloader } from "@/components/site/preloader";
@@ -108,52 +108,49 @@ export default function Home() {
             page through the dot grid (SectionDotEdges): the page's dots ink up
             into solid at the top and fade back out at the bottom. The nav
             inverts while the solid body is behind it. */}
+        {/* --ramp is the height of one dot-ramp edge, and therefore also the
+            section's padding: the ramps sit in the padding, the solid body fills
+            the rest. It shrinks on small screens because 600px of transition is
+            most of a phone screen at each end — two screens of dissolve for one
+            screen of content. The canvases and the nav's invert threshold both
+            read this one value. */}
         <section
-          className="relative isolate mt-16 text-fg sm:mt-24"
+          className="relative isolate mt-16 py-[var(--ramp)] text-fg sm:mt-24 [--ramp:18rem] sm:[--ramp:26rem] lg:[--ramp:37.5rem]"
           id="ai"
           style={darkSection}
         >
-          {/* Solid body — also the SSR fallback so content reads before the
-              canvas paints; the dotted edges overlay the top/bottom 600px.
-
-              Note for future audits: because this fill is a positioned SIBLING
-              of the text rather than an ancestor of it, every contrast checker
-              (the impeccable detector, axe, Lighthouse) walks up from the text,
-              never finds it, and reports this section's light-on-dark type as
-              light-on-WHITE. Those failures are not real. Measured against the
-              actual painted #0a0a0b: body #b6b6c0 is 9.84:1 and accent #5e76ff
-              is 5.19:1, both comfortably past AA. Moving the fill onto the
-              section would fix the tooling but requires inverting the dot-ramp
-              canvases to paint white-over-dark, which changes a signature
-              effect; not worth it for a checker's benefit. */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 top-[600px] bottom-[600px] bg-bg"
-          />
           <SectionDotEdges />
-          <div className="relative mx-auto max-w-6xl px-6 py-[39rem] sm:px-10">
-            <SectionHeader
-              divider={false}
-              lead="The internal AI tooling my team builds with: the context, skills, reviewers, and hooks that turn AI output into work we can actually ship. I designed it and rolled it out, taking AI co-authored pull requests from 5% to 35% of the team's output in four months."
-              title="Harness engineering"
-            />
-            <Reveal className="mt-10">
-              <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-                {layers.map((l) => (
-                  <div key={l.id}>
-                    <p className="text-[0.7rem] uppercase tracking-[0.25em]">
-                      {l.label}
-                    </p>
-                    <p className="mt-3 text-muted-fg text-sm leading-relaxed">
-                      {l.blurb}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-            <Reveal className="mt-14">
-              <ArchitectureMap />
-            </Reveal>
+          {/* The solid body WRAPS the content rather than sitting beside it. As a
+              positioned sibling it was invisible to contrast checkers, which walk
+              up from the text, never found a background, and reported this
+              section's light-on-dark type as light-on-white — a page full of
+              failures that weren't real. As an ancestor it reports the truth
+              (body #b6b6c0 on #0a0a0b is 9.84:1). Same geometry, same paint. */}
+          <div className="relative bg-bg">
+            <div className="mx-auto max-w-6xl px-6 sm:px-10">
+              <SectionHeader
+                divider={false}
+                lead="The internal AI tooling my team builds with: the context, skills, reviewers, and hooks that turn AI output into work we can actually ship. I designed it and rolled it out, taking AI co-authored pull requests from 5% to 35% of the team's output in four months."
+                title="Harness engineering"
+              />
+              <Reveal className="mt-10">
+                <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+                  {layers.map((l) => (
+                    <div key={l.id}>
+                      <p className="text-[0.7rem] uppercase tracking-[0.25em]">
+                        {l.label}
+                      </p>
+                      <p className="mt-3 text-muted-fg text-sm leading-relaxed">
+                        {l.blurb}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+              <Reveal className="mt-14">
+                <ArchitectureMap />
+              </Reveal>
+            </div>
           </div>
         </section>
 
@@ -218,7 +215,7 @@ export default function Home() {
           className="mx-auto max-w-6xl px-6 py-24 sm:px-10 sm:py-32"
           id="creative"
         >
-          <CreativeShowcase items={creativeWork} />
+          <CreativeStrip items={creativeWork} />
         </section>
 
         {/* Contact */}

@@ -3,9 +3,10 @@ import type { WorkItem } from "./types";
 export const creativeWork: WorkItem[] = [
   {
     slug: "promo-video",
-    title: "Promo videos",
+    title: "Film",
+    // Leads with the craft; the association is a credit, not the headline.
     summary:
-      "Event recaps and recruitment films for my student association. Shot and cut by me.",
+      "Event recaps and recruitment films, shot and cut by me for my student association.",
     tags: ["Video", "Editing", "Storytelling"],
     media: {
       kind: "video",
@@ -18,9 +19,9 @@ export const creativeWork: WorkItem[] = [
   },
   {
     slug: "social",
-    title: "Posters & social",
+    title: "Poster series",
     summary:
-      "Recruitment posters and social posts I designed for my student association, like the 'is een Ridder' series.",
+      "Recruitment posters and social posts I designed, including the 'is een Ridder' run for my student association.",
     tags: ["Graphic design", "Posters", "Social"],
     // first = the hero still; the rest fan out on hover
     gallery: [

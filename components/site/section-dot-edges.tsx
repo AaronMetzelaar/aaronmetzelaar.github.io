@@ -8,8 +8,9 @@ import { useEffect, useRef } from "react";
 // Tinted from the page's blue dots into ink. Two fixed-height edge canvases
 // (cheap; no thousands of DOM dots); the solid middle is plain CSS.
 
-export const SECTION_RAMP = 600; // px height of each edge transition
-
+// Each edge's height comes from the section's --ramp (see app/page.tsx), so the
+// ramp can shrink on small screens without a second source of truth. The canvas
+// measures itself; the nav reads the same value off the section's padding.
 const G = 30; // page dot grid
 const S_MIN = 3;
 const S_EXPO = 1.8;
@@ -100,17 +101,19 @@ export function SectionDotEdges() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       for (const [canvas, solidAtTop, seed] of edges) {
         const w = canvas?.parentElement?.clientWidth ?? 0;
-        if (!(canvas && w)) {
+        // CSS gives the canvas its height (--ramp); the bitmap follows it
+        const h = canvas?.clientHeight ?? 0;
+        if (!(canvas && w && h)) {
           continue;
         }
         canvas.width = Math.round(w * dpr);
-        canvas.height = Math.round(SECTION_RAMP * dpr);
+        canvas.height = Math.round(h * dpr);
         const ctx = canvas.getContext("2d");
         if (!ctx) {
           continue;
         }
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        drawRamp(ctx, w, SECTION_RAMP, solidAtTop, seed);
+        drawRamp(ctx, w, h, solidAtTop, seed);
       }
     };
     let raf = 0;
@@ -138,12 +141,12 @@ export function SectionDotEdges() {
     <>
       <canvas
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[600px] w-full"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[var(--ramp)] w-full"
         ref={topRef}
       />
       <canvas
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[600px] w-full"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[var(--ramp)] w-full"
         ref={botRef}
       />
     </>
